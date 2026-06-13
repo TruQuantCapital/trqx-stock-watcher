@@ -17,6 +17,7 @@ async function load() {
   render();
   calcIncome();
   renderGrowthScanner();
+  renderPortfolioBuilder();
   setStatus("Saved stock universe loaded. Click Refresh Market Data for live prices.");
 }
 
@@ -25,21 +26,40 @@ function setStatus(message) {
   if (el) el.textContent = message || "";
 }
 
+function bindControl(id, callback) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  const handler = () => {
+    // Delay one frame so select/input value is fully committed before recalculation.
+    requestAnimationFrame(() => callback());
+  };
+
+  el.addEventListener("input", handler);
+  el.addEventListener("change", handler);
+  el.addEventListener("keyup", handler);
+}
+
 function setupFilters() {
   const sectors = [...new Set(stocks.map((s) => s.sector).filter(Boolean))].sort();
   const sel = document.getElementById("sector");
+
   sectors.forEach((s) => {
-    if (![...sel.options].some((o) => o.value === s)) sel.insertAdjacentHTML("beforeend", `<option>${s}</option>`);
+    if (![...sel.options].some((o) => o.value === s)) {
+      sel.insertAdjacentHTML("beforeend", `<option>${s}</option>`);
+    }
   });
 
   ["search", "sector", "signal", "viewMode"].forEach((id) => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener("input", render);
+    bindControl(id, render);
   });
 
   ["growthCapital", "growthGoal", "maxPrice", "minPrice", "riskMode", "qualityMode"].forEach((id) => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener("input", renderGrowthScanner);
+    bindControl(id, renderGrowthScanner);
+  });
+
+  ["portfolioCapital", "portfolioGoal", "portfolioRisk"].forEach((id) => {
+    bindControl(id, renderPortfolioBuilder);
   });
 }
 
@@ -64,6 +84,15 @@ function opportunityClass(score) {
   if (score >= 85) return "strong";
   if (score >= 70) return "watch";
   return "avoid";
+}
+
+function getAIRating(score) {
+  score = Number(score) || 0;
+  if (score >= 95) return { label: "A+ Elite", cls: "elite" };
+  if (score >= 85) return { label: "A Strong", cls: "strong" };
+  if (score >= 70) return { label: "B Watch", cls: "watch" };
+  if (score >= 50) return { label: "C Spec", cls: "medium" };
+  return { label: "D Avoid", cls: "low" };
 }
 
 function confidenceForStock(s) {
@@ -96,13 +125,88 @@ function confidenceForStock(s) {
     else warnings.push("extreme volatility");
   }
 
-  if (sector.includes("real estate") || sector.includes("utilities") || sector.includes("consumer staples")) {
-    points += 5;
-  }
+  if (sector.includes("real estate") || sector.includes("utilities") || sector.includes("consumer staples")) points += 5;
 
   if (points >= 85) return { label: "High", cls: "high", warnings };
   if (points >= 60) return { label: "Medium", cls: "medium", warnings };
   return { label: "Low", cls: "low", warnings };
+}
+
+function getProbability(stock, confidence) {
+  const score = Number(stock.trqxScore) || 0;
+  const price = Number(stock.price) || 0;
+  const high52 = Number(stock.high52) || 0;
+  const upside = price > 0 && high52 > price ? ((high52 - price) / price) * 100 : 0;
+
+  let probability = 35;
+  probability += score * 0.35;
+  probability += Math.min(upside, 200) * 0.08;
+
+  if (confidence.label === "High") probability += 8;
+  if (confidence.label === "Medium") probability += 2;
+  if (confidence.label === "Low") probability -= 12;
+
+  if (price < 2) probability -= 20;
+  if (price < 5) probability -= 8;
+
+  return Math.max(5, Math.min(95, Math.round(probability)));
+}
+
+function probabilityClass(prob) {
+  if (prob >= 80) return "high";
+  if (prob >= 60) return "medium";
+  return "low";
+}
+
+function getRisk(stock) {
+  const price = Number(stock.price) || 0;
+  const high52 = Number(stock.high52) || 0;
+  const low52 = Number(stock.low52) || 0;
+  const exchange = String(stock.exchange || "").toUpperCase();
+  const score = Number(stock.trqxScore) || 0;
+
+  const volatility = price > 0 && high52 > low52 ? ((high52 - low52) / price) * 100 : 0;
+
+  if (price < 5 || volatility > 250 || !["NYSE", "NASDAQ"].includes(exchange)) {
+    return { label: "Aggressive", icon: "🔴", cls: "low" };
+  }
+
+  if (price < 25 || volatility > 125 || score < 70) {
+    return { label: "Moderate", icon: "🟡", cls: "medium" };
+  }
+
+  return { label: "Conservative", icon: "🟢", cls: "high" };
+}
+
+function getTimeToGoal(stock, goal = 2) {
+  const price = Number(stock.price) || 0;
+  const high52 = Number(stock.high52) || 0;
+  const changePct = Number(stock.changesPercentage) || 0;
+  const target = price * goal;
+
+  if (!price || !high52) return "Unknown";
+
+  if (high52 >= target && changePct > 2) return "6–18 mo";
+  if (high52 >= target) return "12–36 mo";
+  if (high52 >= price * 1.5) return "24–48 mo";
+  return "48+ mo";
+}
+
+function whyThisStock(stock) {
+  const price = Number(stock.price) || 0;
+  const high52 = Number(stock.high52) || 0;
+  const upside = price > 0 && high52 > price ? ((high52 - price) / price) * 100 : 0;
+  const conf = confidenceForStock(stock);
+  const risk = getRisk(stock);
+  const rating = getAIRating(stock.trqxScore);
+
+  return [
+    `${rating.label} TRQX rating`,
+    `${fmtPct(upside)} upside to 52-week high`,
+    `${conf.label} confidence setup`,
+    `${risk.icon} ${risk.label} risk profile`,
+    `${fmtUSD(price)} current price`
+  ];
 }
 
 function filtered() {
@@ -123,16 +227,19 @@ function filtered() {
 function render() {
   const data = filtered().sort((a, b) => (b.trqxScore || 0) - (a.trqxScore || 0));
 
-  document.getElementById("rows").innerHTML = data
-    .map((s) => {
+  document.getElementById("rows").innerHTML = data.length
+    ? data.map((s) => {
       const isWatched = watchlist.includes(s.ticker);
       const change = Number(s.change);
       const changeClass = Number.isNaN(change) ? "" : change >= 0 ? "pos" : "neg";
       const conf = confidenceForStock(s);
+      const prob = getProbability(s, conf);
+      const risk = getRisk(s);
+      const rating = getAIRating(s.trqxScore);
 
       return `<tr>
         <td><button class="star ${isWatched ? "active" : ""}" onclick="toggleWatch('${s.ticker}')">${isWatched ? "★" : "☆"}</button></td>
-        <td><b>${s.ticker}</b><div class="small">${s.exchange || ""}</div></td>
+        <td><button class="tickerBtn" onclick="openStockModal('${s.ticker}')"><b>${s.ticker}</b></button><div class="small">${s.exchange || ""}</div></td>
         <td>${s.name}</td>
         <td>${s.sector}</td>
         <td>${fmtUSD(s.price)}</td>
@@ -143,12 +250,14 @@ function render() {
         <td>${fmtPct(s.from52LowPct)}</td>
         <td>${fmtPct(s.below52HighPct)}</td>
         <td><span class="pill ${signalClass(s.signal)}">${s.signal || "WATCH"}</span></td>
-        <td><span class="meter ${opportunityClass(s.trqxScore)}">${opportunityLabel(s.trqxScore)}</span></td>
-        <td><span class="confidence ${conf.cls}">${conf.label}</span></td>
+        <td><span class="meter ${rating.cls}">${rating.label}</span></td>
+        <td><span class="confidence ${risk.cls}">${risk.icon} ${risk.label}</span></td>
+        <td><span class="confidence ${probabilityClass(prob)}">${prob}%</span></td>
         <td class="score">${s.trqxScore ?? "—"}</td>
       </tr>`;
     })
-    .join("");
+    .join("")
+    : `<tr><td colspan="16" class="emptyState">No stocks match the selected filters.</td></tr>`;
 
   document.getElementById("kpiStocks").textContent = stocks.length;
   document.getElementById("kpiBuys").textContent = stocks.filter((s) => (s.signal || "").toUpperCase().includes("BUY")).length;
@@ -199,10 +308,10 @@ function passesQuality(s, minPrice, maxPrice, riskMode, qualityMode) {
   const conf = confidenceForStock(s);
 
   if (!price || price < minPrice || price > maxPrice) return false;
-
   if (qualityMode === "majorOnly" && !["NYSE", "NASDAQ"].includes(exchange)) return false;
   if (qualityMode === "excludePenny" && price < 2) return false;
   if (qualityMode === "qualityOnly" && (conf.label === "Low" || score < 70 || !["NYSE", "NASDAQ"].includes(exchange))) return false;
+  if (qualityMode === "moonshot" && !(price <= 20 && score >= 80 && ["NYSE", "NASDAQ"].includes(exchange))) return false;
 
   if (riskMode === "conservative") return score >= 75 && conf.label !== "Low";
   if (riskMode === "moderate") return score >= 60;
@@ -216,6 +325,11 @@ function renderGrowthScanner() {
   const minPrice = +document.getElementById("minPrice").value || 0;
   const riskMode = document.getElementById("riskMode").value;
   const qualityMode = document.getElementById("qualityMode").value;
+
+  const title = document.getElementById("growthTitle");
+  if (title) {
+    title.textContent = capital >= 1000 ? `$${Math.round(capital / 1000)}K` : fmtUSD(capital);
+  }
 
   const targetValue = capital * goal;
   document.getElementById("growthTarget").textContent = fmtUSD(targetValue);
@@ -236,6 +350,19 @@ function renderGrowthScanner() {
       const returnAtHighPct = (gainAtHigh / capital) * 100;
       const doublePrice = price * goal;
       const doublePossible = Number(s.high52) >= Number(doublePrice);
+      const prob = getProbability(s, g.confidence);
+      const risk = getRisk(s);
+
+      let adjustedRank = g.growthRank;
+
+      // Make dropdown changes materially affect ranking.
+      if (riskMode === "conservative" && risk.label === "Conservative") adjustedRank += 12;
+      if (riskMode === "conservative" && risk.label === "Aggressive") adjustedRank -= 20;
+      if (riskMode === "aggressive" && doublePossible) adjustedRank += 10;
+      if (riskMode === "aggressive" && price <= 10) adjustedRank += 6;
+      if (qualityMode === "qualityOnly" && g.confidence.label === "High") adjustedRank += 12;
+      if (qualityMode === "moonshot" && doublePossible && price <= 20) adjustedRank += 15;
+      if (qualityMode === "majorOnly" && ["NYSE", "NASDAQ"].includes(String(s.exchange || "").toUpperCase())) adjustedRank += 6;
 
       return {
         ...s,
@@ -246,17 +373,36 @@ function renderGrowthScanner() {
         gainAtHigh,
         returnAtHighPct,
         upsideToHighPct: g.upsideToHighPct,
-        growthRank: g.growthRank,
+        growthRank: Math.max(0, Math.round(adjustedRank)),
         confidence: g.confidence,
-        doublePossible
+        doublePossible,
+        probability: prob,
+        risk
       };
     })
     .filter(Boolean)
-    .sort((a, b) => (b.growthRank || 0) - (a.growthRank || 0))
+    .sort((a, b) => {
+      // Each mode sorts differently so the visible list changes.
+      if (riskMode === "conservative") {
+        const riskOrder = { Conservative: 3, Moderate: 2, Aggressive: 1 };
+        return (riskOrder[b.risk.label] || 0) - (riskOrder[a.risk.label] || 0) || b.growthRank - a.growthRank;
+      }
+
+      if (qualityMode === "qualityOnly") {
+        const confOrder = { High: 3, Medium: 2, Low: 1 };
+        return (confOrder[b.confidence.label] || 0) - (confOrder[a.confidence.label] || 0) || b.growthRank - a.growthRank;
+      }
+
+      if (qualityMode === "moonshot" || riskMode === "aggressive") {
+        return b.upsideToHighPct - a.upsideToHighPct || b.growthRank - a.growthRank;
+      }
+
+      return b.growthRank - a.growthRank;
+    })
     .slice(0, 12);
 
-  document.getElementById("growthRows").innerHTML = candidates
-    .map((s) => {
+  document.getElementById("growthRows").innerHTML = candidates.length
+    ? candidates.map((s) => {
       const warnings = s.confidence.warnings.length ? s.confidence.warnings.join(", ") : "clean setup";
       return `<tr>
         <td><b>${s.ticker}</b><div class="small">${s.name}</div></td>
@@ -269,18 +415,22 @@ function renderGrowthScanner() {
         <td>${fmtUSD(s.valueAtHigh)}</td>
         <td>${fmtPct(s.returnAtHighPct)}</td>
         <td><span class="meter ${s.doublePossible ? "strong" : "watch"}">${s.doublePossible ? "2x setup" : "upside play"}</span></td>
-        <td><span class="confidence ${s.confidence.cls}">${s.confidence.label}</span><div class="small">${warnings}</div></td>
+        <td><span class="confidence ${s.risk.cls}">${s.risk.icon} ${s.risk.label}</span></td>
+        <td><span class="confidence ${probabilityClass(s.probability)}">${s.probability}%</span></td>
+        <td>${getTimeToGoal(s, goal)}</td>
         <td class="score">${s.growthRank}</td>
       </tr>`;
     })
-    .join("");
+    .join("")
+    : `<tr><td colspan="14" class="emptyState">No growth candidates match these settings. Try lowering Min Price, raising Max Price, or changing Quality to All Candidates.</td></tr>`;
 
   const summary = document.getElementById("growthSummary");
   if (summary) {
-    summary.textContent = `${candidates.length} candidates shown after quality filters. Raise minimum price or select Quality Only to reduce speculative names.`;
+    const riskLabel = document.getElementById("riskMode").selectedOptions[0].textContent;
+    const qualityLabel = document.getElementById("qualityMode").selectedOptions[0].textContent;
+    summary.textContent = `${candidates.length} candidates shown for ${fmtUSD(capital)} capital, ${goal}x goal, ${riskLabel} risk, ${qualityLabel} quality filter.`;
   }
 }
-
 function updateLastUpdated() {
   const el = document.getElementById("lastUpdated");
   if (!el) return;
@@ -358,6 +508,7 @@ async function refreshQuotes() {
     lastUpdated = new Date().toLocaleTimeString();
     render();
     renderGrowthScanner();
+    renderPortfolioBuilder();
     setStatus(`Live refresh complete at ${lastUpdated}. Updated ${updated} of ${stocks.length} stocks.`);
   } catch (e) {
     console.error(e);

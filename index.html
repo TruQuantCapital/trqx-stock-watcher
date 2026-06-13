@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>TRQX Stock Watcher</title>
+  <title>TRQX Stock Watcher v5</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -11,9 +11,9 @@
   <main class="wrap">
     <section class="hero">
       <div>
-        <div class="eyebrow">TRQX CAPITAL • DIVIDEND WEALTH SCANNER</div>
+        <div class="eyebrow">TRQX CAPITAL • AI DECISION ENGINE</div>
         <h1>Dividend Opportunity Dashboard</h1>
-        <p>Tracks your stock universe, 52-week ranges, estimated entry zones, watchlists, growth setups, confidence scoring, and TRQX opportunity scores.</p>
+        <p>Tracks your stock universe, 52-week ranges, growth setups, confidence scoring, probability estimates, portfolio ideas, and TRQX AI ratings.</p>
         <div id="status" class="status">Loading saved stock universe...</div>
         <div id="lastUpdated" class="small">Last live refresh: not yet refreshed</div>
       </div>
@@ -34,8 +34,8 @@
     <section class="growth panel">
       <div class="sectionHeader">
         <div>
-          <h2>$2K Growth / Double-Up Scanner</h2>
-          <p class="small">Ranks lower-priced, higher-upside names by affordability, 52-week upside, confidence, and TRQX score. This is not a guarantee of returns.</p>
+          <h2><span id="growthTitle">$2K</span> Growth / Double-Up Scanner</h2>
+          <p class="small">Ranks lower-priced, higher-upside names by affordability, 52-week upside, probability, risk, and TRQX AI rating.</p>
           <p id="growthSummary" class="status"></p>
         </div>
         <div class="targetBox">
@@ -50,27 +50,38 @@
         <label class="field">Min Price <input id="minPrice" type="number" value="2" step="0.01"></label>
         <label class="field">Max Price <input id="maxPrice" type="number" value="25"></label>
         <label class="field">Risk <select id="riskMode"><option value="moderate">Moderate</option><option value="aggressive">Aggressive</option><option value="conservative">Conservative</option></select></label>
-        <label class="field">Quality <select id="qualityMode"><option value="excludePenny">Exclude Penny Stocks</option><option value="qualityOnly">Quality Only</option><option value="majorOnly">NYSE/NASDAQ Only</option><option value="all">All Candidates</option></select></label>
+        <label class="field">Quality <select id="qualityMode"><option value="excludePenny">Exclude Penny Stocks</option><option value="qualityOnly">Quality Only</option><option value="majorOnly">NYSE/NASDAQ Only</option><option value="moonshot">Moonshot Mode</option><option value="all">All Candidates</option></select></label>
       </div>
 
       <table>
         <thead>
           <tr>
-            <th>Ticker</th>
-            <th>Price</th>
-            <th>Shares</th>
-            <th>Invested</th>
-            <th>2x Price</th>
-            <th>52W High</th>
-            <th>Upside to High</th>
-            <th>Value at High</th>
-            <th>Return at High</th>
-            <th>Setup</th>
-            <th>Confidence</th>
-            <th>Growth Rank</th>
+            <th>Ticker</th><th>Price</th><th>Shares</th><th>Invested</th><th>2x Price</th><th>52W High</th><th>Upside</th><th>Value at High</th><th>Return</th><th>Setup</th><th>Risk</th><th>Probability</th><th>Time</th><th>Rank</th>
           </tr>
         </thead>
         <tbody id="growthRows"></tbody>
+      </table>
+    </section>
+
+    <section class="growth panel">
+      <div class="sectionHeader">
+        <div>
+          <h2>TRQX Portfolio Builder</h2>
+          <p id="portfolioSummary" class="small">Build a sample portfolio from the current stock universe.</p>
+        </div>
+      </div>
+
+      <div class="tools">
+        <label class="field">Capital <input id="portfolioCapital" type="number" value="10000"></label>
+        <label class="field">Goal <select id="portfolioGoal"><option value="balanced">Balanced</option><option value="growth">Growth</option><option value="income">Income</option></select></label>
+        <label class="field">Risk <select id="portfolioRisk"><option value="moderate">Moderate</option><option value="conservative">Conservative</option><option value="aggressive">Aggressive</option></select></label>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>Ticker</th><th>Allocation</th><th>Dollars</th><th>Shares</th><th>Risk</th><th>Probability</th></tr>
+        </thead>
+        <tbody id="portfolioRows"></tbody>
       </table>
     </section>
 
@@ -87,21 +98,7 @@
         <table>
           <thead>
             <tr>
-              <th>Watch</th>
-              <th>Ticker</th>
-              <th>Company</th>
-              <th>Sector</th>
-              <th>Price</th>
-              <th>Change $</th>
-              <th>Change %</th>
-              <th>52W Low</th>
-              <th>52W High</th>
-              <th>% From Low</th>
-              <th>% Below High</th>
-              <th>Signal</th>
-              <th>Meter</th>
-              <th>Confidence</th>
-              <th>Score</th>
+              <th>Watch</th><th>Ticker</th><th>Company</th><th>Sector</th><th>Price</th><th>Change $</th><th>Change %</th><th>52W Low</th><th>52W High</th><th>% From Low</th><th>% Below High</th><th>Signal</th><th>AI Rating</th><th>Risk</th><th>Probability</th><th>Score</th>
             </tr>
           </thead>
           <tbody id="rows"></tbody>
@@ -112,16 +109,11 @@
         <h3>Top Opportunities</h3>
         <div id="topList"></div>
 
-        <h3>TRQX Opportunity Meter</h3>
-        <div class="legend"><span class="dot elite"></span>95–100 Elite</div>
-        <div class="legend"><span class="dot strong"></span>85–94 Strong</div>
-        <div class="legend"><span class="dot watch"></span>70–84 Watch</div>
-        <div class="legend"><span class="dot avoid"></span>&lt;70 Avoid</div>
-
-        <h3>Confidence Score</h3>
-        <div class="legend"><span class="dot high"></span>High = stronger quality setup</div>
-        <div class="legend"><span class="dot medium"></span>Medium = balanced risk</div>
-        <div class="legend"><span class="dot low"></span>Low = speculative / volatile</div>
+        <h3>AI Rating</h3>
+        <div class="legend"><span class="dot elite"></span>A+ Elite</div>
+        <div class="legend"><span class="dot strong"></span>A Strong</div>
+        <div class="legend"><span class="dot watch"></span>B Watch</div>
+        <div class="legend"><span class="dot low"></span>C/D Speculative</div>
 
         <h3>Dividend Income Calculator</h3>
         <div class="small">Portfolio Amount</div>
@@ -136,10 +128,18 @@
           <div id="monthlyIncome" class="value">—</div>
         </div>
 
-        <p class="footer">Education only. Not financial advice. Growth scanner is speculative and should be verified with research, risk management, liquidity, and current market conditions.</p>
+        <p class="footer">Education only. Not financial advice. Probability and time estimates are model-based approximations, not guarantees.</p>
       </aside>
     </section>
   </main>
+
+  <div id="stockModal" class="modal">
+    <div class="modalContent">
+      <button class="close" onclick="closeStockModal()">×</button>
+      <h2 id="modalTitle">Stock Detail</h2>
+      <div id="modalBody"></div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
