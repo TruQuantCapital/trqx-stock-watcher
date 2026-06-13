@@ -170,6 +170,23 @@
             </div>
           </div>
         </section>
+
+
+        <section id="aiComparePanel" class="panel aiComparePanel">
+          <h2>AI Stock Comparison</h2>
+          <p>Compare two stocks side-by-side using TRQX AI scoring, risk, probability, upside, and data quality.</p>
+
+          <div class="compareControls">
+            <input id="compareA" placeholder="First ticker, e.g. NVDA" />
+            <input id="compareB" placeholder="Second ticker, e.g. AMD" />
+            <button class="gold-btn" onclick="runAIComparison()">Compare</button>
+          </div>
+
+          <div id="compareResult" class="compareResult">
+            <div class="emptyState">Enter two tickers to generate a TRQX AI comparison.</div>
+          </div>
+        </section>
+
       </section>
 
       <section class="bottom-grid">
@@ -202,6 +219,20 @@
             <li>Earnings season shows positive surprises</li>
             <li>Market sentiment remains bullish</li>
           </ul>
+
+          
+          <div class="aiQuestionBox">
+            <h3>Ask TRQX AI</h3>
+            <p>Quick research prompts for subscribers.</p>
+            <div class="aiPromptButtons">
+              <button onclick="fillAIPrompt('What are the strongest opportunities today?')">Strongest Opportunities</button>
+              <button onclick="fillAIPrompt('What stocks look risky right now?')">Risk Review</button>
+              <button onclick="fillAIPrompt('Build a moderate growth portfolio')">Portfolio Idea</button>
+            </div>
+            <textarea id="aiPromptInput" placeholder="Ask a research question..."></textarea>
+            <button class="gold-btn" onclick="runLocalAIAssistant()">Generate AI Research Note</button>
+            <div id="aiAssistantResult" class="aiAssistantResult"></div>
+          </div>
 
           <div class="terminal-controls">
             <label>Universe Mode

@@ -1,23 +1,23 @@
-# TRQX AI Market Terminal v12 — Luxury UI + AI Stock Report
+# TRQX AI Market Terminal v13 — AI Intelligence Layer
 
 ## Added
 
-- More premium black/gold visual treatment
-- Animated background particles
-- Animated hero-grid glow
-- Larger luxury lion/crown hero treatment
-- Stronger candlestick/chart hero visual
-- Better gold panel glow
-- Upgraded Stock Lookup into a full AI Stock Report
-- TRQX AI Verdict:
-  - Strong Buy Watch
-  - Buy Watch
-  - Watch
-  - Avoid / High Caution
-- Risk notes
-- Confirmation checklist
-- Time horizon estimate
-- Data quality badge preserved
+- AI Investment Thesis inside Stock Lookup
+- Bull Case
+- Bear / Risk Case
+- Confirmation Checklist
+- TRQX AI Verdict
+- Time Horizon estimate
+- AI Stock Comparison module
+- Ask TRQX AI local research assistant
+- Portfolio idea prompt
+- Risk review prompt
+- Strongest opportunities prompt
+
+## Notes
+
+This version uses a local rule-based AI layer. It does not require OpenAI API yet.
+Later, this can be upgraded to use OpenAI or another LLM API for fully dynamic natural language reports.
 
 ## Upload Structure
 

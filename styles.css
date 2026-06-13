@@ -591,3 +591,157 @@ body::after {
     display: none;
   }
 }
+
+
+
+/* === v13 AI Intelligence Layer === */
+.thesisBox {
+  margin: 16px 0;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(214,168,61,.22);
+  background: linear-gradient(180deg, rgba(214,168,61,.10), rgba(214,168,61,.045));
+}
+
+.thesisBox h4 {
+  margin: 0 0 10px;
+  color: var(--gold2);
+}
+
+.thesisBox p {
+  color: #dce1e9;
+  line-height: 1.55;
+  font-size: 14px;
+}
+
+.aiComparePanel {
+  grid-column: 1 / -1;
+}
+
+.compareControls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+
+.compareControls input {
+  flex: 1;
+  min-width: 240px;
+}
+
+.compareCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.compareCard {
+  border: 1px solid rgba(214,168,61,.18);
+  border-radius: 18px;
+  padding: 18px;
+  background: rgba(5,5,5,.75);
+}
+
+.compareCard h3 {
+  margin: 8px 0 14px;
+}
+
+.compareMetric {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  padding: 10px 0;
+}
+
+.compareMetric span {
+  color: var(--muted);
+}
+
+.compareMetric b {
+  color: var(--gold2);
+}
+
+.comparisonWinner {
+  margin-top: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(54,209,124,.28);
+  background: rgba(54,209,124,.08);
+  padding: 18px;
+}
+
+.comparisonWinner span {
+  display: block;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 1000;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.comparisonWinner b {
+  display: block;
+  font-size: 22px;
+  margin: 8px 0;
+}
+
+.aiQuestionBox {
+  margin: 18px 0;
+  border: 1px solid rgba(214,168,61,.18);
+  border-radius: 18px;
+  padding: 16px;
+  background: rgba(214,168,61,.045);
+}
+
+.aiQuestionBox h3 {
+  margin: 0 0 6px;
+}
+
+.aiPromptButtons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+.aiPromptButtons button {
+  padding: 9px 12px;
+  font-size: 12px;
+}
+
+.aiQuestionBox textarea {
+  width: 100%;
+  min-height: 92px;
+  resize: vertical;
+  background: #050505;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.aiNote {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(5,5,5,.72);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.aiNote h4 {
+  margin: 0 0 10px;
+  color: var(--gold2);
+}
+
+.aiNote li {
+  margin: 8px 0;
+  color: #dce1e9;
+}
+
+@media(max-width: 800px) {
+  .compareCards {
+    grid-template-columns: 1fr;
+  }
+}

@@ -416,6 +416,7 @@ function scrollToSection(id) {
 
 
 
+
 function dataQualityForStock(stock) {
   const hasPrice = Number(stock.price) > 0;
   const hasRange = Number(stock.low52) > 0 && Number(stock.high52) > 0;
@@ -503,6 +504,40 @@ function aiVerdict(score, risk, probability, quality) {
   return { label: "AVOID / HIGH CAUTION", cls: "avoid", note: "Weak score or insufficient data." };
 }
 
+function sectorTone(stock) {
+  const sector = String(stock.sector || "").toLowerCase();
+  if (sector.includes("technology") || sector.includes("it")) return "AI, software, semiconductors, and digital infrastructure remain high-interest growth areas.";
+  if (sector.includes("real estate")) return "Real estate setups should be evaluated with rates, debt costs, and dividend sustainability in mind.";
+  if (sector.includes("energy")) return "Energy names are sensitive to commodity pricing, cash flow cycles, and geopolitical risk.";
+  if (sector.includes("health")) return "Healthcare names can be defensive, but trial, regulatory, and reimbursement risk can be material.";
+  if (sector.includes("financial")) return "Financial stocks are sensitive to rates, credit conditions, and loan growth.";
+  return "Sector context is limited, so the rating relies more heavily on price range, TRQX score, and probability model.";
+}
+
+function buildInvestmentThesis(stock, analysis) {
+  const thesis = [];
+
+  if (analysis.verdict.cls === "buy") {
+    thesis.push(`${stock.ticker} currently screens as a positive TRQX watchlist candidate because its score, probability, and setup quality are aligned.`);
+  } else if (analysis.verdict.cls === "watch") {
+    thesis.push(`${stock.ticker} belongs on a watchlist rather than an automatic action list because the model sees either limited data, elevated risk, or incomplete confirmation.`);
+  } else {
+    thesis.push(`${stock.ticker} should be treated with caution because the current model does not show enough high-quality confirmation.`);
+  }
+
+  thesis.push(sectorTone(stock));
+
+  if (analysis.upside != null && analysis.upside > 25) {
+    thesis.push(`The stock has measurable room to its 52-week high, but that upside should be weighed against volatility and liquidity.`);
+  }
+
+  if (analysis.risk.label === "Aggressive") {
+    thesis.push("Because risk is aggressive, this setup is better suited for smaller position sizing and stricter risk management.");
+  }
+
+  return thesis;
+}
+
 function explainStock(stock) {
   const price = Number(stock.price) || 0;
   const low52 = Number(stock.low52) || 0;
@@ -547,7 +582,9 @@ function explainStock(stock) {
 
   const horizon = risk.label === "Aggressive" ? "3–12 months" : score >= 80 ? "12–24 months" : "24+ months";
 
-  return { rating, prob, risk, conf, upside, fromLow, reasons, risks, confirmations, quality, verdict, horizon };
+  const analysis = { rating, prob, risk, conf, upside, fromLow, reasons, risks, confirmations, quality, verdict, horizon };
+  analysis.thesis = buildInvestmentThesis(stock, analysis);
+  return analysis;
 }
 
 async function runStockLookup() {
@@ -602,14 +639,19 @@ async function runStockLookup() {
         <div><span>Time Horizon</span><b>${analysis.horizon}</b></div>
       </div>
 
+      <div class="thesisBox">
+        <h4>AI Investment Thesis</h4>
+        <p>${analysis.thesis.join(" ")}</p>
+      </div>
+
       <div class="reportGrid">
         <div class="whyBox">
-          <h4>Why TRQX is watching it</h4>
+          <h4>Bull Case</h4>
           <ul>${analysis.reasons.map((r) => `<li>${r}</li>`).join("")}</ul>
         </div>
 
         <div class="riskBox">
-          <h4>Risk Notes</h4>
+          <h4>Bear / Risk Case</h4>
           <ul>${analysis.risks.map((r) => `<li>${r}</li>`).join("")}</ul>
         </div>
 
@@ -633,6 +675,131 @@ async function runStockLookup() {
   render();
   renderGrowthScanner();
   renderPortfolioBuilder();
+}
+
+async function runAIComparison() {
+  const aInput = document.getElementById("compareA");
+  const bInput = document.getElementById("compareB");
+  const out = document.getElementById("compareResult");
+  if (!aInput || !bInput || !out) return;
+
+  const aQuery = aInput.value.trim();
+  const bQuery = bInput.value.trim();
+
+  if (!aQuery || !bQuery) {
+    out.innerHTML = `<div class="emptyState">Enter two tickers first.</div>`;
+    return;
+  }
+
+  let a = findStockByQuery(aQuery);
+  let b = findStockByQuery(bQuery);
+
+  if (!a || !b) {
+    out.innerHTML = `<div class="emptyState">One or both tickers were not found. Load Expanded Universe if needed.</div>`;
+    return;
+  }
+
+  out.innerHTML = `<div class="emptyState">Running TRQX AI comparison...</div>`;
+
+  a = await fetchLiveQuoteForLookup(a);
+  b = await fetchLiveQuoteForLookup(b);
+
+  const aa = explainStock(a);
+  const bb = explainStock(b);
+
+  const aScore = (Number(a.trqxScore) || 0) + aa.prob - (aa.risk.label === "Aggressive" ? 8 : 0);
+  const bScore = (Number(b.trqxScore) || 0) + bb.prob - (bb.risk.label === "Aggressive" ? 8 : 0);
+  const winner = aScore >= bScore ? a : b;
+  const winnerAnalysis = aScore >= bScore ? aa : bb;
+
+  out.innerHTML = `
+    <div class="compareCards">
+      ${comparisonCard(a, aa)}
+      ${comparisonCard(b, bb)}
+    </div>
+    <div class="comparisonWinner">
+      <span>TRQX AI Winner</span>
+      <b>${winner.ticker} — ${winner.name}</b>
+      <p>${winner.ticker} ranks better in this comparison based on TRQX score, probability, risk, and available data quality. Verdict: ${winnerAnalysis.verdict.label}.</p>
+    </div>
+  `;
+}
+
+function comparisonCard(stock, analysis) {
+  return `
+    <div class="compareCard">
+      <div class="eyebrow">${stock.ticker}</div>
+      <h3>${stock.name}</h3>
+      <div class="compareMetric"><span>Price</span><b>${fmtUSD(stock.price)}</b></div>
+      <div class="compareMetric"><span>TRQX Rating</span><b>${analysis.rating.label}</b></div>
+      <div class="compareMetric"><span>Risk</span><b>${analysis.risk.icon} ${analysis.risk.label}</b></div>
+      <div class="compareMetric"><span>Probability</span><b>${analysis.prob}%</b></div>
+      <div class="compareMetric"><span>Verdict</span><b>${analysis.verdict.label}</b></div>
+    </div>
+  `;
+}
+
+function fillAIPrompt(text) {
+  const input = document.getElementById("aiPromptInput");
+  if (input) input.value = text;
+}
+
+function runLocalAIAssistant() {
+  const input = document.getElementById("aiPromptInput");
+  const out = document.getElementById("aiAssistantResult");
+  if (!input || !out) return;
+
+  const prompt = input.value.trim().toLowerCase();
+  if (!prompt) {
+    out.innerHTML = `<div class="emptyState">Enter a research question first.</div>`;
+    return;
+  }
+
+  const candidates = stocks
+    .filter((s) => Number(s.price) > 0)
+    .map((s) => ({ stock: s, analysis: explainStock(s) }))
+    .sort((a, b) => (b.analysis.prob + (Number(b.stock.trqxScore) || 0)) - (a.analysis.prob + (Number(a.stock.trqxScore) || 0)))
+    .slice(0, 5);
+
+  if (prompt.includes("risk")) {
+    const risky = stocks
+      .filter((s) => Number(s.price) > 0)
+      .map((s) => ({ stock: s, analysis: explainStock(s) }))
+      .filter((x) => x.analysis.risk.label === "Aggressive" || x.analysis.quality.cls === "low")
+      .slice(0, 5);
+
+    out.innerHTML = aiNoteTemplate("Risk Review", risky, "These names require caution due to aggressive risk profile or limited live data quality.");
+    return;
+  }
+
+  if (prompt.includes("portfolio")) {
+    out.innerHTML = `
+      <div class="aiNote">
+        <h4>Moderate Growth Portfolio Idea</h4>
+        <p>TRQX AI would favor diversified exposure across higher-probability names, avoiding overconcentration in speculative setups.</p>
+        <ul>
+          ${candidates.map((x, i) => `<li>${x.stock.ticker}: suggested ${i < 2 ? "core" : "satellite"} allocation candidate. Probability ${x.analysis.prob}%.</li>`).join("")}
+        </ul>
+        <p class="disclaimerBox">Educational research only. Not personalized financial advice.</p>
+      </div>
+    `;
+    return;
+  }
+
+  out.innerHTML = aiNoteTemplate("Strongest Opportunities", candidates, "These stocks currently rank highest by TRQX score, probability, and available setup quality.");
+}
+
+function aiNoteTemplate(title, list, intro) {
+  return `
+    <div class="aiNote">
+      <h4>${title}</h4>
+      <p>${intro}</p>
+      <ul>
+        ${list.map((x) => `<li><b>${x.stock.ticker}</b> — ${x.analysis.verdict.label}, probability ${x.analysis.prob}%, risk ${x.analysis.risk.label}.</li>`).join("")}
+      </ul>
+      <p class="disclaimerBox">Educational research only. Not personalized financial advice.</p>
+    </div>
+  `;
 }
 
 
