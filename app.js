@@ -178,6 +178,12 @@ function getRisk(stock) {
   return { label: "Conservative", icon: "🟢", cls: "high" };
 }
 
+function getScannerMode(mode) {
+  if (mode === "aggressive") return { label: "Aggressive", icon: "🔴", cls: "low" };
+  if (mode === "conservative") return { label: "Conservative", icon: "🟢", cls: "high" };
+  return { label: "Moderate", icon: "🟡", cls: "medium" };
+}
+
 function getTimeToGoal(stock, goal = 2) {
   const price = Number(stock.price) || 0;
   const high52 = Number(stock.high52) || 0;
@@ -260,6 +266,8 @@ function render() {
     : `<tr><td colspan="16" class="emptyState">No stocks match the selected filters.</td></tr>`;
 
   document.getElementById("kpiStocks").textContent = stocks.length;
+  const universeCount = document.getElementById("universeCount");
+  if (universeCount) universeCount.textContent = stocks.length;
   document.getElementById("kpiBuys").textContent = stocks.filter((s) => (s.signal || "").toUpperCase().includes("BUY")).length;
   document.getElementById("kpiWatchlist").textContent = watchlist.length;
 
@@ -325,6 +333,7 @@ function renderGrowthScanner() {
   const minPrice = +document.getElementById("minPrice").value || 0;
   const riskMode = document.getElementById("riskMode").value;
   const qualityMode = document.getElementById("qualityMode").value;
+  const scannerMode = getScannerMode(riskMode);
 
   const title = document.getElementById("growthTitle");
   if (title) {
@@ -416,13 +425,14 @@ function renderGrowthScanner() {
         <td>${fmtPct(s.returnAtHighPct)}</td>
         <td><span class="meter ${s.doublePossible ? "strong" : "watch"}">${s.doublePossible ? "2x setup" : "upside play"}</span></td>
         <td><span class="confidence ${s.risk.cls}">${s.risk.icon} ${s.risk.label}</span></td>
+        <td><span class="confidence ${scannerMode.cls}">${scannerMode.icon} ${scannerMode.label}</span></td>
         <td><span class="confidence ${probabilityClass(s.probability)}">${s.probability}%</span></td>
         <td>${getTimeToGoal(s, goal)}</td>
         <td class="score">${s.growthRank}</td>
       </tr>`;
     })
     .join("")
-    : `<tr><td colspan="14" class="emptyState">No growth candidates match these settings. Try lowering Min Price, raising Max Price, or changing Quality to All Candidates.</td></tr>`;
+    : `<tr><td colspan="15" class="emptyState">No growth candidates match these settings. Try lowering Min Price, raising Max Price, or changing Quality to All Candidates.</td></tr>`;
 
   const summary = document.getElementById("growthSummary");
   if (summary) {

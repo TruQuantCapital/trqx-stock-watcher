@@ -64,3 +64,12 @@ Education only. Not financial advice. Probability and time estimates are model-b
 - Risk and Quality dropdowns now force a recalculation on input, change, and keyup.
 - Risk and Quality settings now materially affect ranking and sorting.
 - Growth summary now shows current capital, goal, risk, and quality settings.
+
+
+## v5.3 Risk Label + Universe Note
+
+- Added a Stock Universe note showing that the app currently uses the tickers inside `data/stocks.json`.
+- Clarified risk columns:
+  - `Stock Risk` = calculated risk for the individual ticker.
+  - `Scanner Mode` = the dropdown selected by the user.
+- This avoids confusion when scanner mode is Aggressive but a specific stock still calculates as Moderate.

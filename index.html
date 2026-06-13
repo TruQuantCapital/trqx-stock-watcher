@@ -31,6 +31,10 @@
       <div class="card"><div class="label">100-Share Capital</div><div id="kpiCost" class="value">—</div></div>
     </section>
 
+    <section class="panel universeNote">
+      <b>Stock Universe:</b> This dashboard is currently using <span id="universeCount">175</span> stocks from <code>data/stocks.json</code>. To expand it, replace that file with a larger ticker list such as S&amp;P 500, Nasdaq 100, Dividend Aristocrats, or a custom TRQX master list.
+    </section>
+
     <section class="growth panel">
       <div class="sectionHeader">
         <div>
@@ -56,11 +60,15 @@
       <table>
         <thead>
           <tr>
-            <th>Ticker</th><th>Price</th><th>Shares</th><th>Invested</th><th>2x Price</th><th>52W High</th><th>Upside</th><th>Value at High</th><th>Return</th><th>Setup</th><th>Risk</th><th>Probability</th><th>Time</th><th>Rank</th>
+            <th>Ticker</th><th>Price</th><th>Shares</th><th>Invested</th><th>2x Price</th><th>52W High</th><th>Upside</th><th>Value at High</th><th>Return</th><th>Setup</th><th>Stock Risk</th><th>Scanner Mode</th><th>Probability</th><th>Time</th><th>Rank</th>
           </tr>
         </thead>
         <tbody id="growthRows"></tbody>
       </table>
+    </section>
+
+    <section class="panel universeNote">
+      <b>Stock Universe:</b> This dashboard is currently using <span id="universeCount">175</span> stocks from <code>data/stocks.json</code>. To expand it, replace that file with a larger ticker list such as S&amp;P 500, Nasdaq 100, Dividend Aristocrats, or a custom TRQX master list.
     </section>
 
     <section class="growth panel">
@@ -98,7 +106,7 @@
         <table>
           <thead>
             <tr>
-              <th>Watch</th><th>Ticker</th><th>Company</th><th>Sector</th><th>Price</th><th>Change $</th><th>Change %</th><th>52W Low</th><th>52W High</th><th>% From Low</th><th>% Below High</th><th>Signal</th><th>AI Rating</th><th>Risk</th><th>Probability</th><th>Score</th>
+              <th>Watch</th><th>Ticker</th><th>Company</th><th>Sector</th><th>Price</th><th>Change $</th><th>Change %</th><th>52W Low</th><th>52W High</th><th>% From Low</th><th>% Below High</th><th>Signal</th><th>AI Rating</th><th>Stock Risk</th><th>Probability</th><th>Score</th>
             </tr>
           </thead>
           <tbody id="rows"></tbody>
