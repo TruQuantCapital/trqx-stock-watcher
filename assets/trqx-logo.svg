@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="70" viewBox="0 0 240 70">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1"><stop stop-color="#ffe071"/><stop offset="1" stop-color="#b77b18"/></linearGradient>
+  </defs>
+  <circle cx="34" cy="35" r="27" fill="url(#g)"/>
+  <path d="M34 17l5 12 13-1-10 8 4 13-12-7-12 7 4-13-10-8 13 1z" fill="#050505"/>
+  <text x="75" y="34" font-family="Arial Black,Arial" font-size="28" fill="#ffe071" font-weight="900">TRQX</text>
+  <text x="77" y="52" font-family="Arial" font-size="9" fill="#d6a83d" font-weight="800" letter-spacing="2">AI MARKET TERMINAL</text>
+</svg>

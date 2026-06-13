@@ -599,3 +599,239 @@ footer { color: var(--muted); font-size: 11px; text-align: center; padding: 20px
   .hero h1 { font-size: 30px; }
   .stats-row, .bottom-row { grid-template-columns: 1fr; }
 }
+
+/* ================================================================
+   BACKGROUND DEPTH & ATMOSPHERE UPGRADES
+   ================================================================ */
+
+/* Richer body background — 3 depth layers */
+body {
+  background:
+    radial-gradient(ellipse at 68% 0%,   rgba(214,168,61,.18) 0%, transparent 44%),
+    radial-gradient(ellipse at 8%  8%,   rgba(214,168,61,.09) 0%, transparent 30%),
+    radial-gradient(ellipse at 50% 100%, rgba(214,168,61,.06) 0%, transparent 38%),
+    linear-gradient(160deg, #060606 0%, #08070100% 50%, #040404 100%) !important;
+}
+
+/* Denser gold grid — full page depth */
+body::before {
+  background-image:
+    linear-gradient(rgba(214,168,61,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(214,168,61,.04) 1px, transparent 1px) !important;
+  background-size: 56px 56px !important;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,.95) 0%, rgba(0,0,0,.3) 60%, transparent 100%) !important;
+}
+
+/* Faster, denser particle drift */
+body::after {
+  background-image: radial-gradient(rgba(255,215,94,.55) 1px, transparent 1px) !important;
+  background-size: 80px 80px !important;
+  opacity: .06 !important;
+  animation: drift 20s linear infinite !important;
+}
+
+/* ================================================================
+   SCROLLING TICKER TAPE
+   ================================================================ */
+.ticker-tape {
+  overflow: hidden;
+  background: rgba(0,0,0,.6);
+  border-top: 1px solid rgba(214,168,61,.15);
+  border-bottom: 1px solid rgba(214,168,61,.15);
+  padding: 8px 0;
+  margin: 14px 0;
+  position: relative;
+}
+.ticker-tape::before,
+.ticker-tape::after {
+  content: "";
+  position: absolute; top: 0; bottom: 0; width: 80px; z-index: 2;
+  pointer-events: none;
+}
+.ticker-tape::before { left: 0;  background: linear-gradient(90deg, #050505, transparent); }
+.ticker-tape::after  { right: 0; background: linear-gradient(-90deg, #050505, transparent); }
+
+.ticker-tape-inner {
+  display: flex; gap: 0;
+  white-space: nowrap;
+  animation: tickerScroll 60s linear infinite;
+  width: max-content;
+}
+.ticker-tape:hover .ticker-tape-inner { animation-play-state: paused; }
+@keyframes tickerScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+.ticker-item {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 0 24px;
+  border-right: 1px solid rgba(214,168,61,.12);
+  font-size: 12px; font-weight: 700; letter-spacing: .3px;
+}
+.ticker-item .t-sym  { color: var(--gold2); font-weight: 900; }
+.ticker-item .t-price{ color: var(--text); }
+.ticker-item .t-chg  { font-size: 11px; font-weight: 800; }
+.ticker-item .t-chg.up   { color: var(--green); }
+.ticker-item .t-chg.down { color: var(--red); }
+
+/* ================================================================
+   SECTION DIVIDERS WITH GOLD PULSE
+   ================================================================ */
+.section-divider {
+  display: flex; align-items: center; gap: 14px;
+  margin: 20px 0 14px;
+}
+.section-divider-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(214,168,61,.35), transparent);
+  position: relative; overflow: hidden;
+}
+.section-divider-line::after {
+  content: "";
+  position: absolute; top: 0; left: -100%; width: 60%;
+  height: 100%; background: linear-gradient(90deg, transparent, rgba(255,215,94,.8), transparent);
+  animation: lineScanner 4s ease-in-out infinite;
+}
+@keyframes lineScanner { 0%{left:-60%} 100%{left:160%} }
+
+.section-divider-label {
+  color: var(--gold2); font-size: 10px; font-weight: 900;
+  text-transform: uppercase; letter-spacing: 2px; white-space: nowrap;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-divider-label::before { content: "◆"; font-size: 7px; color: var(--gold); }
+
+/* ================================================================
+   ENHANCED PANELS — glow halo, depth, shimmer border
+   ================================================================ */
+.panel {
+  box-shadow:
+    0 0 0 1px rgba(214,168,61,.04),
+    0 0 40px rgba(214,168,61,.06),
+    0 4px 32px rgba(0,0,0,.4),
+    inset 0 1px rgba(255,255,255,.04) !important;
+  transition: box-shadow .3s;
+}
+.panel:hover {
+  box-shadow:
+    0 0 0 1px rgba(214,168,61,.08),
+    0 0 56px rgba(214,168,61,.1),
+    0 4px 32px rgba(0,0,0,.5),
+    inset 0 1px rgba(255,255,255,.06) !important;
+}
+
+/* ================================================================
+   STAT CARDS — pulse animation when value updates
+   ================================================================ */
+@keyframes valuePulse {
+  0%   { text-shadow: 0 0 0px rgba(255,215,94,0); }
+  40%  { text-shadow: 0 0 28px rgba(255,215,94,.7), 0 0 8px rgba(255,215,94,.5); }
+  100% { text-shadow: 0 0 24px rgba(255,215,94,.1); }
+}
+.stat-value.pulse { animation: valuePulse .9s ease-out forwards; }
+
+/* Stat card sparkline as animated line */
+.stat-spark {
+  position: relative; overflow: hidden;
+}
+.stat-spark::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.12) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: shimmer 3s ease-in-out infinite;
+}
+@keyframes shimmer { to { transform: translateX(200%); } }
+
+/* ================================================================
+   HERO CANDLESTICK SVG BACKGROUND
+   ================================================================ */
+.hero-candles {
+  position: absolute; right: 0; top: 0; bottom: 0; width: 55%;
+  z-index: 0; pointer-events: none; opacity: .22;
+  overflow: hidden;
+}
+.hero-candles svg { width: 100%; height: 100%; }
+
+/* Brighter chart lines with animation */
+.hero-chart-lines {
+  animation: chartPulse 6s ease-in-out infinite;
+  filter: drop-shadow(0 0 22px rgba(255,215,94,.3)) !important;
+}
+@keyframes chartPulse {
+  0%,100% { opacity: .65; }
+  50%      { opacity: .9; }
+}
+
+/* ================================================================
+   LIVE DATA SCAN LINE (decorative) — runs across page periodically
+   ================================================================ */
+.scan-line {
+  position: fixed; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,215,94,.6) 50%, transparent 100%);
+  z-index: 50; pointer-events: none;
+  animation: scanDown 12s ease-in-out infinite;
+  opacity: 0;
+}
+@keyframes scanDown {
+  0%   { top: 58px; opacity: 0; }
+  2%   { opacity: .7; }
+  95%  { opacity: .4; }
+  98%  { top: 100vh; opacity: 0; }
+  100% { top: 58px; opacity: 0; }
+}
+
+/* ================================================================
+   AI CHAT PANEL — richer atmosphere
+   ================================================================ */
+.ai-chat-panel {
+  box-shadow:
+    0 0 0 1px rgba(214,168,61,.08),
+    0 0 60px rgba(214,168,61,.08),
+    0 8px 40px rgba(0,0,0,.5) !important;
+  background: linear-gradient(180deg, rgba(11,11,11,.99), rgba(5,5,5,.99)) !important;
+}
+.ai-chat-panel::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(214,168,61,.07), transparent 50%);
+  pointer-events: none; border-radius: 16px;
+}
+.ai-chat-section { position: relative; }
+
+/* ================================================================
+   WATCHLIST PANEL — header bar
+   ================================================================ */
+.watchlist-section {
+  position: relative;
+}
+.watchlist-section::before {
+  content: "";
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold2), var(--gold), transparent);
+  border-radius: 14px 14px 0 0;
+}
+
+/* ================================================================
+   PAGE — subtle vignette at left/right edges
+   ================================================================ */
+.page::before {
+  content: ""; pointer-events: none;
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.4) 0%, transparent 8%, transparent 92%, rgba(0,0,0,.4) 100%);
+}
+
+/* ================================================================
+   BOTTOM ROW PANELS — alternating subtle tint
+   ================================================================ */
+.bottom-row .panel:nth-child(odd) {
+  background: linear-gradient(180deg, rgba(14,12,6,.97), rgba(8,7,3,.97)) !important;
+}
+.bottom-row .panel:nth-child(even) {
+  background: linear-gradient(180deg, rgba(12,14,14,.97), rgba(6,8,8,.97)) !important;
+}
+
+/* ================================================================
+   RESPONSIVE GUARDS
+   ================================================================ */
+@media (max-width: 900px) {
+  .ticker-tape { display: none; }
+  .scan-line   { display: none; }
+}

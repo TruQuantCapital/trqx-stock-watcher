@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="520" viewBox="0 0 720 520">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#ffe071" stop-opacity="0.95"/>
+      <stop offset="45%" stop-color="#b77b18" stop-opacity="0.65"/>
+      <stop offset="75%" stop-color="#8a5b0f" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" x2="1">
+      <stop stop-color="#ffe071"/>
+      <stop offset=".5" stop-color="#b77b18"/>
+      <stop offset="1" stop-color="#fff0a0"/>
+    </linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="7"/></filter>
+  </defs>
+  <circle cx="370" cy="260" r="230" fill="url(#glow)" filter="url(#blur)"/>
+  <g transform="translate(120,35)">
+    <path d="M255 16 C170 24,98 88,82 170 C35 193,18 250,38 306 C60 368,115 388,162 385 C207 435,287 449,346 418 C423 431,502 392,526 319 C548 255,525 190,478 165 C455 76,360 4,255 16Z" fill="#2b1804" stroke="#d6a83d" stroke-width="4"/>
+    <path d="M243 58 C178 75,135 125,126 191 C78 223,72 294,113 335 C154 378,226 358,248 313 C282 357,359 378,407 334 C451 293,443 224,394 192 C386 125,324 52,243 58Z" fill="url(#gold)" opacity=".95"/>
+    <path d="M183 198 C209 184,238 190,257 208 C231 206,207 209,183 198Z" fill="#111"/>
+    <path d="M324 208 C350 188,382 183,410 198 C384 209,355 208,324 208Z" fill="#111"/>
+    <path d="M287 240 C265 274,271 305,301 320 C335 305,339 274,314 240Z" fill="#1a0d02"/>
+    <path d="M240 340 C274 372,330 372,363 340" fill="none" stroke="#211103" stroke-width="13" stroke-linecap="round"/>
+    <path d="M118 166 C78 178,55 225,61 270 M90 98 C42 132,20 206,38 274 M146 59 C90 74,47 119,26 177 M374 61 C434 82,482 131,501 194 M445 109 C491 146,514 204,505 268 M458 183 C504 202,526 252,512 305" fill="none" stroke="#ffd75e" stroke-width="10" opacity=".5"/>
+    <path d="M120 410 C185 470,306 486,414 432" fill="none" stroke="#d6a83d" stroke-width="12" opacity=".35"/>
+  </g>
+</svg>

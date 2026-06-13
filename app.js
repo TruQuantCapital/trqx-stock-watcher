@@ -27,6 +27,7 @@ async function load() {
   calcIncome();
   renderGrowthScanner();
   renderPortfolioBuilder();
+  renderTickerTape();
   setStatus("TRQX AI Market Terminal loaded. Click Refresh Market Data for live prices.");
 }
 
@@ -168,6 +169,7 @@ function refreshAllViews() {
   renderGrowthScanner();
   renderPortfolioBuilder();
   updateInsights();
+  renderTickerTape();
 }
 
 
@@ -184,9 +186,9 @@ function updateInsights() {
   const highProbEl = document.getElementById("highProbCount");
   const regimeEl = document.getElementById("marketRegime");
 
-  if (bullishEl) bullishEl.textContent = bullish.toLocaleString();
-  if (eliteEl) eliteEl.textContent = elite.toLocaleString();
-  if (highProbEl) highProbEl.textContent = highProb.toLocaleString();
+  if (bullishEl) { bullishEl.textContent = bullish.toLocaleString(); pulseStatValue("bullishCount"); }
+  if (eliteEl)   { eliteEl.textContent   = elite.toLocaleString();   pulseStatValue("eliteCount"); }
+  if (highProbEl){ highProbEl.textContent = highProb.toLocaleString(); pulseStatValue("highProbCount"); }
 
   if (regimeEl) {
     const ratio = stocks.length ? bullish / stocks.length : 0;
@@ -1411,4 +1413,46 @@ async function fetchMarketStrip() {
   } catch (e) {
     console.warn("Market strip fetch failed:", e);
   }
+}
+
+// ============================================================
+// TICKER TAPE — populated from loaded stock universe
+// ============================================================
+function renderTickerTape() {
+  const el = document.getElementById("tickerTapeInner");
+  if (!el) return;
+
+  // Take top 16 by TRQX score that have prices
+  const top = stocks
+    .filter(s => s.price != null && s.price > 0)
+    .slice().sort((a, b) => (b.trqxScore || 0) - (a.trqxScore || 0))
+    .slice(0, 16);
+
+  if (!top.length) return;
+
+  function makeItem(s) {
+    const chg = Number(s.changesPercentage);
+    const hasChg = !Number.isNaN(chg) && s.changesPercentage != null;
+    const up = hasChg ? chg >= 0 : true;
+    const chgTxt = hasChg ? `${up ? "▲" : "▼"} ${Math.abs(chg).toFixed(2)}%` : "—";
+    return `<span class="ticker-item">
+      <span class="t-sym">${s.ticker}</span>
+      <span class="t-price">${fmtUSD(s.price)}</span>
+      <span class="t-chg ${up ? "up" : "down"}">${chgTxt}</span>
+    </span>`;
+  }
+
+  // Duplicate for seamless CSS marquee
+  const html = top.map(makeItem).join("") + top.map(makeItem).join("");
+  el.innerHTML = html;
+}
+
+// Pulse animation when stat cards update
+function pulseStatValue(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove("pulse");
+  void el.offsetWidth; // reflow
+  el.classList.add("pulse");
+  setTimeout(() => el.classList.remove("pulse"), 1000);
 }
