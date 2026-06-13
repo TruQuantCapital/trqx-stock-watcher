@@ -1,34 +1,40 @@
-# TRQX AI Market Terminal v15.2 — Full Background + Live Market Strip Fix
-
-## Fixed
-
-- Top RSS/market strip now has real element IDs:
-  - strip-price-spx
-  - strip-pct-spx
-  - strip-price-ndx
-  - strip-pct-ndx
-  - strip-price-dji
-  - strip-pct-dji
-  - strip-price-gold
-  - strip-pct-gold
-  - strip-price-btc
-  - strip-pct-btc
+# TRQX AI Market Terminal v12 — Luxury UI + AI Stock Report
 
 ## Added
 
-- Stronger full-screen background
-- Side lion watermark
-- Side candlestick charts
-- Bigger ticker-tape background
-- Larger TRQX watermark
-- Richer gold glow
-- Wider dashboard content
+- More premium black/gold visual treatment
+- Animated background particles
+- Animated hero-grid glow
+- Larger luxury lion/crown hero treatment
+- Stronger candlestick/chart hero visual
+- Better gold panel glow
+- Upgraded Stock Lookup into a full AI Stock Report
+- TRQX AI Verdict:
+  - Strong Buy Watch
+  - Buy Watch
+  - Watch
+  - Avoid / High Caution
+- Risk notes
+- Confirmation checklist
+- Time horizon estimate
+- Data quality badge preserved
 
-## Required Vercel Environment Variables
+## Upload Structure
 
 ```text
-FINNHUB_API_KEY
-ANTHROPIC_API_KEY
+index.html
+app.js
+styles.css
+favicon.svg
+README.md
+api/
+  quotes.js
+  symbols.js
+data/
+  stocks.json
+  expanded_universe_template.json
 ```
 
-Redeploy and hard refresh with Ctrl+F5.
+Redeploy in Vercel and hard refresh with Ctrl+F5.
+
+Education only. Not financial advice.
