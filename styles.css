@@ -802,3 +802,86 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+
+
+/* === v16.1 Removed Sentinel Panel / Added Top AI Picks === */
+.brandPanel,
+.brandPanelImage {
+  display: none !important;
+}
+
+.topAIPicksPanel {
+  grid-column: span 2;
+  min-height: 260px;
+}
+
+.topAIPicks {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.topPick {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid rgba(214,168,61,.18);
+  border-radius: 10px;
+  background: rgba(5,5,5,.62);
+}
+
+.topPick .rank {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--gold2), #9b650f);
+  color: #050505;
+  font-weight: 1000;
+}
+
+.topPick b {
+  display: block;
+  color: #fff;
+  font-size: 15px;
+}
+
+.topPick span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.pickStats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.pickStats span {
+  color: var(--gold2);
+  border: 1px solid rgba(214,168,61,.18);
+  background: rgba(214,168,61,.08);
+  border-radius: 999px;
+  padding: 6px 8px;
+  font-weight: 900;
+}
+
+@media(max-width: 1300px) {
+  .topAIPicksPanel {
+    grid-column: span 1;
+  }
+
+  .topPick {
+    grid-template-columns: 42px 1fr;
+  }
+
+  .pickStats {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+}

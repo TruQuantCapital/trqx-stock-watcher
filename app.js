@@ -1436,3 +1436,61 @@ document.addEventListener("DOMContentLoaded", bindAutoRefreshControl);
 
 // Keep top market strip fresh.
 setInterval(fetchMarketStrip, 60000);
+
+
+
+function renderTopAIPicks() {
+  const el = document.getElementById("topAIPicks");
+  if (!el || !Array.isArray(stocks)) return;
+
+  const picks = stocks
+    .filter((s) => Number(s.price) > 0 || Number(s.trqxScore) > 0)
+    .slice()
+    .sort((a, b) => {
+      const aScore = (Number(a.trqxScore) || 0) + (Number(a.price) > 0 ? 5 : 0);
+      const bScore = (Number(b.trqxScore) || 0) + (Number(b.price) > 0 ? 5 : 0);
+      return bScore - aScore;
+    })
+    .slice(0, 5);
+
+  if (!picks.length) {
+    el.innerHTML = `<div class="emptyState">No AI picks available yet.</div>`;
+    return;
+  }
+
+  el.innerHTML = picks.map((s, i) => {
+    const score = Number(s.trqxScore) || 0;
+    const signal = s.signal || (score >= 85 ? "BUY" : score >= 70 ? "WATCH" : "REVIEW");
+    const risk = typeof getRisk === "function" ? getRisk(s) : { label: "Moderate", icon: "●", cls: "medium" };
+    const conf = typeof confidenceForStock === "function" ? confidenceForStock(s) : { label: "Medium" };
+    const prob = typeof getProbability === "function" ? getProbability(s, conf) : Math.min(95, Math.max(45, score));
+
+    return `
+      <div class="topPick">
+        <div class="rank">${i + 1}</div>
+        <div>
+          <b>${s.ticker}</b>
+          <span>${s.name || "Unknown Company"}</span>
+        </div>
+        <div class="pickStats">
+          <span>${signal}</span>
+          <span>${risk.icon} ${risk.label}</span>
+          <span>${prob}%</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+const originalRenderForTopPicks = typeof render === "function" ? render : null;
+if (originalRenderForTopPicks && !window.__trqxTopPicksPatched) {
+  window.__trqxTopPicksPatched = true;
+  render = function() {
+    originalRenderForTopPicks();
+    renderTopAIPicks();
+  };
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(renderTopAIPicks, 400);
+});

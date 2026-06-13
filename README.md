@@ -1,34 +1,24 @@
-# TRQX AI Market Terminal v16 — Brand Asset Upgrade
+# TRQX AI Market Terminal v16.1 — Sentinel Panel Removed
 
-## Added
+## Changed
 
-- Uses your uploaded TRQX master hero image as the hero background
-- Adds Mr. TRQX brand panel
-- Adds Flow Scanner premium preview section
-- Replaces cartoon-style icon feel with cleaner line-icon panels
-- Keeps the scanner, stock lookup, AI chat, live strip, and portfolio builder logic
+- Removed the TRQX Market Sentinel/Mr. TRQX panel that was visually crowding the dashboard.
+- Added a more useful **Top AI Picks Today** panel in its place.
+- The new panel ranks the top 5 opportunities from the current TRQX universe.
 
-## Asset Files Added
+## Keeps
 
-```text
-assets/trqx-master-hero.png
-assets/mr-trqx.png
-assets/flow-scanner-pro.png
-```
+- Brand hero image
+- Flow Scanner preview
+- Stock Lookup
+- Growth Scanner
+- AI Market Analyst
+- Market Heat Map
+- AI Insights
+- Portfolio Builder
+- Live market strip
+- Secure AI routes
 
-## Upload Structure
+## Upload
 
-Upload all files/folders to GitHub root:
-
-```text
-index.html
-app.js
-styles.css
-favicon.svg
-README.md
-assets/
-api/
-data/
-```
-
-Redeploy in Vercel and hard refresh with Ctrl+F5.
+Upload all files/folders to GitHub root, redeploy in Vercel, then hard refresh with Ctrl+F5.
