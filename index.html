@@ -1,226 +1,290 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TRQX AI Market Terminal</title>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="favicon.svg" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
-  <main class="wrap">
-    <section class="hero">
-      <div>
-        <div class="eyebrow">TRQX CAPITAL • AI MARKET TERMINAL</div>
-        <h1>TRQX AI Market Terminal</h1>
-        <p>Search stocks, compare opportunities, and understand the why behind every setup. Built for growth, income, value, momentum, and portfolio research.</p>
-        <div id="status" class="status">Loading saved stock universe...</div>
-        <div id="lastUpdated" class="small">Last live refresh: not yet refreshed</div>
-        <div id="terminalMeta" class="terminalMeta">TRQX AI Engine • Real-Time Market Intelligence • Growth, Income, Momentum & Portfolio Tools</div>
-        <div class="heroCtas">
-          <button class="secondary" onclick="scrollToSection('stockLookupPanel')">Start Stock Search</button>
-          <button class="secondary" onclick="scrollToSection('growthScannerPanel')">View Growth Scanner</button>
-          <button class="secondary" onclick="scrollToSection('portfolioBuilderPanel')">Build Portfolio</button>
+  <div class="terminal-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">♛</div>
+        <div>
+          <div class="brand-title">TRQX</div>
+          <div class="brand-subtitle">AI MARKET TERMINAL</div>
         </div>
       </div>
-      <div class="heroActions">
-        <button class="refresh" onclick="refreshQuotes()">Refresh Market Data</button>
-        <label class="toggle"><input id="autoRefresh" type="checkbox" onchange="toggleAutoRefresh()"> Auto-refresh 5m</label>
+
+      <nav class="nav">
+        <button class="active" onclick="scrollToSection('home')">Dashboard</button>
+        <button onclick="scrollToSection('stockLookupPanel')">Stock Lookup</button>
+        <button onclick="scrollToSection('growthScannerPanel')">Growth Scanner</button>
+        <button onclick="scrollToSection('growthScannerPanel')">$2K Double-Up</button>
+        <button onclick="scrollToSection('portfolioBuilderPanel')">Portfolio Builder</button>
+        <button onclick="scrollToSection('marketHeatMapPanel')">Market Heat Map</button>
+        <button onclick="scrollToSection('aiInsightsPanel')">AI Insights</button>
+        <button onclick="scrollToSection('watchlistPanel')">Watchlist</button>
+      </nav>
+
+      <div class="member-card">
+        <div class="member-badge">PRO MEMBER</div>
+        <h3>TRQX Pro</h3>
+        <p>Premium scanner access</p>
+        <button class="outline-btn">Manage Subscription</button>
       </div>
-    </section>
+    </aside>
 
-    <section class="customerValueStrip">
-      <div>AI Opportunity Scoring</div>
-      <div>Growth Setups</div>
-      <div>Portfolio Builder</div>
-      <div>Probability Engine</div>
-      <div>Market Regime</div>
-    </section>
+    <main class="content">
+      <section class="market-strip">
+        <div><span>S&P 500</span><strong>5,321.41</strong><em class="positive">▲ 0.78%</em></div>
+        <div><span>NASDAQ</span><strong>16,801.54</strong><em class="positive">▲ 1.05%</em></div>
+        <div><span>DOW JONES</span><strong>39,872.99</strong><em class="positive">▲ 0.45%</em></div>
+        <div><span>GOLD</span><strong>2,354.80</strong><em class="positive">▲ 0.21%</em></div>
+        <div><span>OIL (WTI)</span><strong>78.24</strong><em class="negative">▼ 0.38%</em></div>
+        <div><span>BTC/USD</span><strong>66,482.91</strong><em class="positive">▲ 1.32%</em></div>
+        <div class="market-open">● Market Open</div>
+      </section>
 
-    <section id="stockLookupPanel" class="panel stockLookupPanel">
-      <div class="sectionHeader">
-        <div>
+      <section id="home" class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">TRQX CAPITAL • AI MARKET TERMINAL</div>
+          <h1>TRQX AI MARKET <span>TERMINAL</span></h1>
+          <h2>AI-Powered. Data-Driven. Built for Winners.</h2>
+          <p>
+            Search, analyze, and discover high-potential opportunities with real-time data,
+            AI ratings, probability scoring, and advanced analytics.
+          </p>
+
+          <div id="status" class="status-line">TRQX AI Market Terminal loaded. Click Refresh Market Data for live prices.</div>
+          <div id="lastUpdated" class="muted">Last live refresh: not yet refreshed</div>
+          <div id="terminalMeta" class="terminal-meta">TRQX AI Engine • Real-Time Market Intelligence • Growth, Income, Momentum & Portfolio Tools</div>
+
+          <div class="hero-actions">
+            <button class="gold-btn" onclick="scrollToSection('stockLookupPanel')">Start Stock Search</button>
+            <button class="dark-btn" onclick="scrollToSection('growthScannerPanel')">Growth Scanner</button>
+            <button class="dark-btn" onclick="scrollToSection('portfolioBuilderPanel')">Build Portfolio</button>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="world-grid"></div>
+          <div class="chart-lines"></div>
+          <div class="lion">♌</div>
+        </div>
+
+        <div class="refresh-box">
+          <button class="gold-btn" onclick="refreshQuotes()">Refresh Market Data</button>
+          <label><input type="checkbox" id="autoRefresh" /> Auto-refresh 5m</label>
+        </div>
+      </section>
+
+      <section class="stats">
+        <article><span>AI Opportunities</span><strong id="bullishCount">—</strong><small>High Quality Setups</small><i></i></article>
+        <article><span>Elite AI Ratings</span><strong id="eliteCount">—</strong><small>Top Rated Stocks</small><i class="gold-spark"></i></article>
+        <article><span>High Probability</span><strong id="highProbCount">—</strong><small>70%+ Probability</small><i class="blue-spark"></i></article>
+        <article><span>Terminal Status</span><strong class="green">LIVE</strong><small>Market Data Active</small><i></i></article>
+        <article><span>AI Confidence</span><strong class="purple">89%</strong><small>Strong Confidence</small><i class="purple-spark"></i></article>
+        <article><span>Portfolio Value</span><strong class="green">$24,785.60</strong><small>+1,245.30 (5.29%)</small><i></i></article>
+      </section>
+
+      <section class="main-grid">
+        <section id="growthScannerPanel" class="panel scanner-panel">
+          <div class="panel-head">
+            <div>
+              <h2><span id="growthTitle">$2K</span> Growth / Double-Up Scanner</h2>
+              <p>Find stocks with explosive potential using TRQX AI scoring.</p>
+              <div id="growthSummary" class="gold-note">Adjust the filters below to rank candidates.</div>
+            </div>
+            <div class="target-card">
+              <span>Target Value</span>
+              <strong id="growthTarget">$4,000.00</strong>
+            </div>
+          </div>
+
+          <div class="control-row">
+            <label>Capital<input id="growthCapital" type="number" value="2000" /></label>
+            <label>Goal Multiple<input id="growthGoal" type="number" value="2" /></label>
+            <label>Min Price<input id="minPrice" type="number" value="2" /></label>
+            <label>Max Price<input id="maxPrice" type="number" value="25" /></label>
+            <label>Risk
+              <select id="riskMode">
+                <option value="conservative">Conservative</option>
+                <option value="moderate" selected>Moderate</option>
+                <option value="aggressive">Aggressive</option>
+              </select>
+            </label>
+            <label>Quality
+              <select id="qualityMode">
+                <option value="all">All Candidates</option>
+                <option value="excludePenny" selected>Exclude Penny Stocks</option>
+                <option value="qualityOnly">Quality Only</option>
+                <option value="majorOnly">Major Exchanges Only</option>
+                <option value="moonshot">Moonshot Mode</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Ticker</th><th>Price</th><th>Shares</th><th>Invested</th><th>2x Price</th><th>52W High</th><th>Upside</th><th>Value at High</th><th>Return</th><th>Setup</th><th>Stock Risk</th><th>Scanner Mode</th><th>Probability</th><th>Time</th><th>Rank</th>
+                </tr>
+              </thead>
+              <tbody id="growthRows"></tbody>
+            </table>
+          </div>
+
+          <button class="wide-btn" onclick="scrollToSection('watchlistPanel')">View All Opportunities</button>
+        </section>
+
+        <section id="stockLookupPanel" class="panel lookup-panel">
           <h2>Stock Lookup</h2>
-          <p class="small">Enter a ticker to get a TRQX rating, risk profile, probability estimate, and plain-English setup explanation.</p>
-        </div>
-      </div>
+          <p>Search by ticker or company name.</p>
 
-      <div class="lookupBar">
-        <input id="stockLookupInput" placeholder="Search ticker, e.g. AAPL, NVDA, PLTR" onkeydown="if(event.key==='Enter') runStockLookup()">
-        <button class="refresh" onclick="runStockLookup()">Analyze Stock</button>
-      </div>
+          <div class="lookup-bar">
+            <input id="stockLookupInput" placeholder="Search: AAPL, Tesla, Microsoft..." onkeydown="if(event.key==='Enter') runStockLookup()" />
+            <button class="gold-btn" onclick="runStockLookup()">Analyze</button>
+          </div>
 
-      <div id="stockLookupResult" class="lookupResult">
-        <div class="emptyState">Search a ticker to generate a TRQX AI explanation.</div>
-      </div>
-    </section>
+          <div id="stockLookupResult" class="lookup-result">
+            <div class="lookup-preview">
+              <div class="ticker-orb">◎</div>
+              <div>
+                <h3>NVIDIA CORPORATION</h3>
+                <p>NVDA • NASDAQ</p>
+                <div class="preview-price">$1,037.89 <span>▲ 18.74 (1.84%)</span></div>
+              </div>
+              <div class="rating-pill">
+                <strong>Strong Buy</strong>
+                <span>AI Confidence: 89%</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
 
-    <section class="panel presetScannerPanel">
-      <div class="sectionHeader">
-        <div>
-          <h2>Preset Scanners</h2>
-          <p class="small">One-click research filters for common investor goals.</p>
-        </div>
-      </div>
+      <section class="bottom-grid">
+        <section id="marketHeatMapPanel" class="panel">
+          <h2>Market Heat Map</h2>
+          <div class="heat-map">
+            <div class="heat up">Technology<br><strong>+1.85%</strong></div>
+            <div class="heat up">Financials<br><strong>+0.62%</strong></div>
+            <div class="heat up">Healthcare<br><strong>+0.11%</strong></div>
+            <div class="heat up">Consumer Cyclical<br><strong>+1.23%</strong></div>
+            <div class="heat down">Energy<br><strong>-0.72%</strong></div>
+            <div class="heat down">Utilities<br><strong>-0.15%</strong></div>
+            <div class="heat up">Industrials<br><strong>+0.48%</strong></div>
+            <div class="heat down">Real Estate<br><strong>-0.28%</strong></div>
+            <div class="heat up">Materials<br><strong>+0.22%</strong></div>
+          </div>
+        </section>
 
-      <div class="presetGrid">
-        <button onclick="applyPreset('growth')">Best Growth Stocks</button>
-        <button onclick="applyPreset('dividend')">Dividend / Income Ideas</button>
-        <button onclick="applyPreset('undervalued')">Near 52W Low</button>
-        <button onclick="applyPreset('under25')">Stocks Under $25</button>
-        <button onclick="applyPreset('highProbability')">High Probability</button>
-        <button onclick="applyPreset('aggressive')">Aggressive Double-Up</button>
-      </div>
-    </section>
+        <section id="aiInsightsPanel" class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>AI Insights</h2>
+              <p>Market intelligence layer combining ratings, probability, setups, and portfolio construction.</p>
+            </div>
+            <div class="market-badge" id="marketRegime">Market Regime: Neutral</div>
+          </div>
+          <ul class="insight-list">
+            <li>Strong momentum in Technology sector</li>
+            <li>High institutional accumulation detected</li>
+            <li>Earnings season shows positive surprises</li>
+            <li>Market sentiment remains bullish</li>
+          </ul>
 
+          <div class="terminal-controls">
+            <label>Universe Mode
+              <select id="universeMode" onchange="changeUniverseMode()">
+                <option value="scored">TRQX Scored Universe</option>
+                <option value="live">Expanded Live U.S. Universe</option>
+              </select>
+            </label>
+            <button class="dark-btn" onclick="loadExpandedUniverse()">Load Expanded Universe</button>
+          </div>
+        </section>
 
+        <section id="portfolioBuilderPanel" class="panel">
+          <h2>Portfolio Summary</h2>
+          <div class="portfolio-total">$24,785.60 <span>+ $1,245.30 (5.29%)</span></div>
+          <p>Build a sample portfolio from the current stock universe.</p>
 
-    <section class="panel trqxInsightsPanel">
-      <div class="insightHeader">
-        <div>
-          <h2>TRQX AI Insights</h2>
-          <p class="small">A premium market intelligence layer combining AI ratings, probability scoring, growth setups, dividend opportunities, and portfolio construction.</p>
-        </div>
-        <div class="marketBadge" id="marketRegime">Market Regime: Neutral</div>
-      </div>
+          <div class="control-row mini">
+            <label>Capital<input id="portfolioCapital" type="number" value="10000" /></label>
+            <label>Goal
+              <select id="portfolioGoal">
+                <option value="balanced">Balanced</option>
+                <option value="growth" selected>Growth</option>
+                <option value="income">Income</option>
+              </select>
+            </label>
+            <label>Risk
+              <select id="portfolioRisk">
+                <option value="conservative">Conservative</option>
+                <option value="moderate">Moderate</option>
+                <option value="aggressive" selected>Aggressive</option>
+              </select>
+            </label>
+          </div>
 
-      <div class="insightGrid">
-        <div class="insightCard">
-          <div class="label">Bullish Opportunities</div>
-          <div id="bullishCount" class="value">—</div>
-        </div>
-        <div class="insightCard">
-          <div class="label">Elite AI Ratings</div>
-          <div id="eliteCount" class="value">—</div>
-        </div>
-        <div class="insightCard">
-          <div class="label">High Probability</div>
-          <div id="highProbCount" class="value">—</div>
-        </div>
-        <div class="insightCard">
-          <div class="label">Terminal Status</div>
-          <div class="value statusValue">LIVE</div>
-        </div>
-      </div>
+          <div id="portfolioSummary" class="gold-note"></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Ticker</th><th>Allocation</th><th>Dollars</th><th>Shares</th><th>Risk</th><th>Probability</th></tr></thead>
+              <tbody id="portfolioRows"></tbody>
+            </table>
+          </div>
+        </section>
 
-      <div class="tools terminalControls">
-        <label class="field">Universe Mode
-          <select id="universeMode" onchange="changeUniverseMode()">
-            <option value="scored">TRQX Scored Universe</option>
-            <option value="live">Expanded Live U.S. Universe</option>
-          </select>
-        </label>
-        <button class="secondary" onclick="loadExpandedUniverse()">Load Expanded Universe</button>
-      </div>
-    </section>
+        <section class="panel">
+          <h2>AI Probability Distribution</h2>
+          <div class="probability-bars">
+            <div><span>90%+</span><b style="width:78%"></b><em>23</em></div>
+            <div><span>70% - 90%</span><b style="width:92%"></b><em>49</em></div>
+            <div><span>50% - 70%</span><b class="warn" style="width:66%"></b><em>61</em></div>
+            <div><span>Below 50%</span><b class="bad" style="width:38%"></b><em>17</em></div>
+          </div>
+        </section>
+      </section>
 
-    <section id="growthScannerPanel" class="growth panel">
-      <div class="sectionHeader">
-        <div>
-          <h2><span id="growthTitle">$2K</span> Growth / Double-Up Scanner</h2>
-          <p class="small">Ranks lower-priced, higher-upside names by affordability, 52-week upside, probability, risk, and TRQX AI rating.</p>
-          <p id="growthSummary" class="status"></p>
-        </div>
-        <div class="targetBox">
-          <div class="label">Target Value</div>
-          <div id="growthTarget" class="value">—</div>
-        </div>
-      </div>
-
-      <div class="tools">
-        <label class="field">Capital <input id="growthCapital" type="number" value="2000"></label>
-        <label class="field">Goal Multiple <input id="growthGoal" type="number" value="2" step="0.1"></label>
-        <label class="field">Min Price <input id="minPrice" type="number" value="2" step="0.01"></label>
-        <label class="field">Max Price <input id="maxPrice" type="number" value="25"></label>
-        <label class="field">Risk <select id="riskMode"><option value="moderate">Moderate</option><option value="aggressive">Aggressive</option><option value="conservative">Conservative</option></select></label>
-        <label class="field">Quality <select id="qualityMode"><option value="excludePenny">Exclude Penny Stocks</option><option value="qualityOnly">Quality Only</option><option value="majorOnly">NYSE/NASDAQ Only</option><option value="moonshot">Moonshot Mode</option><option value="all">All Candidates</option></select></label>
-      </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Ticker</th><th>Price</th><th>Shares</th><th>Invested</th><th>2x Price</th><th>52W High</th><th>Upside</th><th>Value at High</th><th>Return</th><th>Setup</th><th>Stock Risk</th><th>Scanner Mode</th><th>Probability</th><th>Time</th><th>Rank</th>
-          </tr>
-        </thead>
-        <tbody id="growthRows"></tbody>
-      </table>
-    </section>
-
-    <section id="portfolioBuilderPanel" class="growth panel">
-      <div class="sectionHeader">
-        <div>
-          <h2>TRQX Portfolio Builder</h2>
-          <p id="portfolioSummary" class="small">Build a sample portfolio from the current stock universe.</p>
-        </div>
-      </div>
-
-      <div class="tools">
-        <label class="field">Capital <input id="portfolioCapital" type="number" value="10000"></label>
-        <label class="field">Goal <select id="portfolioGoal"><option value="balanced">Balanced</option><option value="growth">Growth</option><option value="income">Income</option></select></label>
-        <label class="field">Risk <select id="portfolioRisk"><option value="moderate">Moderate</option><option value="conservative">Conservative</option><option value="aggressive">Aggressive</option></select></label>
-      </div>
-
-      <table>
-        <thead>
-          <tr><th>Ticker</th><th>Allocation</th><th>Dollars</th><th>Shares</th><th>Risk</th><th>Probability</th></tr>
-        </thead>
-        <tbody id="portfolioRows"></tbody>
-      </table>
-    </section>
-
-    <section class="grid">
-      <div class="panel">
-        <div class="tools">
-          <input id="search" placeholder="Search ticker or company">
+      <section id="watchlistPanel" class="panel universe-panel">
+        <h2>Watchlist & Full Stock Universe</h2>
+        <div class="filter-row">
+          <input id="search" placeholder="Search ticker or company" />
           <select id="sector"><option value="">All sectors</option></select>
           <select id="signal"><option value="">All signals</option><option>BUY</option><option>WATCH</option><option>AVOID</option></select>
-          <select id="viewMode"><option value="all">All stocks</option><option value="watchlist">My watchlist</option></select>
-          <button class="secondary" onclick="exportWatchlist()">Export Watchlist</button>
+          <select id="viewMode"><option value="all">All stocks</option><option value="watchlist">Watchlist</option></select>
+          <button class="dark-btn" onclick="exportWatchlist()">Export Watchlist</button>
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Watch</th><th>Ticker</th><th>Company</th><th>Sector</th><th>Price</th><th>Change $</th><th>Change %</th><th>52W Low</th><th>52W High</th><th>% From Low</th><th>% Below High</th><th>Signal</th><th>AI Rating</th><th>Stock Risk</th><th>Probability</th><th>Score</th>
-            </tr>
-          </thead>
-          <tbody id="rows"></tbody>
-        </table>
-      </div>
-
-      <aside class="panel">
-        <h3>Top Opportunities</h3>
-        <div id="topList"></div>
-
-        <h3>AI Rating</h3>
-        <div class="legend"><span class="dot elite"></span>A+ Elite</div>
-        <div class="legend"><span class="dot strong"></span>A Strong</div>
-        <div class="legend"><span class="dot watch"></span>B Watch</div>
-        <div class="legend"><span class="dot low"></span>C/D Speculative</div>
-
-        <h3>Dividend Income Calculator</h3>
-        <div class="small">Portfolio Amount</div>
-        <input id="portfolio" type="number" value="100000" oninput="calcIncome()">
-        <div class="small">Estimated Yield %</div>
-        <input id="yield" type="number" value="4" step="0.1" oninput="calcIncome()">
-
-        <div class="card">
-          <div class="label">Estimated Annual Income</div>
-          <div id="annualIncome" class="value">—</div>
-          <div class="label">Estimated Monthly Income</div>
-          <div id="monthlyIncome" class="value">—</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Watch</th><th>Ticker</th><th>Company</th><th>Sector</th><th>Price</th><th>52W Low</th><th>52W High</th><th>% From Low</th><th>% Below High</th><th>Signal</th><th>Meter</th><th>AI Rating</th><th>Stock Risk</th><th>Probability</th><th>Score</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
         </div>
+      </section>
 
-        <p class="footer">Education only. Not financial advice. Probability and time estimates are model-based approximations, not guarantees.</p>
-      </aside>
-    </section>
-  </main>
+      <footer>
+        TRQX AI Market Terminal is an educational research tool. It does not provide personalized financial advice, investment recommendations, or guaranteed outcomes.
+      </footer>
+    </main>
+  </div>
 
-  <div id="stockModal" class="modal">
-    <div class="modalContent">
-      <button class="close" onclick="closeStockModal()">×</button>
-      <h2 id="modalTitle">Stock Detail</h2>
-      <div id="modalBody"></div>
+  <div id="modal" class="modal hidden">
+    <div class="modalCard">
+      <button class="closeBtn" onclick="closeStockModal()">×</button>
+      <div id="modalContent"></div>
     </div>
   </div>
 

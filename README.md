@@ -1,19 +1,43 @@
-# TRQX AI Market Terminal v9.2 — Lookup Quality Upgrade
+# TRQX AI Market Terminal v11 — Full Premium Mockup Build
 
-## Added
+This package builds out the premium black-and-gold terminal page based on the final mockup.
 
-- Search by ticker or company name
-- Live quote refresh inside Stock Lookup
-- Data Quality badge:
-  - Live Data Available
-  - Limited Data
-  - Limited OTC Coverage
-  - No Live Coverage
-- Better explanations for penny stocks, OTC names, and securities with missing market data
-- Lookup updates the main universe when live quote data is found
+## Included
 
-## Why this matters
+- Left sidebar navigation
+- Top market ticker strip
+- Premium hero section
+- Lion-inspired gold visual
+- AI opportunity stat cards
+- Growth / Double-Up scanner
+- Stock Lookup module
+- Market Heat Map
+- AI Insights
+- Portfolio Builder
+- AI Probability Distribution
+- Full Stock Universe / Watchlist table
+- Existing API routes retained:
+  - api/quotes.js
+  - api/symbols.js
 
-Some penny stocks, OTC names, warrants, ADRs, and thinly traded securities do not return full live data from Finnhub. The terminal now explains that clearly instead of showing blank values without context.
+## Upload Structure
+
+Upload all extracted files to the GitHub repo root:
+
+```text
+index.html
+app.js
+styles.css
+favicon.svg
+README.md
+api/
+  quotes.js
+  symbols.js
+data/
+  stocks.json
+  expanded_universe_template.json
+```
+
+Then redeploy in Vercel and hard refresh with Ctrl+F5.
 
 Education only. Not financial advice.

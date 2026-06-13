@@ -827,11 +827,9 @@ function renderGrowthScanner() {
         <td>${fmtUSD(s.doublePrice)}</td>
         <td>${fmtUSD(s.high52)}</td>
         <td>${fmtPct(s.upsideToHighPct)}</td>
-        <td>${fmtUSD(s.valueAtHigh)}</td>
-        <td>${fmtPct(s.returnAtHighPct)}</td>
-        <td><span class="meter ${s.doublePossible ? "strong" : "watch"}">${s.doublePossible ? "2x setup" : "upside play"}</span></td>
+        <td class="score">${s.growthRank}</td>
         <td><span class="confidence ${s.risk.cls}">${s.risk.icon} ${s.risk.label}</span></td>
-        <td><span class="confidence ${scannerMode.cls}">${scannerMode.icon} ${scannerMode.label}</span></td>
+        <td><span class="meter ${s.doublePossible ? "strong" : "watch"}">${s.doublePossible ? "2x Setup" : "Upside"}</span></td>
         <td><span class="confidence ${probabilityClass(s.probability)}">${s.probability}%</span></td>
         <td>${getTimeToGoal(s, goal)}</td>
         <td class="score">${s.growthRank}</td>
