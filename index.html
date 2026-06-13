@@ -10,6 +10,8 @@
 
 <body>
   <div class="terminal-shell">
+
+    <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar">
       <div class="brand">
         <div class="brand-mark">♛</div>
@@ -20,35 +22,43 @@
       </div>
 
       <nav class="nav">
-        <button class="active" onclick="scrollToSection('home')">Dashboard</button>
-        <button onclick="scrollToSection('stockLookupPanel')">Stock Lookup</button>
-        <button onclick="scrollToSection('growthScannerPanel')">Growth Scanner</button>
-        <button onclick="scrollToSection('growthScannerPanel')">$2K Double-Up</button>
-        <button onclick="scrollToSection('portfolioBuilderPanel')">Portfolio Builder</button>
-        <button onclick="scrollToSection('marketHeatMapPanel')">Market Heat Map</button>
-        <button onclick="scrollToSection('aiInsightsPanel')">AI Insights</button>
-        <button onclick="scrollToSection('watchlistPanel')">Watchlist</button>
+        <button class="active" data-icon="⊞" onclick="scrollToSection('home')">Dashboard</button>
+        <button data-icon="◎" onclick="scrollToSection('stockLookupPanel')">Stock Lookup</button>
+        <button data-icon="📈" onclick="scrollToSection('growthScannerPanel')">Growth Scanner</button>
+        <button data-icon="⚡" onclick="scrollToSection('growthScannerPanel')">$2K Double-Up</button>
+        <button data-icon="◈" onclick="scrollToSection('portfolioBuilderPanel')">Portfolio Builder</button>
+        <button data-icon="◉" onclick="scrollToSection('marketHeatMapPanel')">Market Intelligence</button>
+        <button data-icon="♥" onclick="scrollToSection('watchlistPanel')">Watchlist</button>
+        <button data-icon="🔔" onclick="scrollToSection('aiInsightsPanel')">Alerts</button>
+        <button data-icon="🗺" onclick="scrollToSection('marketHeatMapPanel')">Market Heat Map</button>
+        <button data-icon="✦" onclick="scrollToSection('aiInsightsPanel')">AI Insights</button>
+        <button data-icon="⚙" onclick="scrollToSection('home')">Settings</button>
       </nav>
 
       <div class="member-card">
         <div class="member-badge">PRO MEMBER</div>
         <h3>TRQX Pro</h3>
         <p>Premium scanner access</p>
-        <button class="outline-btn">Manage Subscription</button>
+        <div class="access-exp">Access Expires<br><strong>Dec 31, 2025</strong></div>
+        <button class="outline-btn" onclick="scrollToSection('home')">Manage Subscription</button>
       </div>
     </aside>
 
+    <!-- ===== MAIN CONTENT ===== -->
     <main class="content">
+
+      <!-- MARKET STRIP -->
       <section class="market-strip live-market-strip">
-        <div><span>S&P 500</span><strong>5,321.41</strong><em class="positive">▲ 0.78%</em></div>
+        <div><span>S&amp;P 500</span><strong>5,321.41</strong><em class="positive">▲ 0.78%</em></div>
         <div><span>NASDAQ</span><strong>16,801.54</strong><em class="positive">▲ 1.05%</em></div>
         <div><span>DOW JONES</span><strong>39,872.99</strong><em class="positive">▲ 0.45%</em></div>
         <div><span>GOLD</span><strong>2,354.80</strong><em class="positive">▲ 0.21%</em></div>
         <div><span>OIL (WTI)</span><strong>78.24</strong><em class="negative">▼ 0.38%</em></div>
         <div><span>BTC/USD</span><strong>66,482.91</strong><em class="positive">▲ 1.32%</em></div>
-        <div class="market-open">● Market Open</div>
+        <div class="market-open">Market Open</div>
       </section>
 
+      <!-- HERO -->
       <section id="home" class="hero">
         <div class="hero-copy">
           <div class="eyebrow">TRQX CAPITAL • AI MARKET TERMINAL</div>
@@ -61,12 +71,12 @@
 
           <div id="status" class="status-line">TRQX AI Market Terminal loaded. Click Refresh Market Data for live prices.</div>
           <div id="lastUpdated" class="muted">Last live refresh: not yet refreshed</div>
-          <div id="terminalMeta" class="terminal-meta">TRQX AI Engine • Real-Time Market Intelligence • Growth, Income, Momentum & Portfolio Tools</div>
+          <div id="terminalMeta" class="terminal-meta">TRQX AI Engine • Real-Time Market Intelligence • Growth, Income, Momentum &amp; Portfolio Tools</div>
 
           <div class="hero-actions">
-            <button class="gold-btn" onclick="scrollToSection('stockLookupPanel')">Start Stock Search</button>
-            <button class="dark-btn" onclick="scrollToSection('growthScannerPanel')">Growth Scanner</button>
-            <button class="dark-btn" onclick="scrollToSection('portfolioBuilderPanel')">Build Portfolio</button>
+            <button class="gold-btn" onclick="scrollToSection('stockLookupPanel')">🔍 Start Stock Search</button>
+            <button class="dark-btn" onclick="scrollToSection('growthScannerPanel')">📈 Growth Scanner</button>
+            <button class="dark-btn" onclick="scrollToSection('portfolioBuilderPanel')">💼 Build Portfolio</button>
           </div>
         </div>
 
@@ -82,26 +92,60 @@
 
         <div class="refresh-box">
           <button class="gold-btn" onclick="refreshQuotes()">Refresh Market Data</button>
-          <label><input type="checkbox" id="autoRefresh" /> Auto-refresh 5m</label>
+          <label><input type="checkbox" id="autoRefresh" onchange="toggleAutoRefresh()" /> Auto-refresh 5m</label>
         </div>
       </section>
 
+      <!-- STATS ROW -->
       <section class="stats">
-        <article><span>AI Opportunities</span><strong id="bullishCount">—</strong><small>High Quality Setups</small><i></i></article>
-        <article><span>Elite AI Ratings</span><strong id="eliteCount">—</strong><small>Top Rated Stocks</small><i class="gold-spark"></i></article>
-        <article><span>High Probability</span><strong id="highProbCount">—</strong><small>70%+ Probability</small><i class="blue-spark"></i></article>
-        <article><span>Terminal Status</span><strong class="green">LIVE</strong><small>Market Data Active</small><i></i></article>
-        <article><span>AI Confidence</span><strong class="purple">89%</strong><small>Strong Confidence</small><i class="purple-spark"></i></article>
-        <article><span>Portfolio Value</span><strong class="green">$24,785.60</strong><small>+1,245.30 (5.29%)</small><i></i></article>
+        <article>
+          <span>AI Opportunities</span>
+          <strong id="bullishCount">—</strong>
+          <small>High Quality Setups</small>
+          <i></i>
+        </article>
+        <article>
+          <span>Elite AI Ratings</span>
+          <strong id="eliteCount">—</strong>
+          <small>Top Rated Stocks ⭐</small>
+          <i class="gold-spark"></i>
+        </article>
+        <article>
+          <span>High Probability</span>
+          <strong id="highProbCount">—</strong>
+          <small>70%+ Probability</small>
+          <i class="blue-spark"></i>
+        </article>
+        <article>
+          <span>Terminal Status</span>
+          <strong class="green">LIVE</strong>
+          <small>Market Data Active</small>
+          <i></i>
+        </article>
+        <article>
+          <span>AI Confidence</span>
+          <strong class="purple">89%</strong>
+          <small>Strong Confidence</small>
+          <i class="purple-spark"></i>
+        </article>
+        <article>
+          <span>Portfolio Value</span>
+          <strong class="green">$24,785</strong>
+          <small>+1,245 (5.29%)</small>
+          <i></i>
+        </article>
       </section>
 
+      <!-- MAIN 2-COL GRID -->
       <section class="main-grid">
+
+        <!-- Growth Scanner -->
         <section id="growthScannerPanel" class="panel scanner-panel">
           <div class="panel-head">
             <div>
-              <h2><span id="growthTitle">$2K</span> Growth / Double-Up Scanner</h2>
+              <h2>$2K GROWTH / DOUBLE-UP SCANNER</h2>
               <p>Find stocks with explosive potential using TRQX AI scoring.</p>
-              <div id="growthSummary" class="gold-note">Adjust the filters below to rank candidates.</div>
+              <div id="growthSummary" class="gold-note" style="margin-top:6px">Adjust the filters below to rank candidates.</div>
             </div>
             <div class="target-card">
               <span>Target Value</span>
@@ -136,7 +180,10 @@
             <table>
               <thead>
                 <tr>
-                  <th>Ticker</th><th>Price</th><th>Shares</th><th>Invested</th><th>2x Price</th><th>52W High</th><th>Upside</th><th>Value at High</th><th>Return</th><th>Setup</th><th>Stock Risk</th><th>Scanner Mode</th><th>Probability</th><th>Time</th><th>Rank</th>
+                  <th>Ticker</th><th>Price</th><th>Shares</th><th>Invested</th>
+                  <th>2x Price</th><th>52W High</th><th>Upside</th>
+                  <th>AI Score</th><th>Risk</th><th>Setup</th>
+                  <th>Probability</th><th>Time</th><th>Rank</th>
                 </tr>
               </thead>
               <tbody id="growthRows"></tbody>
@@ -146,21 +193,23 @@
           <button class="wide-btn" onclick="scrollToSection('watchlistPanel')">View All Opportunities</button>
         </section>
 
+        <!-- Stock Lookup -->
         <section id="stockLookupPanel" class="panel lookup-panel">
-          <h2>Stock Lookup</h2>
+          <h2>STOCK LOOKUP</h2>
           <p>Search by ticker or company name.</p>
 
           <div class="lookup-bar">
-            <input id="stockLookupInput" placeholder="Search: AAPL, Tesla, Microsoft..." onkeydown="if(event.key==='Enter') runStockLookup()" />
+            <input id="stockLookupInput" placeholder="Search: AAPL, Tesla, Microsoft..."
+              onkeydown="if(event.key==='Enter') runStockLookup()" />
             <button class="gold-btn" onclick="runStockLookup()">Analyze</button>
           </div>
 
-          <div id="stockLookupResult" class="lookup-result">
+          <div id="stockLookupResult">
             <div class="lookup-preview premium-lookup-preview">
-              <div class="ticker-orb">◎</div>
+              <div class="ticker-orb" style="background:rgba(118,185,0,.14);color:#76b900;font-size:20px;font-weight:900">NV</div>
               <div>
-                <h3>NVIDIA CORPORATION</h3>
-                <p>NVDA • NASDAQ</p>
+                <h3 style="font-size:15px;margin-bottom:2px">NVIDIA CORPORATION</h3>
+                <p style="font-size:12px;margin-bottom:6px">NVDA • NASDAQ</p>
                 <div class="preview-price">$1,037.89 <span>▲ 18.74 (1.84%)</span></div>
               </div>
               <div class="rating-pill">
@@ -168,48 +217,56 @@
                 <span>AI Confidence: 89%</span>
               </div>
             </div>
+            <!-- Quick stats under preview -->
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px">
+              <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px;text-align:center">
+                <div style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px">TRQX Rating</div>
+                <div style="font-size:18px;font-weight:900;color:var(--gold2);margin-top:4px">A−</div>
+              </div>
+              <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px;text-align:center">
+                <div style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Risk Level</div>
+                <div style="font-size:14px;font-weight:800;color:var(--gold2);margin-top:4px">Moderate</div>
+              </div>
+              <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px;text-align:center">
+                <div style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Probability</div>
+                <div style="font-size:18px;font-weight:900;color:var(--green);margin-top:4px">89%</div>
+              </div>
+              <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px;text-align:center">
+                <div style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Upside</div>
+                <div style="font-size:18px;font-weight:900;color:var(--green);margin-top:4px">38.2%</div>
+              </div>
+            </div>
+            <button class="wide-btn" style="margin-top:10px" onclick="document.getElementById('stockLookupInput').value='NVDA';runStockLookup()">View Full Analysis</button>
           </div>
         </section>
-
-
-        <section id="aiComparePanel" class="panel aiComparePanel">
-          <h2>AI Stock Comparison</h2>
-          <p>Compare two stocks side-by-side using TRQX AI scoring, risk, probability, upside, and data quality.</p>
-
-          <div class="compareControls">
-            <input id="compareA" placeholder="First ticker, e.g. NVDA" />
-            <input id="compareB" placeholder="Second ticker, e.g. AMD" />
-            <button class="gold-btn" onclick="runAIComparison()">Compare</button>
-          </div>
-
-          <div id="compareResult" class="compareResult">
-            <div class="emptyState">Enter two tickers to generate a TRQX AI comparison.</div>
-          </div>
-        </section>
-
       </section>
 
+      <!-- BOTTOM 4-COL GRID -->
       <section class="bottom-grid">
+
+        <!-- Market Heat Map -->
         <section id="marketHeatMapPanel" class="panel">
-          <h2>Market Heat Map</h2>
+          <h2>MARKET HEAT MAP</h2>
           <div class="heat-map">
             <div class="heat up">Technology<br><strong>+1.85%</strong></div>
             <div class="heat up">Financials<br><strong>+0.62%</strong></div>
             <div class="heat up">Healthcare<br><strong>+0.11%</strong></div>
             <div class="heat up">Consumer Cyclical<br><strong>+1.23%</strong></div>
-            <div class="heat down">Energy<br><strong>-0.72%</strong></div>
-            <div class="heat down">Utilities<br><strong>-0.15%</strong></div>
+            <div class="heat down">Energy<br><strong>−0.72%</strong></div>
+            <div class="heat down">Utilities<br><strong>−0.15%</strong></div>
             <div class="heat up">Industrials<br><strong>+0.48%</strong></div>
-            <div class="heat down">Real Estate<br><strong>-0.28%</strong></div>
+            <div class="heat down">Real Estate<br><strong>−0.28%</strong></div>
             <div class="heat up">Materials<br><strong>+0.22%</strong></div>
           </div>
+          <button class="wide-btn" onclick="scrollToSection('aiInsightsPanel')" style="margin-top:12px">View Full Heat Map</button>
         </section>
 
+        <!-- AI Insights -->
         <section id="aiInsightsPanel" class="panel">
           <div class="panel-head">
             <div>
-              <h2>AI Insights</h2>
-              <p>Market intelligence layer combining ratings, probability, setups, and portfolio construction.</p>
+              <h2>AI INSIGHTS</h2>
+              <p>Market intelligence combining ratings, probability, setups, and portfolio tools.</p>
             </div>
             <div class="market-badge" id="marketRegime">Market Regime: Neutral</div>
           </div>
@@ -217,22 +274,9 @@
             <li>Strong momentum in Technology sector</li>
             <li>High institutional accumulation detected</li>
             <li>Earnings season shows positive surprises</li>
+            <li>Above average options flow in AI leaders</li>
             <li>Market sentiment remains bullish</li>
           </ul>
-
-          
-          <div class="aiQuestionBox">
-            <h3>Ask TRQX AI</h3>
-            <p>Quick research prompts for subscribers.</p>
-            <div class="aiPromptButtons">
-              <button onclick="fillAIPrompt('What are the strongest opportunities today?')">Strongest Opportunities</button>
-              <button onclick="fillAIPrompt('What stocks look risky right now?')">Risk Review</button>
-              <button onclick="fillAIPrompt('Build a moderate growth portfolio')">Portfolio Idea</button>
-            </div>
-            <textarea id="aiPromptInput" placeholder="Ask a research question..."></textarea>
-            <button class="gold-btn" onclick="runLocalAIAssistant()">Generate AI Research Note</button>
-            <div id="aiAssistantResult" class="aiAssistantResult"></div>
-          </div>
 
           <div class="terminal-controls">
             <label>Universe Mode
@@ -243,12 +287,14 @@
             </label>
             <button class="dark-btn" onclick="loadExpandedUniverse()">Load Expanded Universe</button>
           </div>
+          <button class="wide-btn" onclick="scrollToSection('aiInsightsPanel')" style="margin-top:12px">View All Insights</button>
         </section>
 
+        <!-- Portfolio Summary -->
         <section id="portfolioBuilderPanel" class="panel">
-          <h2>Portfolio Summary</h2>
+          <h2>PORTFOLIO SUMMARY</h2>
           <div class="portfolio-total">$24,785.60 <span>+ $1,245.30 (5.29%)</span></div>
-          <p>Build a sample portfolio from the current stock universe.</p>
+          <p style="margin-bottom:10px">Build a sample portfolio from the current stock universe.</p>
 
           <div class="control-row mini">
             <label>Capital<input id="portfolioCapital" type="number" value="10000" /></label>
@@ -268,28 +314,50 @@
             </label>
           </div>
 
+          <!-- Mini donut chart (CSS only) -->
+          <div style="display:flex;align-items:center;gap:16px;margin:10px 0">
+            <svg width="80" height="80" viewBox="0 0 80 80" style="flex-shrink:0">
+              <circle cx="40" cy="40" r="30" fill="none" stroke="#1a1a1a" stroke-width="14"/>
+              <circle cx="40" cy="40" r="30" fill="none" stroke="#2fb8ff"  stroke-width="14" stroke-dasharray="84.8 103.7" stroke-dashoffset="0"    transform="rotate(-90 40 40)"/>
+              <circle cx="40" cy="40" r="30" fill="none" stroke="#36d17c"  stroke-width="14" stroke-dasharray="37.7 150.8" stroke-dashoffset="-84.8" transform="rotate(-90 40 40)"/>
+              <circle cx="40" cy="40" r="30" fill="none" stroke="#ffd75e"  stroke-width="14" stroke-dasharray="28.3 160.2" stroke-dashoffset="-122.5"transform="rotate(-90 40 40)"/>
+              <circle cx="40" cy="40" r="30" fill="none" stroke="#b45cff"  stroke-width="14" stroke-dasharray="18.9 169.6" stroke-dashoffset="-150.8"transform="rotate(-90 40 40)"/>
+            </svg>
+            <div style="font-size:11px;display:grid;gap:4px">
+              <div style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#2fb8ff;flex-shrink:0"></span><span style="color:var(--muted2)">Technology</span><strong style="margin-left:auto">45%</strong></div>
+              <div style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#36d17c;flex-shrink:0"></span><span style="color:var(--muted2)">Healthcare</span><strong style="margin-left:auto">20%</strong></div>
+              <div style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#ffd75e;flex-shrink:0"></span><span style="color:var(--muted2)">Financials</span><strong style="margin-left:auto">15%</strong></div>
+              <div style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#b45cff;flex-shrink:0"></span><span style="color:var(--muted2)">Energy</span><strong style="margin-left:auto">10%</strong></div>
+              <div style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#555;flex-shrink:0"></span><span style="color:var(--muted2)">Other</span><strong style="margin-left:auto">10%</strong></div>
+            </div>
+          </div>
+
           <div id="portfolioSummary" class="gold-note"></div>
-          <div class="table-wrap">
+          <div class="table-wrap" style="max-height:200px;overflow-y:auto">
             <table>
               <thead><tr><th>Ticker</th><th>Allocation</th><th>Dollars</th><th>Shares</th><th>Risk</th><th>Probability</th></tr></thead>
               <tbody id="portfolioRows"></tbody>
             </table>
           </div>
+          <button class="wide-btn" onclick="scrollToSection('portfolioBuilderPanel')" style="margin-top:8px">View Portfolio</button>
         </section>
 
+        <!-- AI Probability Distribution -->
         <section class="panel">
-          <h2>AI Probability Distribution</h2>
+          <h2>AI PROBABILITY DISTRIBUTION</h2>
           <div class="probability-bars">
             <div><span>90%+</span><b style="width:78%"></b><em>23</em></div>
-            <div><span>70% - 90%</span><b style="width:92%"></b><em>49</em></div>
-            <div><span>50% - 70%</span><b class="warn" style="width:66%"></b><em>61</em></div>
+            <div><span>70% – 90%</span><b style="width:92%"></b><em>49</em></div>
+            <div><span>50% – 70%</span><b class="warn" style="width:66%"></b><em>61</em></div>
             <div><span>Below 50%</span><b class="bad" style="width:38%"></b><em>17</em></div>
           </div>
+          <button class="wide-btn" onclick="scrollToSection('watchlistPanel')" style="margin-top:16px">View All Opportunities</button>
         </section>
       </section>
 
+      <!-- WATCHLIST / UNIVERSE -->
       <section id="watchlistPanel" class="panel universe-panel">
-        <h2>Watchlist & Full Stock Universe</h2>
+        <h2>WATCHLIST &amp; FULL STOCK UNIVERSE</h2>
         <div class="filter-row">
           <input id="search" placeholder="Search ticker or company" />
           <select id="sector"><option value="">All sectors</option></select>
@@ -302,7 +370,10 @@
           <table>
             <thead>
               <tr>
-                <th>Watch</th><th>Ticker</th><th>Company</th><th>Sector</th><th>Price</th><th>52W Low</th><th>52W High</th><th>% From Low</th><th>% Below High</th><th>Signal</th><th>Meter</th><th>AI Rating</th><th>Stock Risk</th><th>Probability</th><th>Score</th>
+                <th>Watch</th><th>Ticker</th><th>Company</th><th>Sector</th>
+                <th>Price</th><th>Change $</th><th>Change %</th>
+                <th>52W Low</th><th>52W High</th><th>% From Low</th><th>% Below High</th>
+                <th>Signal</th><th>AI Rating</th><th>Stock Risk</th><th>Probability</th><th>Score</th>
               </tr>
             </thead>
             <tbody id="rows"></tbody>
@@ -311,11 +382,12 @@
       </section>
 
       <footer>
-        TRQX AI Market Terminal is an educational research tool. It does not provide personalized financial advice, investment recommendations, or guaranteed outcomes.
+        TRQX AI Market Terminal is an educational research tool. It does not provide personalized financial advice, investment recommendations, or guaranteed outcomes. All data and analysis are for educational purposes only.
       </footer>
     </main>
   </div>
 
+  <!-- MODAL -->
   <div id="modal" class="modal hidden">
     <div class="modalCard">
       <button class="closeBtn" onclick="closeStockModal()">×</button>

@@ -73,10 +73,13 @@ function normalizeUniverse(raw) {
     });
 }
 
+function isMajorExchange(exchange) {
+  const e = String(exchange || "").toUpperCase();
+  return ["NYSE", "NASDAQ", "NYSE AMERICAN", "AMEX", "NYSEARCA", "ARCA", "BATS", "CBOE"].includes(e);
+}
+
 function guessExchange(ticker) {
-  // Default to NASDAQ for symbols without exchange data.
-  // Finnhub still accepts bare U.S. tickers in most cases.
-  return "NASDAQ";
+  return "UNKNOWN";
 }
 
 function baseScoreFromRange(price, low52, high52) {
@@ -289,7 +292,7 @@ function confidenceForStock(s) {
   else if (price >= 2) points += 10;
   else warnings.push("penny-stock risk");
 
-  if (["NYSE", "NASDAQ"].includes(exchange)) points += 25;
+  if (isMajorExchange(exchange)) points += 25;
   else warnings.push("non-major exchange");
 
   if (score >= 85) points += 25;
@@ -345,7 +348,7 @@ function getRisk(stock) {
 
   const volatility = price > 0 && high52 > low52 ? ((high52 - low52) / price) * 100 : 0;
 
-  if (price < 5 || volatility > 250 || !["NYSE", "NASDAQ"].includes(exchange)) {
+  if (price < 5 || volatility > 250 || !isMajorExchange(exchange)) {
     return { label: "Aggressive", icon: "🔴", cls: "low" };
   }
 
@@ -413,7 +416,6 @@ function scrollToSection(id) {
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
-
 
 
 
@@ -504,40 +506,6 @@ function aiVerdict(score, risk, probability, quality) {
   return { label: "AVOID / HIGH CAUTION", cls: "avoid", note: "Weak score or insufficient data." };
 }
 
-function sectorTone(stock) {
-  const sector = String(stock.sector || "").toLowerCase();
-  if (sector.includes("technology") || sector.includes("it")) return "AI, software, semiconductors, and digital infrastructure remain high-interest growth areas.";
-  if (sector.includes("real estate")) return "Real estate setups should be evaluated with rates, debt costs, and dividend sustainability in mind.";
-  if (sector.includes("energy")) return "Energy names are sensitive to commodity pricing, cash flow cycles, and geopolitical risk.";
-  if (sector.includes("health")) return "Healthcare names can be defensive, but trial, regulatory, and reimbursement risk can be material.";
-  if (sector.includes("financial")) return "Financial stocks are sensitive to rates, credit conditions, and loan growth.";
-  return "Sector context is limited, so the rating relies more heavily on price range, TRQX score, and probability model.";
-}
-
-function buildInvestmentThesis(stock, analysis) {
-  const thesis = [];
-
-  if (analysis.verdict.cls === "buy") {
-    thesis.push(`${stock.ticker} currently screens as a positive TRQX watchlist candidate because its score, probability, and setup quality are aligned.`);
-  } else if (analysis.verdict.cls === "watch") {
-    thesis.push(`${stock.ticker} belongs on a watchlist rather than an automatic action list because the model sees either limited data, elevated risk, or incomplete confirmation.`);
-  } else {
-    thesis.push(`${stock.ticker} should be treated with caution because the current model does not show enough high-quality confirmation.`);
-  }
-
-  thesis.push(sectorTone(stock));
-
-  if (analysis.upside != null && analysis.upside > 25) {
-    thesis.push(`The stock has measurable room to its 52-week high, but that upside should be weighed against volatility and liquidity.`);
-  }
-
-  if (analysis.risk.label === "Aggressive") {
-    thesis.push("Because risk is aggressive, this setup is better suited for smaller position sizing and stricter risk management.");
-  }
-
-  return thesis;
-}
-
 function explainStock(stock) {
   const price = Number(stock.price) || 0;
   const low52 = Number(stock.low52) || 0;
@@ -582,9 +550,7 @@ function explainStock(stock) {
 
   const horizon = risk.label === "Aggressive" ? "3–12 months" : score >= 80 ? "12–24 months" : "24+ months";
 
-  const analysis = { rating, prob, risk, conf, upside, fromLow, reasons, risks, confirmations, quality, verdict, horizon };
-  analysis.thesis = buildInvestmentThesis(stock, analysis);
-  return analysis;
+  return { rating, prob, risk, conf, upside, fromLow, reasons, risks, confirmations, quality, verdict, horizon };
 }
 
 async function runStockLookup() {
@@ -639,19 +605,14 @@ async function runStockLookup() {
         <div><span>Time Horizon</span><b>${analysis.horizon}</b></div>
       </div>
 
-      <div class="thesisBox">
-        <h4>AI Investment Thesis</h4>
-        <p>${analysis.thesis.join(" ")}</p>
-      </div>
-
       <div class="reportGrid">
         <div class="whyBox">
-          <h4>Bull Case</h4>
+          <h4>Why TRQX is watching it</h4>
           <ul>${analysis.reasons.map((r) => `<li>${r}</li>`).join("")}</ul>
         </div>
 
         <div class="riskBox">
-          <h4>Bear / Risk Case</h4>
+          <h4>Risk Notes</h4>
           <ul>${analysis.risks.map((r) => `<li>${r}</li>`).join("")}</ul>
         </div>
 
@@ -675,131 +636,6 @@ async function runStockLookup() {
   render();
   renderGrowthScanner();
   renderPortfolioBuilder();
-}
-
-async function runAIComparison() {
-  const aInput = document.getElementById("compareA");
-  const bInput = document.getElementById("compareB");
-  const out = document.getElementById("compareResult");
-  if (!aInput || !bInput || !out) return;
-
-  const aQuery = aInput.value.trim();
-  const bQuery = bInput.value.trim();
-
-  if (!aQuery || !bQuery) {
-    out.innerHTML = `<div class="emptyState">Enter two tickers first.</div>`;
-    return;
-  }
-
-  let a = findStockByQuery(aQuery);
-  let b = findStockByQuery(bQuery);
-
-  if (!a || !b) {
-    out.innerHTML = `<div class="emptyState">One or both tickers were not found. Load Expanded Universe if needed.</div>`;
-    return;
-  }
-
-  out.innerHTML = `<div class="emptyState">Running TRQX AI comparison...</div>`;
-
-  a = await fetchLiveQuoteForLookup(a);
-  b = await fetchLiveQuoteForLookup(b);
-
-  const aa = explainStock(a);
-  const bb = explainStock(b);
-
-  const aScore = (Number(a.trqxScore) || 0) + aa.prob - (aa.risk.label === "Aggressive" ? 8 : 0);
-  const bScore = (Number(b.trqxScore) || 0) + bb.prob - (bb.risk.label === "Aggressive" ? 8 : 0);
-  const winner = aScore >= bScore ? a : b;
-  const winnerAnalysis = aScore >= bScore ? aa : bb;
-
-  out.innerHTML = `
-    <div class="compareCards">
-      ${comparisonCard(a, aa)}
-      ${comparisonCard(b, bb)}
-    </div>
-    <div class="comparisonWinner">
-      <span>TRQX AI Winner</span>
-      <b>${winner.ticker} — ${winner.name}</b>
-      <p>${winner.ticker} ranks better in this comparison based on TRQX score, probability, risk, and available data quality. Verdict: ${winnerAnalysis.verdict.label}.</p>
-    </div>
-  `;
-}
-
-function comparisonCard(stock, analysis) {
-  return `
-    <div class="compareCard">
-      <div class="eyebrow">${stock.ticker}</div>
-      <h3>${stock.name}</h3>
-      <div class="compareMetric"><span>Price</span><b>${fmtUSD(stock.price)}</b></div>
-      <div class="compareMetric"><span>TRQX Rating</span><b>${analysis.rating.label}</b></div>
-      <div class="compareMetric"><span>Risk</span><b>${analysis.risk.icon} ${analysis.risk.label}</b></div>
-      <div class="compareMetric"><span>Probability</span><b>${analysis.prob}%</b></div>
-      <div class="compareMetric"><span>Verdict</span><b>${analysis.verdict.label}</b></div>
-    </div>
-  `;
-}
-
-function fillAIPrompt(text) {
-  const input = document.getElementById("aiPromptInput");
-  if (input) input.value = text;
-}
-
-function runLocalAIAssistant() {
-  const input = document.getElementById("aiPromptInput");
-  const out = document.getElementById("aiAssistantResult");
-  if (!input || !out) return;
-
-  const prompt = input.value.trim().toLowerCase();
-  if (!prompt) {
-    out.innerHTML = `<div class="emptyState">Enter a research question first.</div>`;
-    return;
-  }
-
-  const candidates = stocks
-    .filter((s) => Number(s.price) > 0)
-    .map((s) => ({ stock: s, analysis: explainStock(s) }))
-    .sort((a, b) => (b.analysis.prob + (Number(b.stock.trqxScore) || 0)) - (a.analysis.prob + (Number(a.stock.trqxScore) || 0)))
-    .slice(0, 5);
-
-  if (prompt.includes("risk")) {
-    const risky = stocks
-      .filter((s) => Number(s.price) > 0)
-      .map((s) => ({ stock: s, analysis: explainStock(s) }))
-      .filter((x) => x.analysis.risk.label === "Aggressive" || x.analysis.quality.cls === "low")
-      .slice(0, 5);
-
-    out.innerHTML = aiNoteTemplate("Risk Review", risky, "These names require caution due to aggressive risk profile or limited live data quality.");
-    return;
-  }
-
-  if (prompt.includes("portfolio")) {
-    out.innerHTML = `
-      <div class="aiNote">
-        <h4>Moderate Growth Portfolio Idea</h4>
-        <p>TRQX AI would favor diversified exposure across higher-probability names, avoiding overconcentration in speculative setups.</p>
-        <ul>
-          ${candidates.map((x, i) => `<li>${x.stock.ticker}: suggested ${i < 2 ? "core" : "satellite"} allocation candidate. Probability ${x.analysis.prob}%.</li>`).join("")}
-        </ul>
-        <p class="disclaimerBox">Educational research only. Not personalized financial advice.</p>
-      </div>
-    `;
-    return;
-  }
-
-  out.innerHTML = aiNoteTemplate("Strongest Opportunities", candidates, "These stocks currently rank highest by TRQX score, probability, and available setup quality.");
-}
-
-function aiNoteTemplate(title, list, intro) {
-  return `
-    <div class="aiNote">
-      <h4>${title}</h4>
-      <p>${intro}</p>
-      <ul>
-        ${list.map((x) => `<li><b>${x.stock.ticker}</b> — ${x.analysis.verdict.label}, probability ${x.analysis.prob}%, risk ${x.analysis.risk.label}.</li>`).join("")}
-      </ul>
-      <p class="disclaimerBox">Educational research only. Not personalized financial advice.</p>
-    </div>
-  `;
 }
 
 
@@ -925,10 +761,10 @@ function passesQuality(s, minPrice, maxPrice, riskMode, qualityMode) {
   const conf = confidenceForStock(s);
 
   if (!price || price < minPrice || price > maxPrice) return false;
-  if (qualityMode === "majorOnly" && !["NYSE", "NASDAQ"].includes(exchange)) return false;
+  if (qualityMode === "majorOnly" && !isMajorExchange(exchange)) return false;
   if (qualityMode === "excludePenny" && price < 2) return false;
-  if (qualityMode === "qualityOnly" && (conf.label === "Low" || score < 70 || !["NYSE", "NASDAQ"].includes(exchange))) return false;
-  if (qualityMode === "moonshot" && !(price <= 20 && score >= 80 && ["NYSE", "NASDAQ"].includes(exchange))) return false;
+  if (qualityMode === "qualityOnly" && (conf.label === "Low" || score < 70 || !isMajorExchange(exchange))) return false;
+  if (qualityMode === "moonshot" && !(price <= 20 && score >= 80 && isMajorExchange(exchange))) return false;
 
   if (riskMode === "conservative") return score >= 75 && conf.label !== "Low";
   if (riskMode === "moderate") return score >= 60;
@@ -980,7 +816,7 @@ function renderGrowthScanner() {
       if (riskMode === "aggressive" && price <= 10) adjustedRank += 6;
       if (qualityMode === "qualityOnly" && g.confidence.label === "High") adjustedRank += 12;
       if (qualityMode === "moonshot" && doublePossible && price <= 20) adjustedRank += 15;
-      if (qualityMode === "majorOnly" && ["NYSE", "NASDAQ"].includes(String(s.exchange || "").toUpperCase())) adjustedRank += 6;
+      if (qualityMode === "majorOnly" && isMajorExchange(s.exchange)) adjustedRank += 6;
 
       return {
         ...s,
@@ -1020,10 +856,9 @@ function renderGrowthScanner() {
     .slice(0, 12);
 
   document.getElementById("growthRows").innerHTML = candidates.length
-    ? candidates.map((s) => {
-      const warnings = s.confidence.warnings.length ? s.confidence.warnings.join(", ") : "clean setup";
+    ? candidates.map((s, idx) => {
       return `<tr>
-        <td><b>${s.ticker}</b><div class="small">${s.name}</div></td>
+        <td><b>${s.ticker}</b><div class="small">${s.name.slice(0,22)}</div></td>
         <td>${fmtUSD(s.price)}</td>
         <td>${s.shares}</td>
         <td>${fmtUSD(s.invested)}</td>
@@ -1035,11 +870,11 @@ function renderGrowthScanner() {
         <td><span class="meter ${s.doublePossible ? "strong" : "watch"}">${s.doublePossible ? "2x Setup" : "Upside"}</span></td>
         <td><span class="confidence ${probabilityClass(s.probability)}">${s.probability}%</span></td>
         <td>${getTimeToGoal(s, goal)}</td>
-        <td class="score">${s.growthRank}</td>
+        <td class="score">${idx + 1}</td>
       </tr>`;
     })
     .join("")
-    : `<tr><td colspan="15" class="emptyState">No growth candidates match these settings. Try lowering Min Price, raising Max Price, or changing Quality to All Candidates.</td></tr>`;
+    : `<tr><td colspan="13" class="emptyState">No growth candidates match these settings. Try lowering Min Price, raising Max Price, or changing Quality to All Candidates.</td></tr>`;
 
   const summary = document.getElementById("growthSummary");
   if (summary) {
@@ -1176,7 +1011,7 @@ function exportWatchlist() {
   const csv = [
     "Ticker,Company,Sector,Price,TRQX Score,Signal",
     ...rows.map((r) => `${r.ticker},"${String(r.company).replaceAll('"', '""')}",${r.sector},${r.price},${r.trqxScore},${r.signal}`)
-  ].join("\\n");
+  ].join("\n");
 
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
@@ -1188,6 +1023,60 @@ function exportWatchlist() {
 }
 
 load();
+
+function openStockModal(ticker) {
+  const stock = stocks.find((s) => s.ticker === ticker);
+  const modal = document.getElementById("modal");
+  const content = document.getElementById("modalContent");
+  if (!stock || !modal || !content) return;
+
+  const conf = confidenceForStock(stock);
+  const prob = getProbability(stock, conf);
+  const risk = getRisk(stock);
+  const rating = getAIRating(stock.trqxScore);
+  const reasons = whyThisStock(stock);
+
+  content.innerHTML = `
+    <div class="eyebrow" style="margin-bottom:10px">TRQX AI STOCK REPORT</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px">
+      <div>
+        <h2 style="font-size:22px;margin-bottom:4px">${stock.ticker} — ${stock.name}</h2>
+        <p style="color:var(--muted);margin-bottom:8px">${stock.sector || "—"} • ${stock.exchange || "US"}</p>
+        <div style="font-size:30px;font-weight:900">${fmtUSD(stock.price)}</div>
+      </div>
+      <div class="verdictBox ${rating.cls === 'elite' || rating.cls === 'strong' ? 'buy' : rating.cls === 'medium' ? 'watch' : 'avoid'}">
+        <span>TRQX AI VERDICT</span>
+        <b>${rating.label}</b>
+        <small>Score: ${stock.trqxScore ?? "—"}</small>
+      </div>
+    </div>
+    <div class="lookupStats" style="grid-template-columns:repeat(4,1fr)">
+      <div><span>Signal</span><b>${stock.signal || "WATCH"}</b></div>
+      <div><span>Risk</span><b>${risk.icon} ${risk.label}</b></div>
+      <div><span>Probability</span><b>${prob}%</b></div>
+      <div><span>52W Upside</span><b>${stock.high52 && stock.price ? fmtPct(((stock.high52 - stock.price) / stock.price) * 100) : "—"}</b></div>
+    </div>
+    <div class="whyBox" style="margin-top:14px">
+      <h4>Why TRQX is watching it</h4>
+      <ul>${reasons.map((r) => `<li>${r}</li>`).join("")}</ul>
+    </div>
+    <p class="disclaimerBox" style="margin-top:12px">Educational research only. Not financial advice or a guaranteed outcome.</p>
+  `;
+
+  modal.classList.remove("hidden");
+}
+
+function closeStockModal() {
+  const modal = document.getElementById("modal");
+  if (modal) modal.classList.add("hidden");
+}
+
+// Close modal on overlay click
+document.addEventListener("DOMContentLoaded", () => {
+  const modal = document.getElementById("modal");
+  if (modal) modal.addEventListener("click", (e) => { if (e.target === modal) closeStockModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeStockModal(); });
+});
 
 function renderPortfolioBuilder() {
   const capitalEl = document.getElementById("portfolioCapital");
