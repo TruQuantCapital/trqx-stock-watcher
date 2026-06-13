@@ -1,25 +1,24 @@
-# TRQX AI Market Terminal v12 — Luxury UI + AI Stock Report
+# TRQX AI Market Terminal v16 — Brand Asset Upgrade
 
 ## Added
 
-- More premium black/gold visual treatment
-- Animated background particles
-- Animated hero-grid glow
-- Larger luxury lion/crown hero treatment
-- Stronger candlestick/chart hero visual
-- Better gold panel glow
-- Upgraded Stock Lookup into a full AI Stock Report
-- TRQX AI Verdict:
-  - Strong Buy Watch
-  - Buy Watch
-  - Watch
-  - Avoid / High Caution
-- Risk notes
-- Confirmation checklist
-- Time horizon estimate
-- Data quality badge preserved
+- Uses your uploaded TRQX master hero image as the hero background
+- Adds Mr. TRQX brand panel
+- Adds Flow Scanner premium preview section
+- Replaces cartoon-style icon feel with cleaner line-icon panels
+- Keeps the scanner, stock lookup, AI chat, live strip, and portfolio builder logic
+
+## Asset Files Added
+
+```text
+assets/trqx-master-hero.png
+assets/mr-trqx.png
+assets/flow-scanner-pro.png
+```
 
 ## Upload Structure
+
+Upload all files/folders to GitHub root:
 
 ```text
 index.html
@@ -27,14 +26,9 @@ app.js
 styles.css
 favicon.svg
 README.md
+assets/
 api/
-  quotes.js
-  symbols.js
 data/
-  stocks.json
-  expanded_universe_template.json
 ```
 
 Redeploy in Vercel and hard refresh with Ctrl+F5.
-
-Education only. Not financial advice.
