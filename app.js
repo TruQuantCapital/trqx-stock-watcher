@@ -412,9 +412,13 @@ function filtered() {
 }
 
 
-function scrollToSection(id) {
+function scrollTo(id) {
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function scrollToSection(id) {
+  scrollTo(id);
 }
 
 
@@ -1185,3 +1189,175 @@ function renderPortfolioBuilder() {
 }
 
 
+
+// ============================================================
+// TRQX AI MARKET ANALYST — Claude-powered chat backend
+// ============================================================
+
+function buildStockContext() {
+  const summary = stocks.slice(0, 175).map((s) => {
+    const conf = confidenceForStock(s);
+    const prob = getProbability(s, conf);
+    const risk = getRisk(s);
+    return {
+      ticker: s.ticker,
+      name: s.name,
+      sector: s.sector,
+      exchange: s.exchange,
+      price: s.price,
+      low52: s.low52,
+      high52: s.high52,
+      from52LowPct: s.from52LowPct != null ? +Number(s.from52LowPct).toFixed(1) : null,
+      below52HighPct: s.below52HighPct != null ? +Number(s.below52HighPct).toFixed(1) : null,
+      signal: s.signal,
+      trqxScore: s.trqxScore,
+      probability: prob,
+      risk: risk.label,
+    };
+  });
+  return JSON.stringify(summary);
+}
+
+function buildSystemPrompt() {
+  const ctx = buildStockContext();
+  return `You are the TRQX AI Market Analyst — an expert financial research assistant embedded in the TRQX AI Market Terminal. You help traders and investors understand the stocks in the TRQX universe, find opportunities, and interpret market data.
+
+You have full access to the current TRQX stock universe data below. Use this data to give specific, data-driven answers. Always refer to real tickers from the universe when relevant.
+
+TRQX Universe Data (JSON):
+${ctx}
+
+Key scoring context:
+- TRQX Score: 0-100. 95+ = Elite, 85-94 = Strong, 70-84 = Watch, 50-69 = Speculative, <50 = Avoid
+- Signal: BUY = strong setup, WATCH = monitor, AVOID/NO = do not enter
+- Probability: model-based likelihood of upside to 52-week high (not guaranteed)
+- Risk: Conservative = low volatility large cap, Moderate = mid range, Aggressive = high volatility/small cap
+
+When referencing stocks, use ticker symbols in backticks like \`AAPL\`. Be specific — cite actual tickers, scores, prices, and setups from the data. Keep answers focused and practical for a trader audience.
+
+IMPORTANT: This is educational analysis only. Always note this is not financial advice and past performance does not guarantee future results. Keep responses concise but thorough — use bullet points for lists of stocks.`;
+}
+
+let chatHistory = [];
+
+async function sendAIMessage() {
+  const input = document.getElementById("aiChatInput");
+  const btn = document.getElementById("aiSendBtn");
+  if (!input || !btn) return;
+
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = "";
+  addChatMessage("user", text);
+  chatHistory.push({ role: "user", content: text });
+
+  btn.disabled = true;
+  btn.textContent = "Thinking...";
+
+  const typingId = showTyping();
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        system: buildSystemPrompt(),
+        messages: chatHistory
+      })
+    });
+
+    removeTyping(typingId);
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || "API error " + response.status);
+    }
+
+    const data = await response.json();
+    const reply = (data.content && data.content[0] && data.content[0].text) || "I could not generate a response. Please try again.";
+
+    chatHistory.push({ role: "assistant", content: reply });
+    if (chatHistory.length > 24) chatHistory = chatHistory.slice(-24);
+
+    addChatMessage("ai", reply);
+
+  } catch (err) {
+    removeTyping(typingId);
+    console.error("AI chat error:", err);
+    addChatMessage("ai", "I could not connect right now. Error: " + err.message + ". Please try again.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Ask AI \u2746";
+  }
+}
+
+function askAI(prompt) {
+  const input = document.getElementById("aiChatInput");
+  if (input) { input.value = prompt; }
+  sendAIMessage();
+}
+
+function addChatMessage(role, text) {
+  const container = document.getElementById("aiChatMessages");
+  if (!container) return;
+
+  const div = document.createElement("div");
+  div.className = "msg " + role;
+
+  const avatar = document.createElement("div");
+  avatar.className = "msg-avatar";
+  avatar.textContent = role === "ai" ? "\u265b" : "\ud83d\udc64";
+
+  const bubble = document.createElement("div");
+  bubble.className = "msg-bubble";
+  bubble.innerHTML = formatAIMessage(text);
+
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function formatAIMessage(text) {
+  return text
+    .replace(/`([A-Z]{1,6})`/g, '<span class="ticker-tag">$1</span>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^[-\u2022]\s+(.+)/gm, '<li>$1</li>')
+    .replace(/(<li>[\s\S]*?<\/li>\n?)+/g, function(m){ return '<ul>' + m + '</ul>'; })
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
+
+let typingCounter = 0;
+
+function showTyping() {
+  const id = "typing-" + (++typingCounter);
+  const container = document.getElementById("aiChatMessages");
+  if (!container) return id;
+
+  const div = document.createElement("div");
+  div.className = "msg ai";
+  div.id = id;
+
+  const avatar = document.createElement("div");
+  avatar.className = "msg-avatar";
+  avatar.textContent = "\u265b";
+
+  const typing = document.createElement("div");
+  typing.className = "ai-typing";
+  typing.innerHTML = "<span></span><span></span><span></span>";
+
+  div.appendChild(avatar);
+  div.appendChild(typing);
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return id;
+}
+
+function removeTyping(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
