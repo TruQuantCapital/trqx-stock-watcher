@@ -1,15 +1,19 @@
-# TRQX AI Market Terminal v9.1 — Stock Lookup Panel Fix
+# TRQX AI Market Terminal v9.2 — Lookup Quality Upgrade
 
-## Fix
+## Added
 
-The hero button **Start Stock Search** was present, but the target Stock Lookup panel was missing from the page.
+- Search by ticker or company name
+- Live quote refresh inside Stock Lookup
+- Data Quality badge:
+  - Live Data Available
+  - Limited Data
+  - Limited OTC Coverage
+  - No Live Coverage
+- Better explanations for penny stocks, OTC names, and securities with missing market data
+- Lookup updates the main universe when live quote data is found
 
-This version adds:
+## Why this matters
 
-- Stock Lookup panel
-- Analyze Stock button
-- Why This Stock explanation
-- Preset Scanners panel
-- Smooth scroll buttons
+Some penny stocks, OTC names, warrants, ADRs, and thinly traded securities do not return full live data from Finnhub. The terminal now explains that clearly instead of showing blank values without context.
 
-Upload all files, redeploy in Vercel, and hard refresh with Ctrl+F5.
+Education only. Not financial advice.

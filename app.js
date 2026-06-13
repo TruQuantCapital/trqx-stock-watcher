@@ -414,6 +414,86 @@ function scrollToSection(id) {
   if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+
+function dataQualityForStock(stock) {
+  const hasPrice = Number(stock.price) > 0;
+  const hasRange = Number(stock.low52) > 0 && Number(stock.high52) > 0;
+  const isLikelyOTC = String(stock.ticker || "").length >= 5 || String(stock.name || "").toUpperCase().includes("OTC");
+
+  if (hasPrice && hasRange) {
+    return {
+      label: "Live Data Available",
+      cls: "high",
+      icon: "🟢",
+      note: "Live price and 52-week range are available."
+    };
+  }
+
+  if (hasPrice && !hasRange) {
+    return {
+      label: "Limited Data",
+      cls: "medium",
+      icon: "🟡",
+      note: "Live price is available, but 52-week range data is limited."
+    };
+  }
+
+  if (isLikelyOTC) {
+    return {
+      label: "Limited OTC Coverage",
+      cls: "low",
+      icon: "🔴",
+      note: "This appears to be a micro-cap, OTC, warrant, ADR, or thinly covered security. Live data may be unavailable."
+    };
+  }
+
+  return {
+    label: "No Live Coverage",
+    cls: "low",
+    icon: "🔴",
+    note: "Live quote coverage is unavailable from the current data provider."
+  };
+}
+
+async function fetchLiveQuoteForLookup(stock) {
+  if (!stock || !stock.ticker) return stock;
+
+  try {
+    const res = await fetch(`/api/quotes?symbols=${encodeURIComponent(stock.ticker)}`);
+    if (!res.ok) return stock;
+
+    const data = await res.json();
+    const q = Array.isArray(data) ? data.find((x) => String(x.symbol).toUpperCase() === stock.ticker) : null;
+
+    if (!q || !q.price) return stock;
+
+    const updated = {
+      ...stock,
+      price: Number(q.price) || stock.price,
+      previousClose: Number(q.previousClose) || stock.previousClose,
+      change: q.change,
+      changesPercentage: q.changesPercentage
+    };
+
+    // Update master universe so other modules benefit too.
+    stocks = stocks.map((s) => String(s.ticker).toUpperCase() === stock.ticker ? updated : s);
+
+    return updated;
+  } catch (error) {
+    console.warn("Lookup quote refresh failed:", error);
+    return stock;
+  }
+}
+
+function findStockByQuery(query) {
+  const q = String(query || "").trim().toUpperCase();
+  if (!q) return null;
+
+  return stocks.find((s) => String(s.ticker || "").toUpperCase() === q)
+    || stocks.find((s) => String(s.name || "").toUpperCase().includes(q))
+    || null;
+}
+
 function explainStock(stock) {
   const price = Number(stock.price) || 0;
   const low52 = Number(stock.low52) || 0;
@@ -423,6 +503,7 @@ function explainStock(stock) {
   const prob = getProbability(stock, conf);
   const risk = getRisk(stock);
   const rating = getAIRating(score);
+  const quality = dataQualityForStock(stock);
 
   const upside = price && high52 ? ((high52 - price) / price) * 100 : null;
   const fromLow = price && low52 ? ((price - low52) / low52) * 100 : null;
@@ -433,45 +514,64 @@ function explainStock(stock) {
   else if (score >= 70) reasons.push("Healthy TRQX AI score with a watchable setup.");
   else reasons.push("Lower TRQX AI score, so this should be treated cautiously.");
 
+  if (quality.cls === "low") {
+    reasons.push("Live market-data coverage is limited, so the analysis should be treated as preliminary.");
+  }
+
   if (upside != null && upside >= 30) reasons.push(`Meaningful upside to the 52-week high: ${fmtPct(upside)}.`);
   else if (upside != null && upside >= 10) reasons.push(`Moderate upside to the 52-week high: ${fmtPct(upside)}.`);
   else if (upside != null) reasons.push("Limited upside to the 52-week high based on current range.");
-  else reasons.push("52-week range data is not available yet. Refresh market data or use a scored stock.");
+  else reasons.push("52-week range data is not available yet, so upside-to-high cannot be calculated.");
 
   if (fromLow != null && fromLow <= 15) reasons.push("Price is near the 52-week low, which may appeal to value/reversal traders.");
   else if (fromLow != null && fromLow >= 75) reasons.push("Price is extended from the 52-week low, which can increase pullback risk.");
   else if (fromLow != null) reasons.push("Price is trading in a middle range versus its 52-week low/high structure.");
 
-  return { rating, prob, risk, conf, upside, fromLow, reasons };
+  if (risk.label === "Aggressive") {
+    reasons.push("Risk profile is aggressive. Position sizing and stop discipline matter more for this type of setup.");
+  }
+
+  return { rating, prob, risk, conf, upside, fromLow, reasons, quality };
 }
 
-function runStockLookup() {
+async function runStockLookup() {
   const input = document.getElementById("stockLookupInput");
   const result = document.getElementById("stockLookupResult");
   if (!input || !result) return;
 
-  const q = input.value.trim().toUpperCase();
+  const q = input.value.trim();
   if (!q) {
-    result.innerHTML = `<div class="emptyState">Enter a ticker symbol first.</div>`;
+    result.innerHTML = `<div class="emptyState">Enter a ticker symbol or company name first.</div>`;
     return;
   }
 
-  const stock = stocks.find((s) => String(s.ticker || "").toUpperCase() === q);
+  let stock = findStockByQuery(q);
 
   if (!stock) {
-    result.innerHTML = `<div class="emptyState">Ticker ${q} was not found in the current universe. Switch to Expanded Live U.S. Universe or refresh the symbol list.</div>`;
+    result.innerHTML = `<div class="emptyState">No match found for "${q}". Try the ticker symbol, switch to Expanded Live U.S. Universe, or load the expanded universe first.</div>`;
     return;
   }
+
+  result.innerHTML = `<div class="emptyState">Analyzing ${stock.ticker} and checking live market data...</div>`;
+
+  stock = await fetchLiveQuoteForLookup(stock);
 
   const analysis = explainStock(stock);
   const signal = stock.signal || "WATCH";
+  const quality = analysis.quality;
 
   result.innerHTML = `
     <div class="lookupCard">
-      <div>
-        <div class="eyebrow">TRQX AI STOCK ANALYSIS</div>
-        <h3>${stock.ticker} — ${stock.name}</h3>
-        <p class="small">${stock.sector || "Unclassified"} • ${stock.exchange || "US"}</p>
+      <div class="lookupTitleRow">
+        <div>
+          <div class="eyebrow">TRQX AI STOCK ANALYSIS</div>
+          <h3>${stock.ticker} — ${stock.name}</h3>
+          <p class="small">${stock.sector || "Unclassified"} • ${stock.exchange || "US"}</p>
+        </div>
+        <div class="dataQuality ${quality.cls}">
+          <b>${quality.icon} ${quality.label}</b>
+          <span>${quality.note}</span>
+        </div>
       </div>
 
       <div class="lookupStats">
@@ -493,7 +593,12 @@ function runStockLookup() {
       </div>
     </div>
   `;
+
+  render();
+  renderGrowthScanner();
+  renderPortfolioBuilder();
 }
+
 
 function applyPreset(type) {
   const search = document.getElementById("search");
