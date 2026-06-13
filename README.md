@@ -1,51 +1,59 @@
-# TRQX Stock Watcher / Dividend Wealth Dashboard
+# TRQX Stock Watcher v2
 
-This is the updated GitHub/Vercel-ready version.
+Updated Vercel/GitHub-ready dashboard.
 
-## Required structure
+## Features
+
+- Finnhub live quote refresh
+- 5-minute auto-refresh toggle
+- Local watchlist with star buttons
+- Watchlist CSV export
+- TRQX Opportunity Meter
+- Wider dashboard layout
+- Correct FINNHUB_API_KEY messaging
+
+## Required GitHub structure
+
+Upload these files at the repository root:
 
 ```text
 index.html
 app.js
 styles.css
 favicon.svg
+README.md
 api/
   quotes.js
 data/
   stocks.json
 ```
 
+Do not upload the zip file itself as the live site.
+
 ## Vercel settings
 
 - Framework Preset: Other
-- Root Directory: ./
-- Build Command: leave blank
-- Output Directory: leave blank
+- Root Directory: `./` if files are at repo root
+- Root Directory: `trqx_dividend_site` only if files are inside that folder
+- Build Command: blank
+- Output Directory: blank
 
 ## Environment variable
 
-Add this in Vercel:
+Add in Vercel:
 
 ```text
-FINNHUB_API_KEY=your_finnhub_key
+FINNHUB_API_KEY=your_key_here
 ```
 
-Apply it to Production, Preview, and Development if available.
+Redeploy after adding or changing environment variables.
 
-After adding the variable, redeploy.
+## Test route
 
-## Live refresh
-
-The button calls:
+After deploy, test:
 
 ```text
-/api/quotes?symbols=AAPL,MSFT,PLD
+https://your-site.vercel.app/api/quotes?symbols=AAPL,MSFT
 ```
 
-The serverless route calls Finnhub securely from Vercel, so your API key is not exposed in browser JavaScript.
-
-## Notes
-
-- The frontend refreshes symbols in batches to reduce rate-limit issues.
-- The saved data in `data/stocks.json` loads immediately even if the live API is unavailable.
-- This is educational software, not financial advice.
+You should see JSON quote data.

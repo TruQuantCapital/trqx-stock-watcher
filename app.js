@@ -1,4 +1,7 @@
 let stocks = [];
+let watchlist = JSON.parse(localStorage.getItem("trqxWatchlist") || "[]");
+let autoTimer = null;
+let lastUpdated = null;
 
 const fmtUSD = (n) =>
   n == null || Number.isNaN(Number(n))
@@ -13,7 +16,7 @@ async function load() {
   setupFilters();
   render();
   calcIncome();
-  setStatus("Saved stock universe loaded.");
+  setStatus("Saved stock universe loaded. Click Refresh Market Data for live prices.");
 }
 
 function setStatus(message) {
@@ -31,9 +34,10 @@ function setupFilters() {
     }
   });
 
-  ["search", "sector", "signal"].forEach((id) =>
-    document.getElementById(id).addEventListener("input", render)
-  );
+  ["search", "sector", "signal", "viewMode"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", render);
+  });
 }
 
 function signalClass(s) {
@@ -43,18 +47,34 @@ function signalClass(s) {
   return "watch";
 }
 
+function opportunityLabel(score) {
+  score = Number(score) || 0;
+  if (score >= 95) return "Elite";
+  if (score >= 85) return "Strong";
+  if (score >= 70) return "Watch";
+  return "Avoid";
+}
+
+function opportunityClass(score) {
+  score = Number(score) || 0;
+  if (score >= 95) return "elite";
+  if (score >= 85) return "strong";
+  if (score >= 70) return "watch";
+  return "avoid";
+}
+
 function filtered() {
   const q = document.getElementById("search").value.toLowerCase();
   const sec = document.getElementById("sector").value;
   const sig = document.getElementById("signal").value;
+  const viewMode = document.getElementById("viewMode").value;
 
   return stocks.filter(
     (s) =>
-      (!q ||
-        s.ticker.toLowerCase().includes(q) ||
-        s.name.toLowerCase().includes(q)) &&
+      (!q || s.ticker.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)) &&
       (!sec || s.sector === sec) &&
-      (!sig || (s.signal || "").toUpperCase().includes(sig))
+      (!sig || (s.signal || "").toUpperCase().includes(sig)) &&
+      (viewMode !== "watchlist" || watchlist.includes(s.ticker))
   );
 }
 
@@ -62,8 +82,12 @@ function render() {
   const data = filtered().sort((a, b) => (b.trqxScore || 0) - (a.trqxScore || 0));
 
   document.getElementById("rows").innerHTML = data
-    .map(
-      (s) => `<tr>
+    .map((s) => {
+      const isWatched = watchlist.includes(s.ticker);
+      return `<tr>
+        <td>
+          <button class="star ${isWatched ? "active" : ""}" onclick="toggleWatch('${s.ticker}')">${isWatched ? "★" : "☆"}</button>
+        </td>
         <td><b>${s.ticker}</b><div class="small">${s.exchange || ""}</div></td>
         <td>${s.name}</td>
         <td>${s.sector}</td>
@@ -73,28 +97,25 @@ function render() {
         <td>${fmtPct(s.from52LowPct)}</td>
         <td>${fmtPct(s.below52HighPct)}</td>
         <td><span class="pill ${signalClass(s.signal)}">${s.signal || "WATCH"}</span></td>
+        <td><span class="meter ${opportunityClass(s.trqxScore)}">${opportunityLabel(s.trqxScore)}</span></td>
         <td class="score">${s.trqxScore ?? "—"}</td>
-      </tr>`
-    )
+      </tr>`;
+    })
     .join("");
 
   document.getElementById("kpiStocks").textContent = stocks.length;
   document.getElementById("kpiBuys").textContent = stocks.filter((s) =>
     (s.signal || "").toUpperCase().includes("BUY")
   ).length;
+  document.getElementById("kpiWatchlist").textContent = watchlist.length;
 
-  const avgScore =
-    stocks.reduce((a, b) => a + (Number(b.trqxScore) || 0), 0) / stocks.length;
-
+  const avgScore = stocks.reduce((a, b) => a + (Number(b.trqxScore) || 0), 0) / stocks.length;
   document.getElementById("kpiScore").textContent = Math.round(avgScore);
   document.getElementById("kpiCost").textContent = fmtUSD(
     stocks.reduce((a, b) => a + (Number(b.cost100) || 0), 0)
   );
 
-  const top = stocks
-    .slice()
-    .sort((a, b) => (b.trqxScore || 0) - (a.trqxScore || 0))
-    .slice(0, 10);
+  const top = stocks.slice().sort((a, b) => (b.trqxScore || 0) - (a.trqxScore || 0)).slice(0, 10);
 
   document.getElementById("topList").innerHTML = top
     .map(
@@ -104,12 +125,29 @@ function render() {
       </div>`
     )
     .join("");
+
+  updateLastUpdated();
+}
+
+function updateLastUpdated() {
+  const el = document.getElementById("lastUpdated");
+  if (!el) return;
+  el.textContent = lastUpdated ? `Last live refresh: ${lastUpdated}` : "Last live refresh: not yet refreshed";
+}
+
+function toggleWatch(ticker) {
+  if (watchlist.includes(ticker)) {
+    watchlist = watchlist.filter((t) => t !== ticker);
+  } else {
+    watchlist.push(ticker);
+  }
+  localStorage.setItem("trqxWatchlist", JSON.stringify(watchlist));
+  render();
 }
 
 function calcIncome() {
   const p = +document.getElementById("portfolio").value || 0;
   const y = (+document.getElementById("yield").value || 0) / 100;
-
   document.getElementById("annualIncome").textContent = fmtUSD(p * y);
   document.getElementById("monthlyIncome").textContent = fmtUSD((p * y) / 12);
 }
@@ -136,7 +174,7 @@ async function refreshQuotes() {
     const allQuotes = [];
 
     for (let i = 0; i < chunks.length; i++) {
-      setStatus(`Refreshing batch ${i + 1} of ${chunks.length}...`);
+      setStatus(`Refreshing live data batch ${i + 1} of ${chunks.length}...`);
 
       const res = await fetch(`/api/quotes?symbols=${encodeURIComponent(chunks[i].join(","))}`);
 
@@ -148,7 +186,7 @@ async function refreshQuotes() {
       const quotes = await res.json();
       allQuotes.push(...quotes);
 
-      await new Promise((resolve) => setTimeout(resolve, 250));
+      await new Promise((resolve) => setTimeout(resolve, 300));
     }
 
     const map = Object.fromEntries(
@@ -175,10 +213,9 @@ async function refreshQuotes() {
       };
     });
 
+    lastUpdated = new Date().toLocaleTimeString();
     render();
-
-    const now = new Date().toLocaleTimeString();
-    setStatus(`Live refresh complete at ${now}. Updated ${updated} of ${stocks.length} stocks.`);
+    setStatus(`Live refresh complete at ${lastUpdated}. Updated ${updated} of ${stocks.length} stocks.`);
   } catch (e) {
     console.error(e);
     setStatus("Live API refresh failed. Check Vercel logs and confirm FINNHUB_API_KEY exists.");
@@ -189,6 +226,46 @@ async function refreshQuotes() {
       button.textContent = "Refresh Market Data";
     }
   }
+}
+
+function toggleAutoRefresh() {
+  const enabled = document.getElementById("autoRefresh").checked;
+
+  if (enabled) {
+    setStatus("Auto-refresh enabled. Refreshing every 5 minutes.");
+    refreshQuotes();
+    autoTimer = setInterval(refreshQuotes, 300000);
+  } else {
+    clearInterval(autoTimer);
+    autoTimer = null;
+    setStatus("Auto-refresh disabled.");
+  }
+}
+
+function exportWatchlist() {
+  const rows = stocks
+    .filter((s) => watchlist.includes(s.ticker))
+    .map((s) => ({
+      ticker: s.ticker,
+      company: s.name,
+      sector: s.sector,
+      price: s.price,
+      trqxScore: s.trqxScore,
+      signal: s.signal
+    }));
+
+  const csv = [
+    "Ticker,Company,Sector,Price,TRQX Score,Signal",
+    ...rows.map((r) => `${r.ticker},"${String(r.company).replaceAll('"', '""')}",${r.sector},${r.price},${r.trqxScore},${r.signal}`)
+  ].join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "trqx-watchlist.csv";
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 load();

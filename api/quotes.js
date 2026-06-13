@@ -1,7 +1,6 @@
-// Vercel serverless API route using Finnhub.
-// Add FINNHUB_API_KEY in Vercel Environment Variables.
+// TRQX Vercel serverless API route using Finnhub.
+// Required Vercel Environment Variable: FINNHUB_API_KEY
 // Endpoint: /api/quotes?symbols=AAPL,MSFT,PLD
-// Note: Finnhub free tier has rate limits, so the frontend sends requests in smaller batches.
 
 export default async function handler(req, res) {
   const symbols = (req.query.symbols || "")
@@ -54,8 +53,6 @@ export default async function handler(req, res) {
     return res.status(200).json(results);
   } catch (error) {
     console.error("Finnhub quote request failed:", error);
-    return res.status(500).json({
-      error: "Finnhub quote request failed"
-    });
+    return res.status(500).json({ error: "Finnhub quote request failed" });
   }
 }
