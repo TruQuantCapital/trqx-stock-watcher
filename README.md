@@ -1,28 +1,25 @@
-# TRQX AI Market Terminal v11 — Full Premium Mockup Build
+# TRQX AI Market Terminal v12 — Luxury UI + AI Stock Report
 
-This package builds out the premium black-and-gold terminal page based on the final mockup.
+## Added
 
-## Included
-
-- Left sidebar navigation
-- Top market ticker strip
-- Premium hero section
-- Lion-inspired gold visual
-- AI opportunity stat cards
-- Growth / Double-Up scanner
-- Stock Lookup module
-- Market Heat Map
-- AI Insights
-- Portfolio Builder
-- AI Probability Distribution
-- Full Stock Universe / Watchlist table
-- Existing API routes retained:
-  - api/quotes.js
-  - api/symbols.js
+- More premium black/gold visual treatment
+- Animated background particles
+- Animated hero-grid glow
+- Larger luxury lion/crown hero treatment
+- Stronger candlestick/chart hero visual
+- Better gold panel glow
+- Upgraded Stock Lookup into a full AI Stock Report
+- TRQX AI Verdict:
+  - Strong Buy Watch
+  - Buy Watch
+  - Watch
+  - Avoid / High Caution
+- Risk notes
+- Confirmation checklist
+- Time horizon estimate
+- Data quality badge preserved
 
 ## Upload Structure
-
-Upload all extracted files to the GitHub repo root:
 
 ```text
 index.html
@@ -38,6 +35,6 @@ data/
   expanded_universe_template.json
 ```
 
-Then redeploy in Vercel and hard refresh with Ctrl+F5.
+Redeploy in Vercel and hard refresh with Ctrl+F5.
 
 Education only. Not financial advice.

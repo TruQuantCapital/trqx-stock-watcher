@@ -415,10 +415,13 @@ function scrollToSection(id) {
 }
 
 
+
 function dataQualityForStock(stock) {
   const hasPrice = Number(stock.price) > 0;
   const hasRange = Number(stock.low52) > 0 && Number(stock.high52) > 0;
-  const isLikelyOTC = String(stock.ticker || "").length >= 5 || String(stock.name || "").toUpperCase().includes("OTC");
+  const symbol = String(stock.ticker || "").toUpperCase();
+  const name = String(stock.name || "").toUpperCase();
+  const isLikelyOTC = symbol.length >= 5 || name.includes("OTC") || name.includes("WARRANT") || name.includes("ADR");
 
   if (hasPrice && hasRange) {
     return {
@@ -475,9 +478,7 @@ async function fetchLiveQuoteForLookup(stock) {
       changesPercentage: q.changesPercentage
     };
 
-    // Update master universe so other modules benefit too.
     stocks = stocks.map((s) => String(s.ticker).toUpperCase() === stock.ticker ? updated : s);
-
     return updated;
   } catch (error) {
     console.warn("Lookup quote refresh failed:", error);
@@ -494,6 +495,14 @@ function findStockByQuery(query) {
     || null;
 }
 
+function aiVerdict(score, risk, probability, quality) {
+  if (quality.cls === "low") return { label: "WATCH ONLY", cls: "watch", note: "Limited live data coverage." };
+  if (score >= 90 && probability >= 85 && risk.label !== "Aggressive") return { label: "STRONG BUY WATCH", cls: "buy", note: "High-quality setup with strong model alignment." };
+  if (score >= 75 && probability >= 70) return { label: "BUY WATCH", cls: "buy", note: "Positive setup, but confirmation is still required." };
+  if (score >= 55) return { label: "WATCH", cls: "watch", note: "Neutral setup. Needs stronger confirmation." };
+  return { label: "AVOID / HIGH CAUTION", cls: "avoid", note: "Weak score or insufficient data." };
+}
+
 function explainStock(stock) {
   const price = Number(stock.price) || 0;
   const low52 = Number(stock.low52) || 0;
@@ -504,11 +513,14 @@ function explainStock(stock) {
   const risk = getRisk(stock);
   const rating = getAIRating(score);
   const quality = dataQualityForStock(stock);
+  const verdict = aiVerdict(score, risk, prob, quality);
 
   const upside = price && high52 ? ((high52 - price) / price) * 100 : null;
   const fromLow = price && low52 ? ((price - low52) / low52) * 100 : null;
 
   const reasons = [];
+  const risks = [];
+  const confirmations = [];
 
   if (score >= 90) reasons.push("Strong TRQX AI score compared with the current universe.");
   else if (score >= 70) reasons.push("Healthy TRQX AI score with a watchable setup.");
@@ -516,22 +528,26 @@ function explainStock(stock) {
 
   if (quality.cls === "low") {
     reasons.push("Live market-data coverage is limited, so the analysis should be treated as preliminary.");
+    risks.push("Limited data coverage can reduce reliability of the rating.");
   }
 
   if (upside != null && upside >= 30) reasons.push(`Meaningful upside to the 52-week high: ${fmtPct(upside)}.`);
   else if (upside != null && upside >= 10) reasons.push(`Moderate upside to the 52-week high: ${fmtPct(upside)}.`);
-  else if (upside != null) reasons.push("Limited upside to the 52-week high based on current range.");
-  else reasons.push("52-week range data is not available yet, so upside-to-high cannot be calculated.");
+  else if (upside != null) risks.push("Limited upside to the 52-week high based on current range.");
+  else risks.push("52-week range data is unavailable, so upside-to-high cannot be calculated.");
 
   if (fromLow != null && fromLow <= 15) reasons.push("Price is near the 52-week low, which may appeal to value/reversal traders.");
-  else if (fromLow != null && fromLow >= 75) reasons.push("Price is extended from the 52-week low, which can increase pullback risk.");
-  else if (fromLow != null) reasons.push("Price is trading in a middle range versus its 52-week low/high structure.");
+  else if (fromLow != null && fromLow >= 75) risks.push("Price is extended from the 52-week low, which can increase pullback risk.");
+  else if (fromLow != null) confirmations.push("Price is trading in a middle range versus its 52-week low/high structure.");
 
-  if (risk.label === "Aggressive") {
-    reasons.push("Risk profile is aggressive. Position sizing and stop discipline matter more for this type of setup.");
-  }
+  if (risk.label === "Aggressive") risks.push("Aggressive risk profile. Position sizing and stop discipline matter more.");
+  if (prob >= 80) confirmations.push("Probability model is showing above-average confidence.");
+  if (score >= 80) confirmations.push("TRQX score supports a higher-quality watchlist candidate.");
+  if (!confirmations.length) confirmations.push("Wait for stronger price action, volume, and trend confirmation.");
 
-  return { rating, prob, risk, conf, upside, fromLow, reasons, quality };
+  const horizon = risk.label === "Aggressive" ? "3–12 months" : score >= 80 ? "12–24 months" : "24+ months";
+
+  return { rating, prob, risk, conf, upside, fromLow, reasons, risks, confirmations, quality, verdict, horizon };
 }
 
 async function runStockLookup() {
@@ -553,39 +569,59 @@ async function runStockLookup() {
   }
 
   result.innerHTML = `<div class="emptyState">Analyzing ${stock.ticker} and checking live market data...</div>`;
-
   stock = await fetchLiveQuoteForLookup(stock);
 
   const analysis = explainStock(stock);
   const signal = stock.signal || "WATCH";
   const quality = analysis.quality;
+  const change = Number(stock.changesPercentage);
+  const changeTxt = Number.isFinite(change) ? `${change >= 0 ? "▲" : "▼"} ${Math.abs(change).toFixed(2)}%` : "—";
 
   result.innerHTML = `
-    <div class="lookupCard">
+    <div class="lookupCard premiumReport">
       <div class="lookupTitleRow">
         <div>
-          <div class="eyebrow">TRQX AI STOCK ANALYSIS</div>
+          <div class="eyebrow">TRQX AI STOCK REPORT</div>
           <h3>${stock.ticker} — ${stock.name}</h3>
           <p class="small">${stock.sector || "Unclassified"} • ${stock.exchange || "US"}</p>
+          <div class="reportPrice">${fmtUSD(stock.price)} <span class="${change >= 0 ? "positive" : "negative"}">${changeTxt}</span></div>
         </div>
-        <div class="dataQuality ${quality.cls}">
-          <b>${quality.icon} ${quality.label}</b>
-          <span>${quality.note}</span>
+        <div class="verdictBox ${analysis.verdict.cls}">
+          <span>TRQX AI Verdict</span>
+          <b>${analysis.verdict.label}</b>
+          <small>${analysis.verdict.note}</small>
         </div>
       </div>
 
       <div class="lookupStats">
-        <div><span>Price</span><b>${fmtUSD(stock.price)}</b></div>
         <div><span>TRQX Rating</span><b>${analysis.rating.label}</b></div>
         <div><span>Signal</span><b>${signal}</b></div>
         <div><span>Risk</span><b>${analysis.risk.icon} ${analysis.risk.label}</b></div>
         <div><span>Probability</span><b>${analysis.prob}%</b></div>
         <div><span>52W Upside</span><b>${analysis.upside == null ? "—" : fmtPct(analysis.upside)}</b></div>
+        <div><span>Time Horizon</span><b>${analysis.horizon}</b></div>
       </div>
 
-      <div class="whyBox">
-        <h4>Why this stock?</h4>
-        <ul>${analysis.reasons.map((r) => `<li>${r}</li>`).join("")}</ul>
+      <div class="reportGrid">
+        <div class="whyBox">
+          <h4>Why TRQX is watching it</h4>
+          <ul>${analysis.reasons.map((r) => `<li>${r}</li>`).join("")}</ul>
+        </div>
+
+        <div class="riskBox">
+          <h4>Risk Notes</h4>
+          <ul>${analysis.risks.map((r) => `<li>${r}</li>`).join("")}</ul>
+        </div>
+
+        <div class="confirmBox">
+          <h4>Confirmation Checklist</h4>
+          <ul>${analysis.confirmations.map((r) => `<li>${r}</li>`).join("")}</ul>
+        </div>
+      </div>
+
+      <div class="dataQuality ${quality.cls}">
+        <b>${quality.icon} ${quality.label}</b>
+        <span>${quality.note}</span>
       </div>
 
       <div class="disclaimerBox">
