@@ -37,6 +37,44 @@
       <div>Market Regime</div>
     </section>
 
+    <section id="stockLookupPanel" class="panel stockLookupPanel">
+      <div class="sectionHeader">
+        <div>
+          <h2>Stock Lookup</h2>
+          <p class="small">Enter a ticker to get a TRQX rating, risk profile, probability estimate, and plain-English setup explanation.</p>
+        </div>
+      </div>
+
+      <div class="lookupBar">
+        <input id="stockLookupInput" placeholder="Search ticker, e.g. AAPL, NVDA, PLTR" onkeydown="if(event.key==='Enter') runStockLookup()">
+        <button class="refresh" onclick="runStockLookup()">Analyze Stock</button>
+      </div>
+
+      <div id="stockLookupResult" class="lookupResult">
+        <div class="emptyState">Search a ticker to generate a TRQX AI explanation.</div>
+      </div>
+    </section>
+
+    <section class="panel presetScannerPanel">
+      <div class="sectionHeader">
+        <div>
+          <h2>Preset Scanners</h2>
+          <p class="small">One-click research filters for common investor goals.</p>
+        </div>
+      </div>
+
+      <div class="presetGrid">
+        <button onclick="applyPreset('growth')">Best Growth Stocks</button>
+        <button onclick="applyPreset('dividend')">Dividend / Income Ideas</button>
+        <button onclick="applyPreset('undervalued')">Near 52W Low</button>
+        <button onclick="applyPreset('under25')">Stocks Under $25</button>
+        <button onclick="applyPreset('highProbability')">High Probability</button>
+        <button onclick="applyPreset('aggressive')">Aggressive Double-Up</button>
+      </div>
+    </section>
+
+
+
     <section class="panel trqxInsightsPanel">
       <div class="insightHeader">
         <div>

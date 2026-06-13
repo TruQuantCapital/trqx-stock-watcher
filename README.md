@@ -1,26 +1,15 @@
-# TRQX AI Market Terminal v9 — Client Landing Upgrade
+# TRQX AI Market Terminal v9.1 — Stock Lookup Panel Fix
 
-## Added
+## Fix
 
-- Landing-style hero buttons
+The hero button **Start Stock Search** was present, but the target Stock Lookup panel was missing from the page.
+
+This version adds:
+
 - Stock Lookup panel
-- Plain-English "Why this stock?" explanation
-- TRQX Rating, Signal, Risk, Probability, and 52-week upside summary
-- Preset scanners:
-  - Best Growth Stocks
-  - Dividend / Income Ideas
-  - Near 52W Low
-  - Stocks Under $25
-  - High Probability
-  - Aggressive Double-Up
+- Analyze Stock button
+- Why This Stock explanation
+- Preset Scanners panel
+- Smooth scroll buttons
 
-## Retained
-
-- KPI row removed
-- Portfolio Builder restored
-- Growth Scanner
-- TRQX AI Insights
-- Expanded Universe
-- Finnhub API routes
-
-Educational research only. Not financial advice.
+Upload all files, redeploy in Vercel, and hard refresh with Ctrl+F5.
