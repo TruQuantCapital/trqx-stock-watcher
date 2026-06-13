@@ -27,7 +27,6 @@ async function load() {
   calcIncome();
   renderGrowthScanner();
   renderPortfolioBuilder();
-  renderTickerTape();
   setStatus("TRQX AI Market Terminal loaded. Click Refresh Market Data for live prices.");
 }
 
@@ -169,7 +168,6 @@ function refreshAllViews() {
   renderGrowthScanner();
   renderPortfolioBuilder();
   updateInsights();
-  renderTickerTape();
 }
 
 
@@ -186,9 +184,9 @@ function updateInsights() {
   const highProbEl = document.getElementById("highProbCount");
   const regimeEl = document.getElementById("marketRegime");
 
-  if (bullishEl) { bullishEl.textContent = bullish.toLocaleString(); pulseStatValue("bullishCount"); }
-  if (eliteEl)   { eliteEl.textContent   = elite.toLocaleString();   pulseStatValue("eliteCount"); }
-  if (highProbEl){ highProbEl.textContent = highProb.toLocaleString(); pulseStatValue("highProbCount"); }
+  if (bullishEl) bullishEl.textContent = bullish.toLocaleString();
+  if (eliteEl) eliteEl.textContent = elite.toLocaleString();
+  if (highProbEl) highProbEl.textContent = highProb.toLocaleString();
 
   if (regimeEl) {
     const ratio = stocks.length ? bullish / stocks.length : 0;
@@ -399,10 +397,10 @@ function whyThisStock(stock) {
 }
 
 function filtered() {
-  const q = document.getElementById("search").value.toLowerCase();
-  const sec = document.getElementById("sector").value;
-  const sig = document.getElementById("signal").value;
-  const viewMode = document.getElementById("viewMode").value;
+  const q = (document.getElementById("search")?.value || "").toLowerCase();
+  const sec = document.getElementById("sector")?.value || "";
+  const sig = document.getElementById("signal")?.value || "";
+  const viewMode = document.getElementById("viewMode")?.value || "all";
 
   return stocks.filter(
     (s) =>
@@ -725,10 +723,13 @@ function render() {
   
   
 
-  const top = stocks.slice().sort((a, b) => (b.trqxScore || 0) - (a.trqxScore || 0)).slice(0, 10);
-  document.getElementById("topList").innerHTML = top
-    .map((s) => `<div><b>${s.ticker}</b> <span class="small">${s.name}</span><div class="bar"><span style="width:${Math.min(s.trqxScore || 0, 100)}%"></span></div></div>`)
-    .join("");
+  const topListEl = document.getElementById("topList");
+  if (topListEl) {
+    const top = stocks.slice().sort((a, b) => (b.trqxScore || 0) - (a.trqxScore || 0)).slice(0, 10);
+    topListEl.innerHTML = top
+      .map((s) => `<div><b>${s.ticker}</b> <span class="small">${s.name}</span><div class="bar"><span style="width:${Math.min(s.trqxScore || 0, 100)}%"></span></div></div>`)
+      .join("");
+  }
 
   updateLastUpdated();
 }
@@ -902,10 +903,16 @@ function toggleWatch(ticker) {
 }
 
 function calcIncome() {
-  const p = +document.getElementById("portfolio").value || 0;
-  const y = (+document.getElementById("yield").value || 0) / 100;
-  document.getElementById("annualIncome").textContent = fmtUSD(p * y);
-  document.getElementById("monthlyIncome").textContent = fmtUSD((p * y) / 12);
+  const portfolioEl = document.getElementById("portfolio");
+  const yieldEl = document.getElementById("yield");
+  const annualEl = document.getElementById("annualIncome");
+  const monthlyEl = document.getElementById("monthlyIncome");
+  if (!portfolioEl || !yieldEl || !annualEl || !monthlyEl) return;
+
+  const p = +portfolioEl.value || 0;
+  const y = (+yieldEl.value || 0) / 100;
+  annualEl.textContent = fmtUSD(p * y);
+  monthlyEl.textContent = fmtUSD((p * y) / 12);
 }
 
 function chunkArray(arr, size) {
@@ -1197,7 +1204,7 @@ function renderPortfolioBuilder() {
 // ============================================================
 
 function buildStockContext() {
-  const summary = stocks.slice(0, 175).map((s) => {
+  const summary = stocks.slice().sort((a, b) => (Number(b.trqxScore) || 0) - (Number(a.trqxScore) || 0)).slice(0, 250).map((s) => {
     const conf = confidenceForStock(s);
     const prob = getProbability(s, conf);
     const risk = getRisk(s);
@@ -1394,7 +1401,7 @@ async function fetchMarketStrip() {
 
       const price    = Number(q.price) * mult;
       const pct      = Number(q.changesPercentage);
-      const up       = pct >= 0;
+      const up       = Number.isFinite(pct) ? pct >= 0 : true;
       const priceStr = price.toLocaleString(undefined, {
         minimumFractionDigits: Number(fmt),
         maximumFractionDigits: Number(fmt)
@@ -1405,7 +1412,7 @@ async function fetchMarketStrip() {
 
       if (priceEl) priceEl.textContent = priceStr;
       if (pctEl) {
-        pctEl.textContent = `${up ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}%`;
+        pctEl.textContent = Number.isFinite(pct) ? `${up ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}%` : "—";
         pctEl.className   = up ? "positive" : "negative";
       }
     });
@@ -1415,44 +1422,17 @@ async function fetchMarketStrip() {
   }
 }
 
-// ============================================================
-// TICKER TAPE — populated from loaded stock universe
-// ============================================================
-function renderTickerTape() {
-  const el = document.getElementById("tickerTapeInner");
-  if (!el) return;
 
-  // Take top 16 by TRQX score that have prices
-  const top = stocks
-    .filter(s => s.price != null && s.price > 0)
-    .slice().sort((a, b) => (b.trqxScore || 0) - (a.trqxScore || 0))
-    .slice(0, 16);
-
-  if (!top.length) return;
-
-  function makeItem(s) {
-    const chg = Number(s.changesPercentage);
-    const hasChg = !Number.isNaN(chg) && s.changesPercentage != null;
-    const up = hasChg ? chg >= 0 : true;
-    const chgTxt = hasChg ? `${up ? "▲" : "▼"} ${Math.abs(chg).toFixed(2)}%` : "—";
-    return `<span class="ticker-item">
-      <span class="t-sym">${s.ticker}</span>
-      <span class="t-price">${fmtUSD(s.price)}</span>
-      <span class="t-chg ${up ? "up" : "down"}">${chgTxt}</span>
-    </span>`;
+function bindAutoRefreshControl() {
+  const auto = document.getElementById("autoRefresh");
+  if (auto && !auto.dataset.bound) {
+    auto.dataset.bound = "true";
+    auto.addEventListener("change", toggleAutoRefresh);
   }
-
-  // Duplicate for seamless CSS marquee
-  const html = top.map(makeItem).join("") + top.map(makeItem).join("");
-  el.innerHTML = html;
 }
 
-// Pulse animation when stat cards update
-function pulseStatValue(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.remove("pulse");
-  void el.offsetWidth; // reflow
-  el.classList.add("pulse");
-  setTimeout(() => el.classList.remove("pulse"), 1000);
-}
+document.addEventListener("DOMContentLoaded", bindAutoRefreshControl);
+
+
+// Keep top market strip fresh.
+setInterval(fetchMarketStrip, 60000);
