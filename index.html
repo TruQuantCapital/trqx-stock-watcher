@@ -16,12 +16,20 @@
         <p>Institutional-grade market intelligence powered by TRQX AI. Discover opportunities across growth, income, value, momentum, and portfolio construction.</p>
         <div id="status" class="status">Loading saved stock universe...</div>
         <div id="lastUpdated" class="small">Last live refresh: not yet refreshed</div>
-        <div id="terminalMeta" class="terminalMeta">TRQX AI Engine • Universe: <span id="universeCount">—</span> Stocks • Live Market Data</div>
+        <div id="terminalMeta" class="terminalMeta">TRQX AI Engine • Real-Time Market Intelligence • Growth, Income, Momentum & Portfolio Tools</div>
       </div>
       <div class="heroActions">
         <button class="refresh" onclick="refreshQuotes()">Refresh Market Data</button>
         <label class="toggle"><input id="autoRefresh" type="checkbox" onchange="toggleAutoRefresh()"> Auto-refresh 5m</label>
       </div>
+    </section>
+
+    <section class="customerValueStrip">
+      <div>AI Opportunity Scoring</div>
+      <div>Growth Setups</div>
+      <div>Portfolio Builder</div>
+      <div>Probability Engine</div>
+      <div>Market Regime</div>
     </section>
 
     <section class="panel trqxInsightsPanel">
@@ -50,6 +58,16 @@
           <div class="label">Terminal Status</div>
           <div class="value statusValue">LIVE</div>
         </div>
+      </div>
+
+      <div class="tools terminalControls">
+        <label class="field">Universe Mode
+          <select id="universeMode" onchange="changeUniverseMode()">
+            <option value="scored">TRQX Scored Universe</option>
+            <option value="live">Expanded Live U.S. Universe</option>
+          </select>
+        </label>
+        <button class="secondary" onclick="loadExpandedUniverse()">Load Expanded Universe</button>
       </div>
     </section>
 

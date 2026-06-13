@@ -1,29 +1,16 @@
-# TRQX AI Market Terminal v7
+# TRQX AI Market Terminal v8.7 — Portfolio Function Restored
 
-## What changed in v7
+## Fix
 
-- Removed the developer-facing Institutional Universe Controls panel
-- Removed customer-facing backend language
-- Rebranded fully as **TRQX AI Market Terminal**
-- Added TRQX AI Insights panel:
-  - Bullish Opportunities
-  - Elite AI Ratings
-  - High Probability count
-  - Market Regime indicator
-- Renamed 100-Share Capital to **100-Share Portfolio Value**
-- Retains:
-  - Growth / Double-Up Scanner
-  - Portfolio Builder
-  - AI Rating
-  - Probability engine
-  - Stock risk meter
-  - Watchlist
-  - CSV export
-  - Finnhub refresh API
+The page error was:
 
-## Required GitHub structure
+```text
+ReferenceError: renderPortfolioBuilder is not defined
+```
 
-Upload extracted files at the repository root:
+This version restores `renderPortfolioBuilder()` and keeps the KPI row removed without using aggressive cleanup scripts.
+
+## Upload Structure
 
 ```text
 index.html
@@ -33,31 +20,10 @@ favicon.svg
 README.md
 api/
   quotes.js
+  symbols.js
 data/
   stocks.json
+  expanded_universe_template.json
 ```
 
-## Vercel
-
-- Framework Preset: Other
-- Root Directory: `./`
-- Build Command: blank
-- Output Directory: blank
-
-Environment variable:
-
-```text
-FINNHUB_API_KEY=your_key_here
-```
-
-## Stock Universe Expansion
-
-The current dataset is still controlled by:
-
-```text
-data/stocks.json
-```
-
-To expand to 2,000+ stocks, replace that file with a larger JSON universe using the same structure.
-
-Education only. Not financial advice.
+After upload, redeploy in Vercel and hard refresh with Ctrl+F5.

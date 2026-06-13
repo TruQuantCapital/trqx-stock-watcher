@@ -1,4 +1,6 @@
 let stocks = [];
+let baseStocks = [];
+let universeMode = localStorage.getItem("trqxUniverseMode") || "scored";
 let watchlist = JSON.parse(localStorage.getItem("trqxWatchlist") || "[]");
 let autoTimer = null;
 let lastUpdated = null;
@@ -14,6 +16,12 @@ const fmtPct = (n) =>
 async function load() {
   stocks = await fetch("data/stocks.json").then((r) => r.json());
   stocks = normalizeUniverse(stocks);
+  baseStocks = [...stocks];
+  const universeSelect = document.getElementById("universeMode");
+  if (universeSelect) universeSelect.value = universeMode;
+  if (universeMode === "live") {
+    await loadExpandedUniverse(false);
+  }
   setupFilters();
   render();
   calcIncome();
@@ -89,8 +97,74 @@ function baseScoreFromRange(price, low52, high52) {
 }
 
 function updateUniverseMeta() {
-  const universeCount = document.getElementById("universeCount");
-  if (universeCount) universeCount.textContent = stocks.length.toLocaleString();
+  // Customer-facing UI hides internal universe count.
+}
+
+
+function mergeUniverses(primary, secondary) {
+  const map = new Map();
+
+  [...secondary, ...primary].forEach((s) => {
+    if (!s || !s.ticker) return;
+    map.set(String(s.ticker).toUpperCase(), s);
+  });
+
+  return [...map.values()];
+}
+
+async function changeUniverseMode() {
+  const el = document.getElementById("universeMode");
+  universeMode = el ? el.value : "scored";
+  localStorage.setItem("trqxUniverseMode", universeMode);
+
+  if (universeMode === "live") {
+    await loadExpandedUniverse();
+  } else {
+    stocks = [...baseStocks];
+    refreshAllViews();
+    setStatus("TRQX scored universe loaded.");
+  }
+}
+
+async function loadExpandedUniverse(showStatus = true) {
+  try {
+    if (showStatus) setStatus("Loading expanded U.S. market universe from Finnhub...");
+
+    const res = await fetch("/api/symbols");
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Symbol API failed: ${res.status} ${text}`);
+    }
+
+    const liveSymbols = normalizeUniverse(await res.json());
+
+    stocks = mergeUniverses(baseStocks, liveSymbols);
+    localStorage.setItem("trqxUniverseMode", "live");
+    universeMode = "live";
+
+    const el = document.getElementById("universeMode");
+    if (el) el.value = "live";
+
+    refreshAllViews();
+
+    if (showStatus) {
+      setStatus(`Expanded universe loaded: ${stocks.length.toLocaleString()} symbols. Use filters/search, then refresh market data for live pricing.`);
+    }
+  } catch (error) {
+    console.error(error);
+    setStatus("Expanded universe failed to load. Confirm FINNHUB_API_KEY exists and redeploy.");
+    alert("Expanded universe failed to load. Confirm FINNHUB_API_KEY exists in Vercel and redeploy.");
+  }
+}
+
+function refreshAllViews() {
+  setupFilters();
+  render();
+  calcIncome();
+  renderGrowthScanner();
+  renderPortfolioBuilder();
+  updateInsights();
 }
 
 
@@ -147,11 +221,12 @@ function setupFilters() {
   const sectors = [...new Set(stocks.map((s) => s.sector).filter(Boolean))].sort();
   const sel = document.getElementById("sector");
 
-  sectors.forEach((s) => {
-    if (![...sel.options].some((o) => o.value === s)) {
-      sel.insertAdjacentHTML("beforeend", `<option>${s}</option>`);
-    }
-  });
+  if (sel) {
+    const current = sel.value;
+    sel.innerHTML = `<option value="">All sectors</option>`;
+    sectors.forEach((s) => sel.insertAdjacentHTML("beforeend", `<option>${s}</option>`));
+    if ([...sel.options].some((o) => o.value === current)) sel.value = current;
+  }
 
   ["search", "sector", "signal", "viewMode"].forEach((id) => {
     bindControl(id, render);
@@ -368,15 +443,10 @@ function render() {
     .join("")
     : `<tr><td colspan="16" class="emptyState">No stocks match the selected filters.</td></tr>`;
 
-  document.getElementById("kpiStocks").textContent = stocks.length.toLocaleString();
   updateUniverseMeta();
   updateInsights();
-  document.getElementById("kpiBuys").textContent = stocks.filter((s) => (s.signal || "").toUpperCase().includes("BUY")).length;
-  document.getElementById("kpiWatchlist").textContent = watchlist.length;
-
-  const avgScore = stocks.length ? stocks.reduce((a, b) => a + (Number(b.trqxScore) || 0), 0) / stocks.length : 0;
-  document.getElementById("kpiScore").textContent = Math.round(avgScore);
-  document.getElementById("kpiCost").textContent = fmtUSD(stocks.reduce((a, b) => a + (Number(b.cost100) || 0), 0));
+  
+  
 
   const top = stocks.slice().sort((a, b) => (b.trqxScore || 0) - (a.trqxScore || 0)).slice(0, 10);
   document.getElementById("topList").innerHTML = top
@@ -581,7 +651,16 @@ async function refreshQuotes() {
 
     setStatus("Requesting live quotes from Finnhub...");
 
-    const symbols = [...new Set(stocks.map((s) => s.ticker).filter(Boolean))];
+    let sourceForRefresh = filtered();
+
+    // Expanded universes can contain thousands of symbols. Refresh visible/filter-matched symbols first
+    // to avoid rate limits and slow browser/API performance.
+    if (universeMode === "live" && !document.getElementById("search").value && !document.getElementById("sector").value && !document.getElementById("signal").value) {
+      sourceForRefresh = stocks.slice(0, 250);
+      setStatus("Expanded universe mode: refreshing the first 250 symbols. Use search or filters to refresh specific names.");
+    }
+
+    const symbols = [...new Set(sourceForRefresh.map((s) => s.ticker).filter(Boolean))].slice(0, 250);
     const chunks = chunkArray(symbols, 25);
     const allQuotes = [];
 
@@ -675,3 +754,111 @@ function exportWatchlist() {
 }
 
 load();
+
+function renderPortfolioBuilder() {
+  const capitalEl = document.getElementById("portfolioCapital");
+  const goalEl = document.getElementById("portfolioGoal");
+  const riskEl = document.getElementById("portfolioRisk");
+  const rowsEl = document.getElementById("portfolioRows");
+  const summaryEl = document.getElementById("portfolioSummary");
+
+  if (!capitalEl || !goalEl || !riskEl || !rowsEl || !summaryEl) return;
+
+  const capital = +capitalEl.value || 0;
+  const goal = goalEl.value;
+  const risk = riskEl.value;
+
+  let candidates = stocks.filter((s) => Number(s.price) > 0);
+
+  if (goal === "income") {
+    candidates = candidates.filter((s) => {
+      const sector = String(s.sector || "").toLowerCase();
+      return (
+        sector.includes("real estate") ||
+        sector.includes("utilities") ||
+        sector.includes("consumer staples") ||
+        sector.includes("energy") ||
+        Number(s.trqxScore) >= 70
+      );
+    });
+  }
+
+  if (goal === "growth") {
+    candidates = candidates.filter((s) => Number(s.trqxScore) >= 65);
+  }
+
+  if (goal === "balanced") {
+    candidates = candidates.filter((s) => Number(s.trqxScore) >= 55);
+  }
+
+  if (risk === "conservative") {
+    candidates = candidates.filter((s) => {
+      const r = getRisk(s).label;
+      return r !== "Aggressive" && Number(s.trqxScore) >= 65;
+    });
+  }
+
+  if (risk === "moderate") {
+    candidates = candidates.filter((s) => Number(s.trqxScore) >= 55);
+  }
+
+  if (risk === "aggressive") {
+    candidates = candidates.filter((s) => {
+      const price = Number(s.price);
+      const score = Number(s.trqxScore) || 0;
+      return price > 0 && price <= 350 && score >= 50;
+    });
+  }
+
+  let fallbackUsed = false;
+  if (!candidates.length) {
+    fallbackUsed = true;
+    candidates = stocks
+      .filter((s) => Number(s.price) > 0)
+      .filter((s) => Number(s.trqxScore) >= 50);
+  }
+
+  candidates = candidates
+    .sort((a, b) => {
+      const pa = getProbability(a, confidenceForStock(a));
+      const pb = getProbability(b, confidenceForStock(b));
+      return pb - pa || (Number(b.trqxScore) || 0) - (Number(a.trqxScore) || 0);
+    })
+    .slice(0, 5);
+
+  const weights = candidates.length ? candidates.map((_, i) => [30, 25, 20, 15, 10][i] || 10) : [];
+  const totalWeight = weights.reduce((a, b) => a + b, 0);
+
+  rowsEl.innerHTML = candidates.length
+    ? candidates.map((s, i) => {
+      const allocationPct = weights[i] / totalWeight;
+      const dollars = capital * allocationPct;
+      const shares = Math.floor(dollars / Number(s.price));
+      const prob = getProbability(s, confidenceForStock(s));
+      const riskObj = getRisk(s);
+
+      return `<tr>
+        <td><button class="tickerBtn" onclick="openStockModal('${s.ticker}')"><b>${s.ticker}</b></button><div class="small">${s.name}</div></td>
+        <td>${fmtPct(allocationPct * 100)}</td>
+        <td>${fmtUSD(dollars)}</td>
+        <td>${shares}</td>
+        <td><span class="confidence ${riskObj.cls}">${riskObj.icon} ${riskObj.label}</span></td>
+        <td><span class="confidence ${probabilityClass(prob)}">${prob}%</span></td>
+      </tr>`;
+    })
+    .join("")
+    : `<tr><td colspan="6" class="emptyState">No priced stocks are available yet. Click Refresh Market Data or switch back to TRQX Scored Universe.</td></tr>`;
+
+  const avgProb = candidates.length
+    ? Math.round(candidates.reduce((a, s) => a + getProbability(s, confidenceForStock(s)), 0) / candidates.length)
+    : 0;
+
+  const goalLabel = goalEl.selectedOptions[0].textContent;
+  const riskLabel = riskEl.selectedOptions[0].textContent;
+
+  summaryEl.textContent = candidates.length
+    ? `${fallbackUsed ? "Fallback portfolio shown because the selected filters were too restrictive. " : ""}Suggested ${goalLabel} / ${riskLabel} portfolio using ${fmtUSD(capital)}. Average probability score: ${avgProb}%.`
+    : "No priced portfolio candidates available. Expanded universe symbols need live price data before portfolio construction.";
+}
+
+

@@ -19,3 +19,17 @@
 .marketBadge.neutral{background:rgba(225,189,87,.15);color:var(--yellow)}
 @media(max-width:900px){.insightHeader{display:block}.insightGrid{grid-template-columns:repeat(2,1fr)}.marketBadge{display:inline-block;margin-top:12px}}
 @media(max-width:600px){.insightGrid{grid-template-columns:1fr}}
+
+.terminalControls{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+
+.cards{display:none!important}
+.customerValueStrip{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:18px 0}
+.customerValueStrip div{background:rgba(16,16,16,.92);border:1px solid var(--line);border-radius:16px;padding:14px 16px;color:var(--gold2);font-weight:900;text-align:center;font-size:13px;letter-spacing:.4px}
+@media(max-width:900px){.customerValueStrip{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.customerValueStrip{grid-template-columns:1fr}}
+
+/* v8.7 hide removed KPI card row only */
+section.cards,
+div.cards {
+  display:none!important;
+}
