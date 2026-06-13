@@ -13,7 +13,7 @@ body:before{content:"";position:fixed;inset:0;background-image:linear-gradient(r
 .hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:24px}.gold-btn,.dark-btn,button{border-radius:7px;border:1px solid rgba(214,168,61,.4);padding:12px 19px;font-weight:900;cursor:pointer}.gold-btn{background:linear-gradient(135deg,#ffe071,#c79224);color:#050505;border:0}.dark-btn{background:#070707;color:var(--gold2)}button:hover{filter:brightness(1.1)}
 .hero-art{position:absolute;inset:70px 0 0 0;z-index:1;overflow:hidden}.chart-bg{position:absolute;right:0;bottom:0;width:72%;height:100%;object-fit:cover;opacity:.8}.lion-img{position:absolute;right:35px;top:20px;width:min(520px,32vw);filter:drop-shadow(0 0 35px rgba(214,168,61,.45));opacity:.98}.refresh-hero{position:absolute;right:62px;bottom:72px;z-index:4}.auto-refresh{position:absolute;right:65px;bottom:38px;color:#ddd;font-size:13px;z-index:4}
 .metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.metric-row article{padding:22px 24px;min-height:118px}.metric-row span{display:block;color:var(--muted);font-size:12px;text-transform:uppercase}.metric-row strong{display:block;font-size:34px;margin:10px 0 5px;color:var(--gold2)}.metric-row small{color:#cfd4dc}.metric-row .live{color:var(--green)}
-.main-grid{display:grid;grid-template-columns:1fr .86fr;gap:14px}.bottom-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1fr;gap:14px;margin-top:14px}.panel{padding:20px}.panel h2{font-size:23px;margin:0 0 8px}.panel p{color:var(--muted);font-size:13px}.panel-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.target-card{border:1px solid var(--soft);background:#050505;border-radius:10px;padding:16px 20px;text-align:right;min-width:140px}.target-card span{color:var(--muted);font-size:11px}.target-card strong{display:block;color:var(--gold2);font-size:28px}
+.main-grid{display:grid;grid-template-columns:1fr .86fr;gap:14px;align-items:start}.bottom-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1fr;gap:14px;margin-top:14px;align-items:start}.panel{padding:20px}.panel h2{font-size:23px;margin:0 0 8px}.panel p{color:var(--muted);font-size:13px}.panel-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.target-card{border:1px solid var(--soft);background:#050505;border-radius:10px;padding:16px 20px;text-align:right;min-width:140px}.target-card span{color:var(--muted);font-size:11px}.target-card strong{display:block;color:var(--gold2);font-size:28px}
 .control-row,.filter-row,.lookup-bar,.terminal-controls,.quick-prompts,.aiChatInputRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.control-row{margin:16px 0}.control-row label,.terminal-controls label{display:grid;gap:6px;color:#ccd2dc;font-size:11px}input,select,textarea{background:#030303;border:1px solid var(--soft);border-radius:7px;color:white;padding:11px;min-height:40px}.lookup-bar input,.filter-row input,.aiChatInputRow input{flex:1;min-width:260px}
 .table-wrap{overflow:auto;border-top:1px solid var(--soft);margin-top:8px}table{width:100%;border-collapse:collapse;min-width:920px}th{color:var(--gold2);font-size:11px;text-align:left;text-transform:uppercase;padding:12px 9px;white-space:nowrap}td{border-top:1px solid rgba(255,255,255,.06);padding:11px 9px;font-size:13px;white-space:nowrap}.small{color:var(--muted);font-size:11px}.score{color:var(--gold2);font-weight:1000}
 .meter,.confidence,.pill{padding:5px 9px;border-radius:999px;font-weight:900;font-size:11px;display:inline-block}.meter.strong,.confidence.high,.pill.buy{background:rgba(54,209,124,.14);color:var(--green)}.meter.watch,.confidence.medium,.pill.watch{background:rgba(214,168,61,.14);color:var(--gold2)}.confidence.low,.pill.avoid{background:rgba(239,77,94,.14);color:var(--red)}
@@ -542,10 +542,9 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
-  opacity: .72;
-  filter: contrast(1.08) saturate(1.05) brightness(.78);
-  transform: scale(1.02);
+  object-position: right center;
+  opacity: .88;
+  filter: contrast(1.05) saturate(1.02) brightness(.82);
 }
 
 .brand-hero-art::before {
@@ -707,10 +706,10 @@ body {
   width: 100%;
   height: 350px;
   object-fit: cover;
-  object-position: center;
+  object-position: right center;
   border-radius: 14px;
   border: 1px solid rgba(214,168,61,.25);
-  filter: contrast(1.08) brightness(.86);
+  filter: contrast(1.05) brightness(.9);
 }
 
 .flowCopy h2 {
@@ -813,7 +812,7 @@ body {
 
 .topAIPicksPanel {
   grid-column: span 2;
-  min-height: 260px;
+  min-height: auto;
 }
 
 .topAIPicks {

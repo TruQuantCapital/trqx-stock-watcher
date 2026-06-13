@@ -27,6 +27,7 @@ async function load() {
   calcIncome();
   renderGrowthScanner();
   renderPortfolioBuilder();
+  renderTopAIPicks();
   setStatus("TRQX AI Market Terminal loaded. Click Refresh Market Data for live prices.");
 }
 
@@ -168,6 +169,7 @@ function refreshAllViews() {
   renderGrowthScanner();
   renderPortfolioBuilder();
   updateInsights();
+  renderTopAIPicks();
 }
 
 
@@ -982,6 +984,7 @@ async function refreshQuotes() {
     render();
     renderGrowthScanner();
     renderPortfolioBuilder();
+    renderTopAIPicks();
     setStatus(`Live refresh complete at ${lastUpdated}. Updated ${updated} of ${stocks.length} stocks.`);
   } catch (e) {
     console.error(e);
