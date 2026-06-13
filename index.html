@@ -20,20 +20,41 @@
     </a>
 
     <div class="nav-links">
-      <button class="active" onclick="scrollTo('home')">Dashboard</button>
-      <button onclick="scrollTo('stockLookupPanel')">Stock Lookup</button>
-      <button onclick="scrollTo('growthScannerPanel')">Growth Scanner</button>
-      <button onclick="scrollTo('portfolioBuilderPanel')">Portfolio</button>
-      <button onclick="scrollTo('aiInsightsPanel')">Market Intelligence</button>
-      <button onclick="scrollTo('watchlistPanel')">Watchlist</button>
+      <button class="active" onclick="navTo('home')">Dashboard</button>
+      <button onclick="navTo('stockLookupPanel')">Stock Lookup</button>
+      <button onclick="navTo('growthScannerPanel')">Growth Scanner</button>
+      <button onclick="navTo('portfolioBuilderPanel')">Portfolio</button>
+      <button onclick="navTo('aiInsightsPanel')">Market Intelligence</button>
+      <button onclick="navTo('watchlistPanel')">Watchlist</button>
     </div>
 
+    <!-- Live market strip — values updated by fetchMarketStrip() -->
     <div class="nav-markets">
-      <div class="nav-market-item"><span>S&amp;P 500</span><strong>5,321.41</strong><em class="positive">▲ 0.78%</em></div>
-      <div class="nav-market-item"><span>NASDAQ</span><strong>16,801.54</strong><em class="positive">▲ 1.05%</em></div>
-      <div class="nav-market-item"><span>DOW</span><strong>39,872.99</strong><em class="positive">▲ 0.45%</em></div>
-      <div class="nav-market-item"><span>GOLD</span><strong>2,354.80</strong><em class="positive">▲ 0.21%</em></div>
-      <div class="nav-market-item"><span>BTC</span><strong>66,482.91</strong><em class="positive">▲ 1.32%</em></div>
+      <div class="nav-market-item">
+        <span>S&amp;P 500</span>
+        <strong id="strip-price-spx">—</strong>
+        <em id="strip-pct-spx" class="positive">—</em>
+      </div>
+      <div class="nav-market-item">
+        <span>NASDAQ</span>
+        <strong id="strip-price-ndx">—</strong>
+        <em id="strip-pct-ndx" class="positive">—</em>
+      </div>
+      <div class="nav-market-item">
+        <span>DOW</span>
+        <strong id="strip-price-dji">—</strong>
+        <em id="strip-pct-dji" class="positive">—</em>
+      </div>
+      <div class="nav-market-item">
+        <span>GOLD</span>
+        <strong id="strip-price-gold">—</strong>
+        <em id="strip-pct-gold" class="positive">—</em>
+      </div>
+      <div class="nav-market-item">
+        <span>BTC</span>
+        <strong id="strip-price-btc">—</strong>
+        <em id="strip-pct-btc" class="positive">—</em>
+      </div>
     </div>
 
     <div class="nav-right">
@@ -57,9 +78,9 @@
         <div id="terminalMeta" class="terminal-meta">TRQX AI Engine • Real-Time Market Intelligence • Growth, Income, Momentum &amp; Portfolio Tools</div>
 
         <div class="hero-actions">
-          <button class="btn btn-gold" onclick="scrollTo('stockLookupPanel')">Start Stock Search</button>
-          <button class="btn btn-dark" onclick="scrollTo('growthScannerPanel')">View Growth Scanner</button>
-          <button class="btn btn-dark" onclick="scrollTo('portfolioBuilderPanel')">Build Portfolio</button>
+          <button class="btn btn-gold" onclick="navTo('stockLookupPanel')">Start Stock Search</button>
+          <button class="btn btn-dark" onclick="navTo('growthScannerPanel')">View Growth Scanner</button>
+          <button class="btn btn-dark" onclick="navTo('portfolioBuilderPanel')">Build Portfolio</button>
         </div>
       </div>
 
@@ -78,7 +99,7 @@
       </div>
     </section>
 
-    <!-- ===== STATS ROW ===== -->
+    <!-- ===== STATS ROW (4 cards) ===== -->
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-label">AI Opportunities</div>
@@ -109,7 +130,7 @@
     <!-- ===== MAIN 2-COL GRID ===== -->
     <div class="main-grid">
 
-      <!-- Growth Scanner -->
+      <!-- Growth / Double-Up Scanner -->
       <section id="growthScannerPanel" class="panel">
         <div class="panel-head">
           <div>
@@ -159,7 +180,7 @@
             <tbody id="growthRows"></tbody>
           </table>
         </div>
-        <button class="wide-btn" onclick="scrollTo('watchlistPanel')">View All Opportunities</button>
+        <button class="wide-btn" onclick="navTo('watchlistPanel')">View All Opportunities</button>
       </section>
 
       <!-- Stock Lookup -->
@@ -220,7 +241,6 @@
         </div>
 
         <div class="ai-chat-messages" id="aiChatMessages">
-          <!-- Initial AI welcome message -->
           <div class="msg ai">
             <div class="msg-avatar">♛</div>
             <div class="msg-bubble">
@@ -243,7 +263,7 @@
       <!-- Why This Stock -->
       <section class="panel">
         <div class="panel-title">WHY THIS STOCK?</div>
-        <ul class="why-list" id="whyList">
+        <ul class="why-list">
           <li>Strong momentum and relative strength vs. market</li>
           <li>High institutional accumulation</li>
           <li>Leading position in AI &amp; data center growth</li>
@@ -273,19 +293,19 @@
       <section id="portfolioBuilderPanel" class="panel">
         <div class="panel-title">PORTFOLIO SUMMARY</div>
         <div class="portfolio-total">$24,785.60<span>+$1,245.30 (5.29%)</span></div>
-        <p style="color:var(--muted);font-size:12px;margin:6px 0 10px">Build a sample portfolio from the current stock universe.</p>
+        <p style="color:var(--muted);font-size:12px;margin:6px 0 10px">Build a sample portfolio from the current universe.</p>
 
         <div class="control-row" style="margin:8px 0">
-          <label>Capital<input id="portfolioCapital" type="number" value="10000" style="width:90px" /></label>
+          <label>Capital<input id="portfolioCapital" type="number" value="10000" style="width:88px" /></label>
           <label>Goal
-            <select id="portfolioGoal" style="width:90px">
+            <select id="portfolioGoal" style="width:86px">
               <option value="balanced">Balanced</option>
               <option value="growth" selected>Growth</option>
               <option value="income">Income</option>
             </select>
           </label>
           <label>Risk
-            <select id="portfolioRisk" style="width:96px">
+            <select id="portfolioRisk" style="width:94px">
               <option value="conservative">Conservative</option>
               <option value="moderate">Moderate</option>
               <option value="aggressive" selected>Aggressive</option>
@@ -293,7 +313,6 @@
           </label>
         </div>
 
-        <!-- donut -->
         <div class="donut-wrap">
           <svg width="72" height="72" viewBox="0 0 72 72" style="flex-shrink:0">
             <circle cx="36" cy="36" r="26" fill="none" stroke="#1a1a1a" stroke-width="12"/>
@@ -311,8 +330,8 @@
           </div>
         </div>
 
-        <div id="portfolioSummary" class="gold-note" style="font-size:11px"></div>
-        <div class="table-wrap" style="max-height:170px;overflow-y:auto">
+        <div id="portfolioSummary" class="gold-note" style="font-size:11px;margin-top:6px"></div>
+        <div class="table-wrap" style="max-height:160px;overflow-y:auto;margin-top:8px">
           <table>
             <thead><tr><th>Ticker</th><th>Alloc</th><th>$</th><th>Shares</th><th>Risk</th><th>Prob</th></tr></thead>
             <tbody id="portfolioRows"></tbody>
@@ -323,13 +342,16 @@
       <!-- AI Probability Distribution -->
       <section class="panel">
         <div class="panel-title">AI PROBABILITY DISTRIBUTION</div>
-        <div class="prob-bars">
-          <div class="prob-row"><span>90%+</span><b class="prob-bar" style="width:78%"></b><em>23</em></div>
-          <div class="prob-row"><span>70%–90%</span><b class="prob-bar" style="width:92%"></b><em>49</em></div>
-          <div class="prob-row"><span>50%–70%</span><b class="prob-bar warn" style="width:66%"></b><em>61</em></div>
-          <div class="prob-row"><span>Below 50%</span><b class="prob-bar bad" style="width:38%"></b><em>17</em></div>
-        </div>
-        <button class="wide-btn" onclick="scrollTo('watchlistPanel')">View All Opportunities</button>
+        <table style="min-width:unset;width:100%;margin-top:12px">
+          <thead><tr><th>Probability Range</th><th style="text-align:right"># of Stocks</th></tr></thead>
+          <tbody>
+            <tr><td style="padding:8px 0"><span style="color:var(--muted2);font-size:11.5px">90%+</span><br><b class="prob-bar" style="display:block;height:14px;width:78%;border-radius:3px;background:linear-gradient(90deg,#36d17c,#84d94d);margin-top:4px"></b></td><td style="text-align:right;font-weight:800;color:var(--muted2)">23</td></tr>
+            <tr><td style="padding:8px 0"><span style="color:var(--muted2);font-size:11.5px">70% – 90%</span><br><b class="prob-bar" style="display:block;height:14px;width:92%;border-radius:3px;background:linear-gradient(90deg,#36d17c,#84d94d);margin-top:4px"></b></td><td style="text-align:right;font-weight:800;color:var(--muted2)">49</td></tr>
+            <tr><td style="padding:8px 0"><span style="color:var(--muted2);font-size:11.5px">50% – 70%</span><br><b class="prob-bar" style="display:block;height:14px;width:66%;border-radius:3px;background:linear-gradient(90deg,#d6a83d,#e8a624);margin-top:4px"></b></td><td style="text-align:right;font-weight:800;color:var(--muted2)">61</td></tr>
+            <tr><td style="padding:8px 0"><span style="color:var(--muted2);font-size:11.5px">Below 50%</span><br><b class="prob-bar" style="display:block;height:14px;width:38%;border-radius:3px;background:linear-gradient(90deg,#ef4d5e,#c43048);margin-top:4px"></b></td><td style="text-align:right;font-weight:800;color:var(--muted2)">17</td></tr>
+          </tbody>
+        </table>
+        <button class="wide-btn" onclick="navTo('watchlistPanel')" style="margin-top:12px">View All Opportunities</button>
       </section>
 
       <!-- AI Insights -->
@@ -345,7 +367,7 @@
           <li>Above avg options flow in AI leaders</li>
           <li>Market sentiment remains bullish</li>
         </ul>
-        <div class="terminal-controls">
+        <div class="terminal-controls" style="margin-top:12px">
           <label>Universe
             <select id="universeMode" onchange="changeUniverseMode()">
               <option value="scored">TRQX Scored Universe</option>
@@ -383,7 +405,7 @@
     </section>
 
     <footer>
-      TRQX AI Market Terminal is an educational research tool. It does not provide personalized financial advice, investment recommendations, or guaranteed outcomes. All data and AI analysis are for educational purposes only. Not financial advice.
+      TRQX AI Market Terminal is an educational research tool. It does not provide personalized financial advice, investment recommendations, or guaranteed outcomes. All data and AI analysis are for educational purposes only.
     </footer>
   </div>
 

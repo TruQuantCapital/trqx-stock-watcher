@@ -412,14 +412,13 @@ function filtered() {
 }
 
 
-function scrollTo(id) {
+function navTo(id) {
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function scrollToSection(id) {
-  scrollTo(id);
-}
+function scrollTo(id) { navTo(id); }
+function scrollToSection(id) { navTo(id); }
 
 
 
@@ -1027,6 +1026,7 @@ function exportWatchlist() {
 }
 
 load();
+fetchMarketStrip();
 
 function openStockModal(ticker) {
   const stock = stocks.find((s) => s.ticker === ticker);
@@ -1361,4 +1361,54 @@ function showTyping() {
 function removeTyping(id) {
   const el = document.getElementById(id);
   if (el) el.remove();
+}
+
+// ============================================================
+// LIVE MARKET STRIP — ETF proxies via Finnhub (free tier)
+// SPY ≈ S&P 500, QQQ ≈ NASDAQ 100, DIA ≈ DOW, GLD ≈ Gold, BTC/USD via Finnhub crypto
+// ============================================================
+
+const STRIP_SYMBOLS = [
+  { id: "spx",  label: "S&P 500", sym: "SPY",               mult: 10,  fmt: "0" },
+  { id: "ndx",  label: "NASDAQ",  sym: "QQQ",               mult: 40,  fmt: "0" },
+  { id: "dji",  label: "DOW",     sym: "DIA",               mult: 100, fmt: "0" },
+  { id: "gold", label: "GOLD",    sym: "GLD",               mult: 9.5, fmt: "2" },
+  { id: "btc",  label: "BTC",     sym: "COINBASE:BTC-USD",  mult: 1,   fmt: "0" },
+];
+
+async function fetchMarketStrip() {
+  try {
+    const etfSyms = STRIP_SYMBOLS.map(s => s.sym).join(",");
+    const res = await fetch(`/api/quotes?symbols=${encodeURIComponent(etfSyms)}`);
+    if (!res.ok) return;
+
+    const data = await res.json();
+    const map = {};
+    (data || []).forEach(q => { if (q && q.symbol) map[q.symbol] = q; });
+
+    STRIP_SYMBOLS.forEach(({ id, sym, mult, fmt }) => {
+      const q = map[sym];
+      if (!q || !q.price) return;
+
+      const price    = Number(q.price) * mult;
+      const pct      = Number(q.changesPercentage);
+      const up       = pct >= 0;
+      const priceStr = price.toLocaleString(undefined, {
+        minimumFractionDigits: Number(fmt),
+        maximumFractionDigits: Number(fmt)
+      });
+
+      const priceEl = document.getElementById("strip-price-" + id);
+      const pctEl   = document.getElementById("strip-pct-" + id);
+
+      if (priceEl) priceEl.textContent = priceStr;
+      if (pctEl) {
+        pctEl.textContent = `${up ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}%`;
+        pctEl.className   = up ? "positive" : "negative";
+      }
+    });
+
+  } catch (e) {
+    console.warn("Market strip fetch failed:", e);
+  }
 }
