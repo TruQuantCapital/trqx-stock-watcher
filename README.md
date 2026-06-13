@@ -1,20 +1,22 @@
-# TRQX Stock Watcher v2
+# TRQX Stock Watcher v3
 
-Updated Vercel/GitHub-ready dashboard.
+## New in v3
 
-## Features
-
-- Finnhub live quote refresh
-- 5-minute auto-refresh toggle
-- Local watchlist with star buttons
+- $2K Growth / Double-Up Scanner
+- Capital input
+- Goal multiple input
+- Max stock price filter
+- Risk mode: Conservative / Moderate / Aggressive
+- Daily Change $ and Daily Change % columns
+- Watchlist stars
 - Watchlist CSV export
 - TRQX Opportunity Meter
-- Wider dashboard layout
-- Correct FINNHUB_API_KEY messaging
+- Auto-refresh every 5 minutes
+- Finnhub serverless API route
 
 ## Required GitHub structure
 
-Upload these files at the repository root:
+Upload the extracted files at the repository root:
 
 ```text
 index.html
@@ -34,9 +36,10 @@ Do not upload the zip file itself as the live site.
 
 - Framework Preset: Other
 - Root Directory: `./` if files are at repo root
-- Root Directory: `trqx_dividend_site` only if files are inside that folder
 - Build Command: blank
 - Output Directory: blank
+
+If your files are inside a folder such as `trqx_dividend_site`, set Root Directory to that folder.
 
 ## Environment variable
 
@@ -46,14 +49,8 @@ Add in Vercel:
 FINNHUB_API_KEY=your_key_here
 ```
 
-Redeploy after adding or changing environment variables.
+Redeploy after changing environment variables.
 
-## Test route
+## Important note
 
-After deploy, test:
-
-```text
-https://your-site.vercel.app/api/quotes?symbols=AAPL,MSFT
-```
-
-You should see JSON quote data.
+The Growth / Double-Up Scanner is educational and speculative. It does not predict guaranteed returns. It ranks candidates based on affordability, distance to 52-week high, and TRQX score.

@@ -16,6 +16,7 @@ async function load() {
   setupFilters();
   render();
   calcIncome();
+  renderGrowthScanner();
   setStatus("Saved stock universe loaded. Click Refresh Market Data for live prices.");
 }
 
@@ -37,6 +38,11 @@ function setupFilters() {
   ["search", "sector", "signal", "viewMode"].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.addEventListener("input", render);
+  });
+
+  ["growthCapital", "growthGoal", "maxPrice", "riskMode"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", renderGrowthScanner);
   });
 }
 
@@ -84,14 +90,17 @@ function render() {
   document.getElementById("rows").innerHTML = data
     .map((s) => {
       const isWatched = watchlist.includes(s.ticker);
+      const change = Number(s.change);
+      const changeClass = Number.isNaN(change) ? "" : change >= 0 ? "pos" : "neg";
+
       return `<tr>
-        <td>
-          <button class="star ${isWatched ? "active" : ""}" onclick="toggleWatch('${s.ticker}')">${isWatched ? "★" : "☆"}</button>
-        </td>
+        <td><button class="star ${isWatched ? "active" : ""}" onclick="toggleWatch('${s.ticker}')">${isWatched ? "★" : "☆"}</button></td>
         <td><b>${s.ticker}</b><div class="small">${s.exchange || ""}</div></td>
         <td>${s.name}</td>
         <td>${s.sector}</td>
         <td>${fmtUSD(s.price)}</td>
+        <td class="${changeClass}">${s.change == null ? "—" : fmtUSD(s.change)}</td>
+        <td class="${changeClass}">${s.changesPercentage == null ? "—" : fmtPct(s.changesPercentage)}</td>
         <td>${fmtUSD(s.low52)}</td>
         <td>${fmtUSD(s.high52)}</td>
         <td>${fmtPct(s.from52LowPct)}</td>
@@ -129,6 +138,96 @@ function render() {
   updateLastUpdated();
 }
 
+function growthScore(stock, maxPrice, riskMode) {
+  const price = Number(stock.price);
+  const high52 = Number(stock.high52);
+  const score = Number(stock.trqxScore) || 0;
+  if (!price || !high52 || price <= 0 || high52 <= price) return null;
+
+  const upsideToHighPct = ((high52 - price) / price) * 100;
+  const doubleNeededPct = 100;
+  const affordabilityScore = Math.max(0, (maxPrice - price) / maxPrice) * 25;
+  const upsideScore = Math.min(upsideToHighPct, 150) / 150 * 45;
+  const trqxComponent = score / 100 * 30;
+
+  let riskBonus = 0;
+  if (riskMode === "aggressive" && price <= 25) riskBonus = 8;
+  if (riskMode === "moderate" && price <= 75 && score >= 70) riskBonus = 5;
+  if (riskMode === "conservative" && score >= 85) riskBonus = 5;
+
+  return {
+    upsideToHighPct,
+    doubleNeededPct,
+    growthRank: Math.round(affordabilityScore + upsideScore + trqxComponent + riskBonus)
+  };
+}
+
+function renderGrowthScanner() {
+  const capital = +document.getElementById("growthCapital").value || 0;
+  const goal = +document.getElementById("growthGoal").value || 2;
+  const maxPrice = +document.getElementById("maxPrice").value || 25;
+  const riskMode = document.getElementById("riskMode").value;
+
+  const targetValue = capital * goal;
+  document.getElementById("growthTarget").textContent = fmtUSD(targetValue);
+
+  const candidates = stocks
+    .map((s) => {
+      const price = Number(s.price);
+      if (!price || price > maxPrice) return null;
+
+      const shares = Math.floor(capital / price);
+      if (shares <= 0) return null;
+
+      const g = growthScore(s, maxPrice, riskMode);
+      if (!g) return null;
+
+      const valueAtHigh = shares * Number(s.high52);
+      const gainAtHigh = valueAtHigh - capital;
+      const returnAtHighPct = (gainAtHigh / capital) * 100;
+      const doublePrice = price * goal;
+
+      return {
+        ...s,
+        shares,
+        invested: shares * price,
+        doublePrice,
+        valueAtHigh,
+        gainAtHigh,
+        returnAtHighPct,
+        upsideToHighPct: g.upsideToHighPct,
+        growthRank: g.growthRank
+      };
+    })
+    .filter(Boolean)
+    .filter((s) => {
+      if (riskMode === "conservative") return s.trqxScore >= 75 && s.price <= maxPrice;
+      if (riskMode === "moderate") return s.trqxScore >= 60 && s.price <= maxPrice;
+      return s.price <= maxPrice;
+    })
+    .sort((a, b) => (b.growthRank || 0) - (a.growthRank || 0))
+    .slice(0, 12);
+
+  document.getElementById("growthRows").innerHTML = candidates
+    .map((s) => {
+      const doublePossible = Number(s.high52) >= Number(s.doublePrice);
+      return `<tr>
+        <td><b>${s.ticker}</b><div class="small">${s.name}</div></td>
+        <td>${fmtUSD(s.price)}</td>
+        <td>${s.shares}</td>
+        <td>${fmtUSD(s.invested)}</td>
+        <td>${fmtUSD(s.doublePrice)}</td>
+        <td>${fmtUSD(s.high52)}</td>
+        <td>${fmtPct(s.upsideToHighPct)}</td>
+        <td>${fmtUSD(s.valueAtHigh)}</td>
+        <td>${fmtPct(s.returnAtHighPct)}</td>
+        <td><span class="meter ${doublePossible ? "strong" : "watch"}">${doublePossible ? "2x setup" : "upside play"}</span></td>
+        <td class="score">${s.growthRank}</td>
+      </tr>`;
+    })
+    .join("");
+}
+
 function updateLastUpdated() {
   const el = document.getElementById("lastUpdated");
   if (!el) return;
@@ -136,11 +235,9 @@ function updateLastUpdated() {
 }
 
 function toggleWatch(ticker) {
-  if (watchlist.includes(ticker)) {
-    watchlist = watchlist.filter((t) => t !== ticker);
-  } else {
-    watchlist.push(ticker);
-  }
+  if (watchlist.includes(ticker)) watchlist = watchlist.filter((t) => t !== ticker);
+  else watchlist.push(ticker);
+
   localStorage.setItem("trqxWatchlist", JSON.stringify(watchlist));
   render();
 }
@@ -185,7 +282,6 @@ async function refreshQuotes() {
 
       const quotes = await res.json();
       allQuotes.push(...quotes);
-
       await new Promise((resolve) => setTimeout(resolve, 300));
     }
 
@@ -206,6 +302,8 @@ async function refreshQuotes() {
         ...s,
         price,
         previousClose: q.previousClose || s.previousClose,
+        change: q.change,
+        changesPercentage: q.changesPercentage,
         from52LowPct: s.low52 ? ((price - s.low52) / s.low52) * 100 : s.from52LowPct,
         below52HighPct: s.high52 ? ((s.high52 - price) / s.high52) * 100 : s.below52HighPct,
         cost25: price * 25,
@@ -215,6 +313,7 @@ async function refreshQuotes() {
 
     lastUpdated = new Date().toLocaleTimeString();
     render();
+    renderGrowthScanner();
     setStatus(`Live refresh complete at ${lastUpdated}. Updated ${updated} of ${stocks.length} stocks.`);
   } catch (e) {
     console.error(e);
@@ -230,7 +329,6 @@ async function refreshQuotes() {
 
 function toggleAutoRefresh() {
   const enabled = document.getElementById("autoRefresh").checked;
-
   if (enabled) {
     setStatus("Auto-refresh enabled. Refreshing every 5 minutes.");
     refreshQuotes();
@@ -257,7 +355,7 @@ function exportWatchlist() {
   const csv = [
     "Ticker,Company,Sector,Price,TRQX Score,Signal",
     ...rows.map((r) => `${r.ticker},"${String(r.company).replaceAll('"', '""')}",${r.sector},${r.price},${r.trqxScore},${r.signal}`)
-  ].join("\n");
+  ].join("\\n");
 
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);

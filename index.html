@@ -13,7 +13,7 @@
       <div>
         <div class="eyebrow">TRQX CAPITAL • DIVIDEND WEALTH SCANNER</div>
         <h1>Dividend Opportunity Dashboard</h1>
-        <p>Tracks your stock universe, 52-week ranges, estimated entry zones, watchlists, and TRQX opportunity scores. Live refresh uses your Vercel API route with FINNHUB_API_KEY.</p>
+        <p>Tracks your stock universe, 52-week ranges, estimated entry zones, watchlists, growth setups, and TRQX opportunity scores. Live refresh uses your Vercel API route with FINNHUB_API_KEY.</p>
         <div id="status" class="status">Loading saved stock universe...</div>
         <div id="lastUpdated" class="small">Last live refresh: not yet refreshed</div>
       </div>
@@ -29,6 +29,45 @@
       <div class="card"><div class="label">Watchlist</div><div id="kpiWatchlist" class="value">—</div></div>
       <div class="card"><div class="label">Average TRQX Score</div><div id="kpiScore" class="value">—</div></div>
       <div class="card"><div class="label">100-Share Capital</div><div id="kpiCost" class="value">—</div></div>
+    </section>
+
+    <section class="growth panel">
+      <div class="sectionHeader">
+        <div>
+          <h2>$2K Growth / Double-Up Scanner</h2>
+          <p class="small">This does not predict guaranteed doubles. It ranks lower-priced, higher-upside names based on available capital, 52-week upside, affordability, and TRQX score.</p>
+        </div>
+        <div class="targetBox">
+          <div class="label">Target Value</div>
+          <div id="growthTarget" class="value">—</div>
+        </div>
+      </div>
+
+      <div class="tools">
+        <label class="field">Capital <input id="growthCapital" type="number" value="2000"></label>
+        <label class="field">Goal Multiple <input id="growthGoal" type="number" value="2" step="0.1"></label>
+        <label class="field">Max Stock Price <input id="maxPrice" type="number" value="25"></label>
+        <label class="field">Risk <select id="riskMode"><option value="moderate">Moderate</option><option value="aggressive">Aggressive</option><option value="conservative">Conservative</option></select></label>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Ticker</th>
+            <th>Price</th>
+            <th>Shares</th>
+            <th>Invested</th>
+            <th>2x Price</th>
+            <th>52W High</th>
+            <th>Upside to High</th>
+            <th>Value at High</th>
+            <th>Return at High</th>
+            <th>Setup</th>
+            <th>Growth Rank</th>
+          </tr>
+        </thead>
+        <tbody id="growthRows"></tbody>
+      </table>
     </section>
 
     <section class="grid">
@@ -49,6 +88,8 @@
               <th>Company</th>
               <th>Sector</th>
               <th>Price</th>
+              <th>Change $</th>
+              <th>Change %</th>
               <th>52W Low</th>
               <th>52W High</th>
               <th>% From Low</th>
@@ -85,7 +126,7 @@
           <div id="monthlyIncome" class="value">—</div>
         </div>
 
-        <p class="footer">Education only. Not financial advice. Verify live data before making trading or investing decisions.</p>
+        <p class="footer">Education only. Not financial advice. Growth scanner is speculative and should be verified with research, risk management, and current market conditions.</p>
       </aside>
     </section>
   </main>

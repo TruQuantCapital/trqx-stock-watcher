@@ -9,16 +9,11 @@ export default async function handler(req, res) {
     .filter(Boolean)
     .slice(0, 50);
 
-  if (!symbols.length) {
-    return res.status(400).json({ error: "Missing symbols" });
-  }
+  if (!symbols.length) return res.status(400).json({ error: "Missing symbols" });
 
   const key = process.env.FINNHUB_API_KEY;
-
   if (!key) {
-    return res.status(500).json({
-      error: "Missing FINNHUB_API_KEY environment variable"
-    });
+    return res.status(500).json({ error: "Missing FINNHUB_API_KEY environment variable" });
   }
 
   try {
