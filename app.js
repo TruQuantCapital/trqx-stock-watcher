@@ -1258,14 +1258,15 @@ async function sendAIMessage() {
   const typingId = showTyping();
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    // Route through /api/chat Vercel serverless proxy to avoid CORS.
+    // Set ANTHROPIC_API_KEY in Vercel → Settings → Environment Variables.
+    const response = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1000,
         system: buildSystemPrompt(),
-        messages: chatHistory
+        messages: chatHistory,
+        max_tokens: 1000
       })
     });
 
@@ -1273,7 +1274,7 @@ async function sendAIMessage() {
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err.error?.message || "API error " + response.status);
+      throw new Error(err.error || "API error " + response.status);
     }
 
     const data = await response.json();
@@ -1287,7 +1288,7 @@ async function sendAIMessage() {
   } catch (err) {
     removeTyping(typingId);
     console.error("AI chat error:", err);
-    addChatMessage("ai", "I could not connect right now. Error: " + err.message + ". Please try again.");
+    addChatMessage("ai", "Connection error: " + err.message + ". Make sure ANTHROPIC_API_KEY is set in Vercel environment variables and the site is redeployed.");
   } finally {
     btn.disabled = false;
     btn.textContent = "Ask AI \u2746";
