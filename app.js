@@ -13,17 +13,99 @@ const fmtPct = (n) =>
 
 async function load() {
   stocks = await fetch("data/stocks.json").then((r) => r.json());
+  stocks = normalizeUniverse(stocks);
   setupFilters();
   render();
   calcIncome();
   renderGrowthScanner();
   renderPortfolioBuilder();
-  setStatus("Saved stock universe loaded. Click Refresh Market Data for live prices.");
+  setStatus("TRQX AI Market Terminal loaded. Click Refresh Market Data for live prices.");
 }
 
 function setStatus(message) {
   const el = document.getElementById("status");
   if (el) el.textContent = message || "";
+}
+
+
+function normalizeUniverse(raw) {
+  const seen = new Set();
+
+  return raw
+    .filter((s) => s && s.ticker)
+    .map((s) => {
+      const ticker = String(s.ticker).trim().toUpperCase();
+      const exchange = String(s.exchange || guessExchange(ticker)).toUpperCase();
+      const price = Number(s.price) || null;
+      const low52 = Number(s.low52) || null;
+      const high52 = Number(s.high52) || null;
+
+      return {
+        sector: s.sector || "Unclassified",
+        name: s.name || ticker,
+        ticker,
+        exchange,
+        symbol: s.symbol || `${exchange}:${ticker}`,
+        low52,
+        high52,
+        price,
+        previousClose: Number(s.previousClose) || null,
+        from52LowPct: Number(s.from52LowPct) || (price && low52 ? ((price - low52) / low52) * 100 : null),
+        below52HighPct: Number(s.below52HighPct) || (price && high52 ? ((high52 - price) / high52) * 100 : null),
+        signal: s.signal || "WATCH",
+        cost25: Number(s.cost25) || (price ? price * 25 : null),
+        cost100: Number(s.cost100) || (price ? price * 100 : null),
+        trqxScore: Number(s.trqxScore) || baseScoreFromRange(price, low52, high52)
+      };
+    })
+    .filter((s) => {
+      if (seen.has(s.ticker)) return false;
+      seen.add(s.ticker);
+      return true;
+    });
+}
+
+function guessExchange(ticker) {
+  // Default to NASDAQ for symbols without exchange data.
+  // Finnhub still accepts bare U.S. tickers in most cases.
+  return "NASDAQ";
+}
+
+function baseScoreFromRange(price, low52, high52) {
+  if (!price || !low52 || !high52 || high52 <= low52) return 50;
+
+  const fromLow = ((price - low52) / low52) * 100;
+  const belowHigh = ((high52 - price) / high52) * 100;
+
+  let score = 50;
+  if (fromLow <= 5) score += 35;
+  else if (fromLow <= 15) score += 25;
+  else if (fromLow <= 30) score += 15;
+
+  if (belowHigh >= 25) score += 15;
+  else if (belowHigh >= 10) score += 8;
+
+  return Math.max(1, Math.min(100, Math.round(score)));
+}
+
+function updateUniverseMeta() {
+  const universeCount = document.getElementById("universeCount");
+  if (universeCount) universeCount.textContent = stocks.length.toLocaleString();
+}
+
+function downloadCurrentUniverse() {
+  const blob = new Blob([JSON.stringify(stocks, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "trqx-expanded-universe.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function showUniverseInstructions() {
+  const el = document.getElementById("universeHelp");
+  if (el) el.classList.toggle("hiddenHelp");
 }
 
 function bindControl(id, callback) {
@@ -265,13 +347,12 @@ function render() {
     .join("")
     : `<tr><td colspan="16" class="emptyState">No stocks match the selected filters.</td></tr>`;
 
-  document.getElementById("kpiStocks").textContent = stocks.length;
-  const universeCount = document.getElementById("universeCount");
-  if (universeCount) universeCount.textContent = stocks.length;
+  document.getElementById("kpiStocks").textContent = stocks.length.toLocaleString();
+  updateUniverseMeta();
   document.getElementById("kpiBuys").textContent = stocks.filter((s) => (s.signal || "").toUpperCase().includes("BUY")).length;
   document.getElementById("kpiWatchlist").textContent = watchlist.length;
 
-  const avgScore = stocks.reduce((a, b) => a + (Number(b.trqxScore) || 0), 0) / stocks.length;
+  const avgScore = stocks.length ? stocks.reduce((a, b) => a + (Number(b.trqxScore) || 0), 0) / stocks.length : 0;
   document.getElementById("kpiScore").textContent = Math.round(avgScore);
   document.getElementById("kpiCost").textContent = fmtUSD(stocks.reduce((a, b) => a + (Number(b.cost100) || 0), 0));
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>TRQX Stock Watcher v5</title>
+  <title>TRQX AI Market Terminal</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -11,11 +11,12 @@
   <main class="wrap">
     <section class="hero">
       <div>
-        <div class="eyebrow">TRQX CAPITAL • AI DECISION ENGINE</div>
-        <h1>Dividend Opportunity Dashboard</h1>
-        <p>Tracks your stock universe, 52-week ranges, growth setups, confidence scoring, probability estimates, portfolio ideas, and TRQX AI ratings.</p>
+        <div class="eyebrow">TRQX CAPITAL • AI MARKET TERMINAL</div>
+        <h1>TRQX AI Market Terminal</h1>
+        <p>Institutional-grade market intelligence powered by TRQX AI. Discover opportunities across growth, income, value, momentum, and portfolio construction.</p>
         <div id="status" class="status">Loading saved stock universe...</div>
         <div id="lastUpdated" class="small">Last live refresh: not yet refreshed</div>
+        <div id="terminalMeta" class="terminalMeta">TRQX AI Engine • Universe: <span id="universeCount">—</span> Stocks • Live Market Data</div>
       </div>
       <div class="heroActions">
         <button class="refresh" onclick="refreshQuotes()">Refresh Market Data</button>
@@ -31,8 +32,21 @@
       <div class="card"><div class="label">100-Share Capital</div><div id="kpiCost" class="value">—</div></div>
     </section>
 
-    <section class="panel universeNote">
-      <b>Stock Universe:</b> This dashboard is currently using <span id="universeCount">175</span> stocks from <code>data/stocks.json</code>. To expand it, replace that file with a larger ticker list such as S&amp;P 500, Nasdaq 100, Dividend Aristocrats, or a custom TRQX master list.
+
+    <section class="growth panel institutionalUniversePanel">
+      <div class="sectionHeader">
+        <div>
+          <h2>Institutional Universe Controls</h2>
+          <p class="small">For 2,000+ stocks, upload or paste a larger ticker universe into <code>data/stocks.json</code>. This terminal is now built to support institutional-scale lists with quote batching and fallback logic.</p>
+        </div>
+      </div>
+      <div class="tools">
+        <button class="secondary" onclick="downloadCurrentUniverse()">Export Current Universe</button>
+        <button class="secondary" onclick="showUniverseInstructions()">How to Expand to 2,000+</button>
+      </div>
+      <div id="universeHelp" class="small hiddenHelp">
+        Recommended sources: NYSE/NASDAQ listed stocks, S&amp;P 500, Russell 2000, Dividend Aristocrats, Nasdaq 100, sector leaders, and ETFs. Keep fields: sector, name, ticker, exchange, symbol, price, low52, high52, previousClose, signal, trqxScore.
+      </div>
     </section>
 
     <section class="growth panel">
@@ -65,10 +79,6 @@
         </thead>
         <tbody id="growthRows"></tbody>
       </table>
-    </section>
-
-    <section class="panel universeNote">
-      <b>Stock Universe:</b> This dashboard is currently using <span id="universeCount">175</span> stocks from <code>data/stocks.json</code>. To expand it, replace that file with a larger ticker list such as S&amp;P 500, Nasdaq 100, Dividend Aristocrats, or a custom TRQX master list.
     </section>
 
     <section class="growth panel">

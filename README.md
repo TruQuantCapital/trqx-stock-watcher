@@ -1,20 +1,43 @@
-# TRQX Stock Watcher v5 — Decision Engine
+# TRQX AI Market Terminal v6
 
-## New in v5
+## Branding Update
 
-- AI Rating column: A+ Elite, A Strong, B Watch, C Speculative, D Avoid
-- Probability estimate column
-- Risk Meter: Conservative, Moderate, Aggressive
-- Estimated time to target
-- Moonshot Mode filter
-- Clickable ticker detail modal
-- "Why This Stock?" explanation
-- TRQX Portfolio Builder
-- Existing watchlist, auto-refresh, Finnhub API route, and Growth Scanner retained
+- Product name changed to **TRQX AI Market Terminal**
+- Removed developer-looking Stock Universe bars
+- Added clean terminal metadata line in the hero section
+- Retains Growth Scanner, Portfolio Builder, Watchlist, Finnhub refresh, AI Rating, Probability, Risk, and Time-to-Target
 
-## Required GitHub structure
+## 2,000+ Stock Expansion
 
-Upload extracted files at the repository root:
+This version is built to support institutional-scale stock universes.
+
+To expand beyond the current universe, replace:
+
+```text
+data/stocks.json
+```
+
+with a larger JSON list using this structure:
+
+```json
+{
+  "sector": "Technology",
+  "name": "Apple Inc",
+  "ticker": "AAPL",
+  "exchange": "NASDAQ",
+  "symbol": "NASDAQ:AAPL",
+  "low52": 169.21,
+  "high52": 288.62,
+  "price": 248.8,
+  "previousClose": 252.89,
+  "signal": "WATCH",
+  "trqxScore": 74
+}
+```
+
+The app now normalizes missing fields and calculates fallback values when possible.
+
+## Required GitHub Structure
 
 ```text
 index.html
@@ -28,12 +51,10 @@ data/
   stocks.json
 ```
 
-Do not upload the ZIP itself as the website.
-
 ## Vercel
 
 - Framework Preset: Other
-- Root Directory: `./` if files are at root
+- Root Directory: `./`
 - Build Command: blank
 - Output Directory: blank
 
@@ -43,33 +64,8 @@ Environment variable:
 FINNHUB_API_KEY=your_key_here
 ```
 
-Redeploy after changing files or variables.
+## Important
 
-## Disclaimer
+For 2,000+ tickers, Finnhub free tier may rate-limit live refresh. The app batches quote requests, but a paid market-data plan or cached backend will eventually be needed for heavy usage.
 
-Education only. Not financial advice. Probability and time estimates are model-based approximations, not guarantees.
-
-
-## v5.1 Dropdown Fix
-
-- Dropdowns now listen for both `input` and `change` events.
-- Growth Scanner, Portfolio Builder, and main table update immediately when filters change.
-- Blank tables now show clear “No matches found” messages.
-
-
-## v5.2 Live Controls Fix
-
-- Scanner title now updates from the Capital input.
-  - Example: 1000 displays `$1K Growth / Double-Up Scanner`.
-- Risk and Quality dropdowns now force a recalculation on input, change, and keyup.
-- Risk and Quality settings now materially affect ranking and sorting.
-- Growth summary now shows current capital, goal, risk, and quality settings.
-
-
-## v5.3 Risk Label + Universe Note
-
-- Added a Stock Universe note showing that the app currently uses the tickers inside `data/stocks.json`.
-- Clarified risk columns:
-  - `Stock Risk` = calculated risk for the individual ticker.
-  - `Scanner Mode` = the dropdown selected by the user.
-- This avoids confusion when scanner mode is Aggressive but a specific stock still calculates as Moderate.
+Education only. Not financial advice.

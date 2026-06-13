@@ -1,0 +1,15 @@
+[
+  {
+    "sector": "Technology",
+    "name": "Example Company",
+    "ticker": "EXMP",
+    "exchange": "NASDAQ",
+    "symbol": "NASDAQ:EXMP",
+    "low52": null,
+    "high52": null,
+    "price": null,
+    "previousClose": null,
+    "signal": "WATCH",
+    "trqxScore": 50
+  }
+]
