@@ -1,22 +1,19 @@
-# TRQX Stock Watcher v3
+# TRQX Stock Watcher v4
 
-## New in v3
+## New in v4
 
-- $2K Growth / Double-Up Scanner
-- Capital input
-- Goal multiple input
-- Max stock price filter
-- Risk mode: Conservative / Moderate / Aggressive
-- Daily Change $ and Daily Change % columns
-- Watchlist stars
-- Watchlist CSV export
-- TRQX Opportunity Meter
-- Auto-refresh every 5 minutes
-- Finnhub serverless API route
+- Growth Scanner quality filters
+- Minimum price filter
+- Exclude penny stocks default
+- Quality Only mode
+- NYSE/NASDAQ-only mode
+- Confidence Score: High / Medium / Low
+- Confidence warnings such as penny-stock risk, non-major exchange, low TRQX score, and extreme volatility
+- Improved Growth Rank that factors confidence into the score
 
 ## Required GitHub structure
 
-Upload the extracted files at the repository root:
+Upload extracted files at the repository root:
 
 ```text
 index.html
@@ -30,27 +27,19 @@ data/
   stocks.json
 ```
 
-Do not upload the zip file itself as the live site.
+Do not upload the zip itself as the live website.
 
-## Vercel settings
+## Vercel
 
 - Framework Preset: Other
-- Root Directory: `./` if files are at repo root
+- Root Directory: `./` if files are at root
 - Build Command: blank
 - Output Directory: blank
 
-If your files are inside a folder such as `trqx_dividend_site`, set Root Directory to that folder.
-
-## Environment variable
-
-Add in Vercel:
+Environment variable:
 
 ```text
 FINNHUB_API_KEY=your_key_here
 ```
 
-Redeploy after changing environment variables.
-
-## Important note
-
-The Growth / Double-Up Scanner is educational and speculative. It does not predict guaranteed returns. It ranks candidates based on affordability, distance to 52-week high, and TRQX score.
+Redeploy after changing files or variables.

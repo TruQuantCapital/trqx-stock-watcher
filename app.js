@@ -28,11 +28,8 @@ function setStatus(message) {
 function setupFilters() {
   const sectors = [...new Set(stocks.map((s) => s.sector).filter(Boolean))].sort();
   const sel = document.getElementById("sector");
-
   sectors.forEach((s) => {
-    if (![...sel.options].some((o) => o.value === s)) {
-      sel.insertAdjacentHTML("beforeend", `<option>${s}</option>`);
-    }
+    if (![...sel.options].some((o) => o.value === s)) sel.insertAdjacentHTML("beforeend", `<option>${s}</option>`);
   });
 
   ["search", "sector", "signal", "viewMode"].forEach((id) => {
@@ -40,7 +37,7 @@ function setupFilters() {
     if (el) el.addEventListener("input", render);
   });
 
-  ["growthCapital", "growthGoal", "maxPrice", "riskMode"].forEach((id) => {
+  ["growthCapital", "growthGoal", "maxPrice", "minPrice", "riskMode", "qualityMode"].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.addEventListener("input", renderGrowthScanner);
   });
@@ -69,6 +66,45 @@ function opportunityClass(score) {
   return "avoid";
 }
 
+function confidenceForStock(s) {
+  const price = Number(s.price) || 0;
+  const score = Number(s.trqxScore) || 0;
+  const exchange = String(s.exchange || "").toUpperCase();
+  const sector = String(s.sector || "").toLowerCase();
+  const high52 = Number(s.high52) || 0;
+  const low52 = Number(s.low52) || 0;
+
+  let points = 0;
+  let warnings = [];
+
+  if (price >= 10) points += 25;
+  else if (price >= 5) points += 18;
+  else if (price >= 2) points += 10;
+  else warnings.push("penny-stock risk");
+
+  if (["NYSE", "NASDAQ"].includes(exchange)) points += 25;
+  else warnings.push("non-major exchange");
+
+  if (score >= 85) points += 25;
+  else if (score >= 70) points += 15;
+  else warnings.push("low TRQX score");
+
+  if (high52 > low52 && price > 0) {
+    const spread = ((high52 - low52) / price) * 100;
+    if (spread < 150) points += 25;
+    else if (spread < 300) points += 15;
+    else warnings.push("extreme volatility");
+  }
+
+  if (sector.includes("real estate") || sector.includes("utilities") || sector.includes("consumer staples")) {
+    points += 5;
+  }
+
+  if (points >= 85) return { label: "High", cls: "high", warnings };
+  if (points >= 60) return { label: "Medium", cls: "medium", warnings };
+  return { label: "Low", cls: "low", warnings };
+}
+
 function filtered() {
   const q = document.getElementById("search").value.toLowerCase();
   const sec = document.getElementById("sector").value;
@@ -92,6 +128,7 @@ function render() {
       const isWatched = watchlist.includes(s.ticker);
       const change = Number(s.change);
       const changeClass = Number.isNaN(change) ? "" : change >= 0 ? "pos" : "neg";
+      const conf = confidenceForStock(s);
 
       return `<tr>
         <td><button class="star ${isWatched ? "active" : ""}" onclick="toggleWatch('${s.ticker}')">${isWatched ? "★" : "☆"}</button></td>
@@ -107,32 +144,23 @@ function render() {
         <td>${fmtPct(s.below52HighPct)}</td>
         <td><span class="pill ${signalClass(s.signal)}">${s.signal || "WATCH"}</span></td>
         <td><span class="meter ${opportunityClass(s.trqxScore)}">${opportunityLabel(s.trqxScore)}</span></td>
+        <td><span class="confidence ${conf.cls}">${conf.label}</span></td>
         <td class="score">${s.trqxScore ?? "—"}</td>
       </tr>`;
     })
     .join("");
 
   document.getElementById("kpiStocks").textContent = stocks.length;
-  document.getElementById("kpiBuys").textContent = stocks.filter((s) =>
-    (s.signal || "").toUpperCase().includes("BUY")
-  ).length;
+  document.getElementById("kpiBuys").textContent = stocks.filter((s) => (s.signal || "").toUpperCase().includes("BUY")).length;
   document.getElementById("kpiWatchlist").textContent = watchlist.length;
 
   const avgScore = stocks.reduce((a, b) => a + (Number(b.trqxScore) || 0), 0) / stocks.length;
   document.getElementById("kpiScore").textContent = Math.round(avgScore);
-  document.getElementById("kpiCost").textContent = fmtUSD(
-    stocks.reduce((a, b) => a + (Number(b.cost100) || 0), 0)
-  );
+  document.getElementById("kpiCost").textContent = fmtUSD(stocks.reduce((a, b) => a + (Number(b.cost100) || 0), 0));
 
   const top = stocks.slice().sort((a, b) => (b.trqxScore || 0) - (a.trqxScore || 0)).slice(0, 10);
-
   document.getElementById("topList").innerHTML = top
-    .map(
-      (s) => `<div>
-        <b>${s.ticker}</b> <span class="small">${s.name}</span>
-        <div class="bar"><span style="width:${Math.min(s.trqxScore || 0, 100)}%"></span></div>
-      </div>`
-    )
+    .map((s) => `<div><b>${s.ticker}</b> <span class="small">${s.name}</span><div class="bar"><span style="width:${Math.min(s.trqxScore || 0, 100)}%"></span></div></div>`)
     .join("");
 
   updateLastUpdated();
@@ -145,37 +173,58 @@ function growthScore(stock, maxPrice, riskMode) {
   if (!price || !high52 || price <= 0 || high52 <= price) return null;
 
   const upsideToHighPct = ((high52 - price) / price) * 100;
-  const doubleNeededPct = 100;
-  const affordabilityScore = Math.max(0, (maxPrice - price) / maxPrice) * 25;
-  const upsideScore = Math.min(upsideToHighPct, 150) / 150 * 45;
-  const trqxComponent = score / 100 * 30;
+  const affordabilityScore = Math.max(0, (maxPrice - price) / maxPrice) * 20;
+  const upsideScore = Math.min(upsideToHighPct, 200) / 200 * 40;
+  const trqxComponent = score / 100 * 25;
+  const conf = confidenceForStock(stock);
 
+  let confidenceComponent = conf.label === "High" ? 15 : conf.label === "Medium" ? 8 : -10;
   let riskBonus = 0;
+
   if (riskMode === "aggressive" && price <= 25) riskBonus = 8;
   if (riskMode === "moderate" && price <= 75 && score >= 70) riskBonus = 5;
-  if (riskMode === "conservative" && score >= 85) riskBonus = 5;
+  if (riskMode === "conservative" && score >= 85 && conf.label !== "Low") riskBonus = 8;
 
   return {
     upsideToHighPct,
-    doubleNeededPct,
-    growthRank: Math.round(affordabilityScore + upsideScore + trqxComponent + riskBonus)
+    growthRank: Math.max(0, Math.round(affordabilityScore + upsideScore + trqxComponent + confidenceComponent + riskBonus)),
+    confidence: conf
   };
+}
+
+function passesQuality(s, minPrice, maxPrice, riskMode, qualityMode) {
+  const price = Number(s.price);
+  const exchange = String(s.exchange || "").toUpperCase();
+  const score = Number(s.trqxScore) || 0;
+  const conf = confidenceForStock(s);
+
+  if (!price || price < minPrice || price > maxPrice) return false;
+
+  if (qualityMode === "majorOnly" && !["NYSE", "NASDAQ"].includes(exchange)) return false;
+  if (qualityMode === "excludePenny" && price < 2) return false;
+  if (qualityMode === "qualityOnly" && (conf.label === "Low" || score < 70 || !["NYSE", "NASDAQ"].includes(exchange))) return false;
+
+  if (riskMode === "conservative") return score >= 75 && conf.label !== "Low";
+  if (riskMode === "moderate") return score >= 60;
+  return true;
 }
 
 function renderGrowthScanner() {
   const capital = +document.getElementById("growthCapital").value || 0;
   const goal = +document.getElementById("growthGoal").value || 2;
   const maxPrice = +document.getElementById("maxPrice").value || 25;
+  const minPrice = +document.getElementById("minPrice").value || 0;
   const riskMode = document.getElementById("riskMode").value;
+  const qualityMode = document.getElementById("qualityMode").value;
 
   const targetValue = capital * goal;
   document.getElementById("growthTarget").textContent = fmtUSD(targetValue);
 
   const candidates = stocks
     .map((s) => {
-      const price = Number(s.price);
-      if (!price || price > maxPrice) return null;
+      if (!passesQuality(s, minPrice, maxPrice, riskMode, qualityMode)) return null;
 
+      const price = Number(s.price);
       const shares = Math.floor(capital / price);
       if (shares <= 0) return null;
 
@@ -186,6 +235,7 @@ function renderGrowthScanner() {
       const gainAtHigh = valueAtHigh - capital;
       const returnAtHighPct = (gainAtHigh / capital) * 100;
       const doublePrice = price * goal;
+      const doublePossible = Number(s.high52) >= Number(doublePrice);
 
       return {
         ...s,
@@ -196,21 +246,18 @@ function renderGrowthScanner() {
         gainAtHigh,
         returnAtHighPct,
         upsideToHighPct: g.upsideToHighPct,
-        growthRank: g.growthRank
+        growthRank: g.growthRank,
+        confidence: g.confidence,
+        doublePossible
       };
     })
     .filter(Boolean)
-    .filter((s) => {
-      if (riskMode === "conservative") return s.trqxScore >= 75 && s.price <= maxPrice;
-      if (riskMode === "moderate") return s.trqxScore >= 60 && s.price <= maxPrice;
-      return s.price <= maxPrice;
-    })
     .sort((a, b) => (b.growthRank || 0) - (a.growthRank || 0))
     .slice(0, 12);
 
   document.getElementById("growthRows").innerHTML = candidates
     .map((s) => {
-      const doublePossible = Number(s.high52) >= Number(s.doublePrice);
+      const warnings = s.confidence.warnings.length ? s.confidence.warnings.join(", ") : "clean setup";
       return `<tr>
         <td><b>${s.ticker}</b><div class="small">${s.name}</div></td>
         <td>${fmtUSD(s.price)}</td>
@@ -221,11 +268,17 @@ function renderGrowthScanner() {
         <td>${fmtPct(s.upsideToHighPct)}</td>
         <td>${fmtUSD(s.valueAtHigh)}</td>
         <td>${fmtPct(s.returnAtHighPct)}</td>
-        <td><span class="meter ${doublePossible ? "strong" : "watch"}">${doublePossible ? "2x setup" : "upside play"}</span></td>
+        <td><span class="meter ${s.doublePossible ? "strong" : "watch"}">${s.doublePossible ? "2x setup" : "upside play"}</span></td>
+        <td><span class="confidence ${s.confidence.cls}">${s.confidence.label}</span><div class="small">${warnings}</div></td>
         <td class="score">${s.growthRank}</td>
       </tr>`;
     })
     .join("");
+
+  const summary = document.getElementById("growthSummary");
+  if (summary) {
+    summary.textContent = `${candidates.length} candidates shown after quality filters. Raise minimum price or select Quality Only to reduce speculative names.`;
+  }
 }
 
 function updateLastUpdated() {
@@ -237,7 +290,6 @@ function updateLastUpdated() {
 function toggleWatch(ticker) {
   if (watchlist.includes(ticker)) watchlist = watchlist.filter((t) => t !== ticker);
   else watchlist.push(ticker);
-
   localStorage.setItem("trqxWatchlist", JSON.stringify(watchlist));
   render();
 }
@@ -272,32 +324,24 @@ async function refreshQuotes() {
 
     for (let i = 0; i < chunks.length; i++) {
       setStatus(`Refreshing live data batch ${i + 1} of ${chunks.length}...`);
-
       const res = await fetch(`/api/quotes?symbols=${encodeURIComponent(chunks[i].join(","))}`);
-
       if (!res.ok) {
         const text = await res.text();
         throw new Error(`API failed: ${res.status} ${text}`);
       }
-
       const quotes = await res.json();
       allQuotes.push(...quotes);
       await new Promise((resolve) => setTimeout(resolve, 300));
     }
 
-    const map = Object.fromEntries(
-      allQuotes.filter((q) => q && q.symbol && q.price).map((q) => [q.symbol, q])
-    );
-
+    const map = Object.fromEntries(allQuotes.filter((q) => q && q.symbol && q.price).map((q) => [q.symbol, q]));
     let updated = 0;
 
     stocks = stocks.map((s) => {
       const q = map[s.ticker];
       if (!q) return s;
-
       const price = Number(q.price) || s.price;
       updated++;
-
       return {
         ...s,
         price,

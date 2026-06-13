@@ -13,7 +13,7 @@
       <div>
         <div class="eyebrow">TRQX CAPITAL • DIVIDEND WEALTH SCANNER</div>
         <h1>Dividend Opportunity Dashboard</h1>
-        <p>Tracks your stock universe, 52-week ranges, estimated entry zones, watchlists, growth setups, and TRQX opportunity scores. Live refresh uses your Vercel API route with FINNHUB_API_KEY.</p>
+        <p>Tracks your stock universe, 52-week ranges, estimated entry zones, watchlists, growth setups, confidence scoring, and TRQX opportunity scores.</p>
         <div id="status" class="status">Loading saved stock universe...</div>
         <div id="lastUpdated" class="small">Last live refresh: not yet refreshed</div>
       </div>
@@ -35,7 +35,8 @@
       <div class="sectionHeader">
         <div>
           <h2>$2K Growth / Double-Up Scanner</h2>
-          <p class="small">This does not predict guaranteed doubles. It ranks lower-priced, higher-upside names based on available capital, 52-week upside, affordability, and TRQX score.</p>
+          <p class="small">Ranks lower-priced, higher-upside names by affordability, 52-week upside, confidence, and TRQX score. This is not a guarantee of returns.</p>
+          <p id="growthSummary" class="status"></p>
         </div>
         <div class="targetBox">
           <div class="label">Target Value</div>
@@ -46,8 +47,10 @@
       <div class="tools">
         <label class="field">Capital <input id="growthCapital" type="number" value="2000"></label>
         <label class="field">Goal Multiple <input id="growthGoal" type="number" value="2" step="0.1"></label>
-        <label class="field">Max Stock Price <input id="maxPrice" type="number" value="25"></label>
+        <label class="field">Min Price <input id="minPrice" type="number" value="2" step="0.01"></label>
+        <label class="field">Max Price <input id="maxPrice" type="number" value="25"></label>
         <label class="field">Risk <select id="riskMode"><option value="moderate">Moderate</option><option value="aggressive">Aggressive</option><option value="conservative">Conservative</option></select></label>
+        <label class="field">Quality <select id="qualityMode"><option value="excludePenny">Exclude Penny Stocks</option><option value="qualityOnly">Quality Only</option><option value="majorOnly">NYSE/NASDAQ Only</option><option value="all">All Candidates</option></select></label>
       </div>
 
       <table>
@@ -63,6 +66,7 @@
             <th>Value at High</th>
             <th>Return at High</th>
             <th>Setup</th>
+            <th>Confidence</th>
             <th>Growth Rank</th>
           </tr>
         </thead>
@@ -96,6 +100,7 @@
               <th>% Below High</th>
               <th>Signal</th>
               <th>Meter</th>
+              <th>Confidence</th>
               <th>Score</th>
             </tr>
           </thead>
@@ -113,6 +118,11 @@
         <div class="legend"><span class="dot watch"></span>70–84 Watch</div>
         <div class="legend"><span class="dot avoid"></span>&lt;70 Avoid</div>
 
+        <h3>Confidence Score</h3>
+        <div class="legend"><span class="dot high"></span>High = stronger quality setup</div>
+        <div class="legend"><span class="dot medium"></span>Medium = balanced risk</div>
+        <div class="legend"><span class="dot low"></span>Low = speculative / volatile</div>
+
         <h3>Dividend Income Calculator</h3>
         <div class="small">Portfolio Amount</div>
         <input id="portfolio" type="number" value="100000" oninput="calcIncome()">
@@ -126,7 +136,7 @@
           <div id="monthlyIncome" class="value">—</div>
         </div>
 
-        <p class="footer">Education only. Not financial advice. Growth scanner is speculative and should be verified with research, risk management, and current market conditions.</p>
+        <p class="footer">Education only. Not financial advice. Growth scanner is speculative and should be verified with research, risk management, liquidity, and current market conditions.</p>
       </aside>
     </section>
   </main>
