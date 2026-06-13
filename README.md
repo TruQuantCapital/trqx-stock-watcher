@@ -1,29 +1,26 @@
-# TRQX AI Market Terminal v8.7 — Portfolio Function Restored
+# TRQX AI Market Terminal v9 — Client Landing Upgrade
 
-## Fix
+## Added
 
-The page error was:
+- Landing-style hero buttons
+- Stock Lookup panel
+- Plain-English "Why this stock?" explanation
+- TRQX Rating, Signal, Risk, Probability, and 52-week upside summary
+- Preset scanners:
+  - Best Growth Stocks
+  - Dividend / Income Ideas
+  - Near 52W Low
+  - Stocks Under $25
+  - High Probability
+  - Aggressive Double-Up
 
-```text
-ReferenceError: renderPortfolioBuilder is not defined
-```
+## Retained
 
-This version restores `renderPortfolioBuilder()` and keeps the KPI row removed without using aggressive cleanup scripts.
+- KPI row removed
+- Portfolio Builder restored
+- Growth Scanner
+- TRQX AI Insights
+- Expanded Universe
+- Finnhub API routes
 
-## Upload Structure
-
-```text
-index.html
-app.js
-styles.css
-favicon.svg
-README.md
-api/
-  quotes.js
-  symbols.js
-data/
-  stocks.json
-  expanded_universe_template.json
-```
-
-After upload, redeploy in Vercel and hard refresh with Ctrl+F5.
+Educational research only. Not financial advice.

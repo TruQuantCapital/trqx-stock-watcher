@@ -13,10 +13,15 @@
       <div>
         <div class="eyebrow">TRQX CAPITAL • AI MARKET TERMINAL</div>
         <h1>TRQX AI Market Terminal</h1>
-        <p>Institutional-grade market intelligence powered by TRQX AI. Discover opportunities across growth, income, value, momentum, and portfolio construction.</p>
+        <p>Search stocks, compare opportunities, and understand the why behind every setup. Built for growth, income, value, momentum, and portfolio research.</p>
         <div id="status" class="status">Loading saved stock universe...</div>
         <div id="lastUpdated" class="small">Last live refresh: not yet refreshed</div>
         <div id="terminalMeta" class="terminalMeta">TRQX AI Engine • Real-Time Market Intelligence • Growth, Income, Momentum & Portfolio Tools</div>
+        <div class="heroCtas">
+          <button class="secondary" onclick="scrollToSection('stockLookupPanel')">Start Stock Search</button>
+          <button class="secondary" onclick="scrollToSection('growthScannerPanel')">View Growth Scanner</button>
+          <button class="secondary" onclick="scrollToSection('portfolioBuilderPanel')">Build Portfolio</button>
+        </div>
       </div>
       <div class="heroActions">
         <button class="refresh" onclick="refreshQuotes()">Refresh Market Data</button>
@@ -71,7 +76,7 @@
       </div>
     </section>
 
-    <section class="growth panel">
+    <section id="growthScannerPanel" class="growth panel">
       <div class="sectionHeader">
         <div>
           <h2><span id="growthTitle">$2K</span> Growth / Double-Up Scanner</h2>
@@ -103,7 +108,7 @@
       </table>
     </section>
 
-    <section class="growth panel">
+    <section id="portfolioBuilderPanel" class="growth panel">
       <div class="sectionHeader">
         <div>
           <h2>TRQX Portfolio Builder</h2>

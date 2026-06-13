@@ -408,6 +408,134 @@ function filtered() {
   );
 }
 
+
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function explainStock(stock) {
+  const price = Number(stock.price) || 0;
+  const low52 = Number(stock.low52) || 0;
+  const high52 = Number(stock.high52) || 0;
+  const score = Number(stock.trqxScore) || 0;
+  const conf = confidenceForStock(stock);
+  const prob = getProbability(stock, conf);
+  const risk = getRisk(stock);
+  const rating = getAIRating(score);
+
+  const upside = price && high52 ? ((high52 - price) / price) * 100 : null;
+  const fromLow = price && low52 ? ((price - low52) / low52) * 100 : null;
+
+  const reasons = [];
+
+  if (score >= 90) reasons.push("Strong TRQX AI score compared with the current universe.");
+  else if (score >= 70) reasons.push("Healthy TRQX AI score with a watchable setup.");
+  else reasons.push("Lower TRQX AI score, so this should be treated cautiously.");
+
+  if (upside != null && upside >= 30) reasons.push(`Meaningful upside to the 52-week high: ${fmtPct(upside)}.`);
+  else if (upside != null && upside >= 10) reasons.push(`Moderate upside to the 52-week high: ${fmtPct(upside)}.`);
+  else if (upside != null) reasons.push("Limited upside to the 52-week high based on current range.");
+  else reasons.push("52-week range data is not available yet. Refresh market data or use a scored stock.");
+
+  if (fromLow != null && fromLow <= 15) reasons.push("Price is near the 52-week low, which may appeal to value/reversal traders.");
+  else if (fromLow != null && fromLow >= 75) reasons.push("Price is extended from the 52-week low, which can increase pullback risk.");
+  else if (fromLow != null) reasons.push("Price is trading in a middle range versus its 52-week low/high structure.");
+
+  return { rating, prob, risk, conf, upside, fromLow, reasons };
+}
+
+function runStockLookup() {
+  const input = document.getElementById("stockLookupInput");
+  const result = document.getElementById("stockLookupResult");
+  if (!input || !result) return;
+
+  const q = input.value.trim().toUpperCase();
+  if (!q) {
+    result.innerHTML = `<div class="emptyState">Enter a ticker symbol first.</div>`;
+    return;
+  }
+
+  const stock = stocks.find((s) => String(s.ticker || "").toUpperCase() === q);
+
+  if (!stock) {
+    result.innerHTML = `<div class="emptyState">Ticker ${q} was not found in the current universe. Switch to Expanded Live U.S. Universe or refresh the symbol list.</div>`;
+    return;
+  }
+
+  const analysis = explainStock(stock);
+  const signal = stock.signal || "WATCH";
+
+  result.innerHTML = `
+    <div class="lookupCard">
+      <div>
+        <div class="eyebrow">TRQX AI STOCK ANALYSIS</div>
+        <h3>${stock.ticker} — ${stock.name}</h3>
+        <p class="small">${stock.sector || "Unclassified"} • ${stock.exchange || "US"}</p>
+      </div>
+
+      <div class="lookupStats">
+        <div><span>Price</span><b>${fmtUSD(stock.price)}</b></div>
+        <div><span>TRQX Rating</span><b>${analysis.rating.label}</b></div>
+        <div><span>Signal</span><b>${signal}</b></div>
+        <div><span>Risk</span><b>${analysis.risk.icon} ${analysis.risk.label}</b></div>
+        <div><span>Probability</span><b>${analysis.prob}%</b></div>
+        <div><span>52W Upside</span><b>${analysis.upside == null ? "—" : fmtPct(analysis.upside)}</b></div>
+      </div>
+
+      <div class="whyBox">
+        <h4>Why this stock?</h4>
+        <ul>${analysis.reasons.map((r) => `<li>${r}</li>`).join("")}</ul>
+      </div>
+
+      <div class="disclaimerBox">
+        Educational research only. This is not financial advice or a guaranteed investment outcome.
+      </div>
+    </div>
+  `;
+}
+
+function applyPreset(type) {
+  const search = document.getElementById("search");
+  const sector = document.getElementById("sector");
+  const signal = document.getElementById("signal");
+  const viewMode = document.getElementById("viewMode");
+  const minPrice = document.getElementById("minPrice");
+  const maxPrice = document.getElementById("maxPrice");
+  const riskMode = document.getElementById("riskMode");
+  const qualityMode = document.getElementById("qualityMode");
+
+  if (search) search.value = "";
+  if (sector) sector.value = "";
+  if (signal) signal.value = "";
+  if (viewMode) viewMode.value = "all";
+
+  const configs = {
+    growth: { signal: "BUY", quality: "qualityOnly", risk: "moderate", min: 5, max: 350 },
+    dividend: { sector: "Real Estate", signal: "BUY", quality: "qualityOnly", risk: "conservative", min: 2, max: 300 },
+    undervalued: { signal: "BUY", quality: "qualityOnly", risk: "moderate", min: 2, max: 500 },
+    under25: { signal: "BUY", quality: "excludePenny", risk: "moderate", min: 2, max: 25 },
+    highProbability: { signal: "BUY", quality: "qualityOnly", risk: "conservative", min: 5, max: 500 },
+    aggressive: { signal: "BUY", quality: "all", risk: "aggressive", min: 2, max: 25 }
+  };
+
+  const cfg = configs[type];
+  if (!cfg) return;
+
+  if (sector && cfg.sector) sector.value = cfg.sector;
+  if (signal) signal.value = cfg.signal;
+  if (qualityMode) qualityMode.value = cfg.quality;
+  if (riskMode) riskMode.value = cfg.risk;
+  if (minPrice) minPrice.value = cfg.min;
+  if (maxPrice) maxPrice.value = cfg.max;
+
+  render();
+  renderGrowthScanner();
+  renderPortfolioBuilder();
+  scrollToSection("growthScannerPanel");
+}
+
+
 function render() {
   const data = filtered().sort((a, b) => (b.trqxScore || 0) - (a.trqxScore || 0));
 

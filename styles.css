@@ -33,3 +33,25 @@ section.cards,
 div.cards {
   display:none!important;
 }
+
+
+.heroCtas{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.stockLookupPanel,.presetScannerPanel{margin-bottom:18px}
+.lookupBar{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+.lookupBar input{min-width:320px;flex:1}
+.lookupResult{margin-top:16px}
+.lookupCard{background:#0b0b0b;border:1px solid var(--line);border-radius:18px;padding:18px}
+.lookupCard h3{margin:8px 0 4px;font-size:28px}
+.lookupStats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:18px 0}
+.lookupStats div{background:#111;border:1px solid var(--line);border-radius:14px;padding:14px}
+.lookupStats span{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+.lookupStats b{font-size:18px;color:var(--text)}
+.whyBox{background:rgba(214,168,61,.08);border:1px solid #3a2d10;border-radius:16px;padding:16px}
+.whyBox h4{margin:0 0 8px;color:var(--gold2)}
+.whyBox li{margin:7px 0;color:var(--muted)}
+.disclaimerBox{margin-top:14px;color:#8f8f8f;font-size:12px}
+.presetGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:14px}
+.presetGrid button{background:#111;border:1px solid #3a2d10;color:var(--gold2);border-radius:14px;padding:14px 10px;font-weight:900;cursor:pointer}
+.presetGrid button:hover{background:#1a1407}
+@media(max-width:1100px){.lookupStats{grid-template-columns:repeat(3,1fr)}.presetGrid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.lookupStats,.presetGrid{grid-template-columns:1fr}.lookupBar input{min-width:100%}}
