@@ -6,3 +6,16 @@
 .terminalMeta{margin-top:8px;color:var(--gold2);font-size:13px;font-weight:800;letter-spacing:.4px}
 .hiddenHelp{display:none}
 .institutionalUniversePanel code{color:var(--gold2);background:#090909;border:1px solid #333;padding:2px 6px;border-radius:6px}
+
+.trqxInsightsPanel{margin-bottom:18px}
+.insightHeader{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:14px}
+.insightHeader h2{margin:0 0 6px}
+.insightGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.insightCard{background:#0b0b0b;border:1px solid var(--line);border-radius:16px;padding:16px}
+.statusValue{color:var(--green)}
+.marketBadge{background:rgba(225,189,87,.15);color:var(--yellow);border:1px solid #3a2d10;border-radius:999px;padding:10px 14px;font-weight:900;font-size:13px;white-space:nowrap}
+.marketBadge.bullish{background:rgba(54,179,106,.15);color:var(--green)}
+.marketBadge.bearish{background:rgba(199,75,75,.15);color:var(--red)}
+.marketBadge.neutral{background:rgba(225,189,87,.15);color:var(--yellow)}
+@media(max-width:900px){.insightHeader{display:block}.insightGrid{grid-template-columns:repeat(2,1fr)}.marketBadge{display:inline-block;margin-top:12px}}
+@media(max-width:600px){.insightGrid{grid-template-columns:1fr}}

@@ -29,23 +29,36 @@
       <div class="card"><div class="label">Buy Signals</div><div id="kpiBuys" class="value">—</div></div>
       <div class="card"><div class="label">Watchlist</div><div id="kpiWatchlist" class="value">—</div></div>
       <div class="card"><div class="label">Average TRQX Score</div><div id="kpiScore" class="value">—</div></div>
-      <div class="card"><div class="label">100-Share Capital</div><div id="kpiCost" class="value">—</div></div>
+      <div class="card"><div class="label">100-Share Portfolio Value</div><div id="kpiCost" class="value">—</div></div>
     </section>
 
 
-    <section class="growth panel institutionalUniversePanel">
-      <div class="sectionHeader">
+    <section class="panel trqxInsightsPanel">
+      <div class="insightHeader">
         <div>
-          <h2>Institutional Universe Controls</h2>
-          <p class="small">For 2,000+ stocks, upload or paste a larger ticker universe into <code>data/stocks.json</code>. This terminal is now built to support institutional-scale lists with quote batching and fallback logic.</p>
+          <h2>TRQX AI Insights</h2>
+          <p class="small">A premium market intelligence layer combining AI ratings, probability scoring, growth setups, dividend opportunities, and portfolio construction.</p>
         </div>
+        <div class="marketBadge" id="marketRegime">Market Regime: Neutral</div>
       </div>
-      <div class="tools">
-        <button class="secondary" onclick="downloadCurrentUniverse()">Export Current Universe</button>
-        <button class="secondary" onclick="showUniverseInstructions()">How to Expand to 2,000+</button>
-      </div>
-      <div id="universeHelp" class="small hiddenHelp">
-        Recommended sources: NYSE/NASDAQ listed stocks, S&amp;P 500, Russell 2000, Dividend Aristocrats, Nasdaq 100, sector leaders, and ETFs. Keep fields: sector, name, ticker, exchange, symbol, price, low52, high52, previousClose, signal, trqxScore.
+
+      <div class="insightGrid">
+        <div class="insightCard">
+          <div class="label">Bullish Opportunities</div>
+          <div id="bullishCount" class="value">—</div>
+        </div>
+        <div class="insightCard">
+          <div class="label">Elite AI Ratings</div>
+          <div id="eliteCount" class="value">—</div>
+        </div>
+        <div class="insightCard">
+          <div class="label">High Probability</div>
+          <div id="highProbCount" class="value">—</div>
+        </div>
+        <div class="insightCard">
+          <div class="label">Terminal Status</div>
+          <div class="value statusValue">LIVE</div>
+        </div>
       </div>
     </section>
 

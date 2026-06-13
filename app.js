@@ -93,20 +93,41 @@ function updateUniverseMeta() {
   if (universeCount) universeCount.textContent = stocks.length.toLocaleString();
 }
 
-function downloadCurrentUniverse() {
-  const blob = new Blob([JSON.stringify(stocks, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "trqx-expanded-universe.json";
-  a.click();
-  URL.revokeObjectURL(url);
+
+function updateInsights() {
+  const bullish = stocks.filter((s) => String(s.signal || "").toUpperCase().includes("BUY")).length;
+  const elite = stocks.filter((s) => Number(s.trqxScore) >= 95).length;
+  const highProb = stocks.filter((s) => {
+    const conf = confidenceForStock(s);
+    return getProbability(s, conf) >= 80;
+  }).length;
+
+  const bullishEl = document.getElementById("bullishCount");
+  const eliteEl = document.getElementById("eliteCount");
+  const highProbEl = document.getElementById("highProbCount");
+  const regimeEl = document.getElementById("marketRegime");
+
+  if (bullishEl) bullishEl.textContent = bullish.toLocaleString();
+  if (eliteEl) eliteEl.textContent = elite.toLocaleString();
+  if (highProbEl) highProbEl.textContent = highProb.toLocaleString();
+
+  if (regimeEl) {
+    const ratio = stocks.length ? bullish / stocks.length : 0;
+    let label = "Neutral";
+    let cls = "neutral";
+    if (ratio >= 0.58) {
+      label = "Bullish";
+      cls = "bullish";
+    } else if (ratio <= 0.38) {
+      label = "Bearish";
+      cls = "bearish";
+    }
+
+    regimeEl.textContent = `Market Regime: ${label}`;
+    regimeEl.className = `marketBadge ${cls}`;
+  }
 }
 
-function showUniverseInstructions() {
-  const el = document.getElementById("universeHelp");
-  if (el) el.classList.toggle("hiddenHelp");
-}
 
 function bindControl(id, callback) {
   const el = document.getElementById(id);
@@ -349,6 +370,7 @@ function render() {
 
   document.getElementById("kpiStocks").textContent = stocks.length.toLocaleString();
   updateUniverseMeta();
+  updateInsights();
   document.getElementById("kpiBuys").textContent = stocks.filter((s) => (s.signal || "").toUpperCase().includes("BUY")).length;
   document.getElementById("kpiWatchlist").textContent = watchlist.length;
 
