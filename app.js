@@ -1572,6 +1572,8 @@ setInterval(() => {
 
 
 
+
+
 function renderTopAIPickMetric() {
   const tickerEl = document.getElementById("topPickTicker");
   const metaEl = document.getElementById("topPickMeta");
@@ -1587,9 +1589,8 @@ function renderTopAIPickMetric() {
     });
 
   const pick = ranked[0];
-
   if (!pick) {
-    tickerEl.textContent = "—";
+    tickerEl.textContent = "Top Pick";
     metaEl.textContent = "Refresh data to rank";
     return;
   }
@@ -1597,24 +1598,57 @@ function renderTopAIPickMetric() {
   const score = Number(pick.trqxScore) || 0;
   const conf = typeof confidenceForStock === "function" ? confidenceForStock(pick) : { label: "Medium" };
   const prob = typeof getProbability === "function" ? getProbability(pick, conf) : Math.min(95, Math.max(45, score));
-  const risk = typeof getRisk === "function" ? getRisk(pick) : { label: "Moderate" };
-
-  tickerEl.textContent = pick.ticker || "—";
-  metaEl.textContent = `${prob}% confidence • ${risk.label} risk`;
+  tickerEl.textContent = pick.ticker || "Top Pick";
+  metaEl.textContent = `${prob}% confidence`;
 }
 
-if (!window.__trqxTopPickMetricPatched) {
-  window.__trqxTopPickMetricPatched = true;
+function renderGammaDashboard() {
+  const spy = Array.isArray(stocks) ? stocks.find(s => String(s.ticker || "").toUpperCase() === "SPY") : null;
+  const qqq = Array.isArray(stocks) ? stocks.find(s => String(s.ticker || "").toUpperCase() === "QQQ") : null;
+  const ref = spy || qqq;
 
-  const originalRenderForTopPickMetric = typeof render === "function" ? render : null;
-  if (originalRenderForTopPickMetric) {
+  const price = ref ? Number(ref.price) : 0;
+  const change = ref ? Number(ref.changesPercentage || ref.changePercent || 0) : 0;
+
+  const gammaBiasEl = document.getElementById("gammaBias");
+  const squeezeRiskEl = document.getElementById("squeezeRisk");
+  const callWallEl = document.getElementById("callWall");
+  const putWallEl = document.getElementById("putWall");
+
+  if (gammaBiasEl) {
+    gammaBiasEl.textContent = change > 0.35 ? "Positive" : change < -0.35 ? "Negative" : "Neutral";
+    gammaBiasEl.className = change > 0.35 ? "gamma-positive" : change < -0.35 ? "gamma-negative" : "";
+  }
+
+  if (squeezeRiskEl) {
+    const abs = Math.abs(change);
+    squeezeRiskEl.textContent = abs >= 1 ? "High" : abs >= 0.35 ? "Moderate" : "Low";
+  }
+
+  if (callWallEl) {
+    callWallEl.textContent = price ? `$${Math.ceil(price / 5) * 5}` : "—";
+  }
+
+  if (putWallEl) {
+    putWallEl.textContent = price ? `$${Math.floor(price / 5) * 5}` : "—";
+  }
+}
+
+if (!window.__trqxCommandStripPatched) {
+  window.__trqxCommandStripPatched = true;
+  const originalRenderCommandStrip = typeof render === "function" ? render : null;
+  if (originalRenderCommandStrip) {
     render = function() {
-      originalRenderForTopPickMetric();
+      originalRenderCommandStrip();
       renderTopAIPickMetric();
+      renderGammaDashboard();
     };
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(renderTopAIPickMetric, 500);
+    setTimeout(() => {
+      renderTopAIPickMetric();
+      renderGammaDashboard();
+    }, 500);
   });
 }

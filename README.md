@@ -1,21 +1,18 @@
-# TRQX AI Market Terminal v19.2 — Metric Cards Upgrade
+# TRQX AI Market Terminal v19.3 — Gamma Restored + Metrics Cleaned
 
-## Changed only the metric-card section
+## Fixed
 
-Updated the intelligence cards to be clearer for users:
+- Restored Gamma Dashboard in the navigation.
+- Added Gamma Dashboard section back into the page.
+- Removed the bloated metric-card layout.
+- Replaced it with a cleaner command strip:
+  - Stock Lookup
+  - Growth Setups
+  - Gamma Dashboard
+  - Top AI Pick
+  - Terminal Status
 
-- AI Opportunities → Qualified Setups
-- Elite AI Ratings → A-Rated Stocks
-- High Probability → 70%+ Probability
-- Added Top AI Pick
-- Terminal Status remains LIVE
+## Notes
 
-## New dynamic metric
-
-Top AI Pick uses the existing TRQX stock data and scoring logic to show:
-
-- Ticker
-- Confidence %
-- Risk level
-
-No other sections were changed.
+This keeps the section useful and removes the unnecessary dashboard decoration.
+No scanner, lookup, portfolio, AI chat, watchlist, or options-flow functionality was intentionally changed.
