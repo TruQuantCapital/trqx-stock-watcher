@@ -1441,60 +1441,6 @@ function renderTopAIPicks() {
 
 
 
-async function fetchMarketStrip() {
-  const map = [
-    { key: "spx", symbol: "SPY" },
-    { key: "ndx", symbol: "QQQ" },
-    { key: "dji", symbol: "DIA" },
-    { key: "gold", symbol: "GLD" },
-    { key: "btc", symbol: "MSTR" }
-  ];
-
-  try {
-    const symbols = map.map((m) => m.symbol).join(",");
-    const res = await fetch(`/api/quotes?symbols=${encodeURIComponent(symbols)}`);
-    if (!res.ok) throw new Error("Market strip quote request failed");
-
-    const data = await res.json();
-    const quotes = Array.isArray(data) ? data : [];
-
-    map.forEach((m) => {
-      const q = quotes.find((x) => String(x.symbol || "").toUpperCase() === m.symbol);
-      const priceEl = document.getElementById(`strip-price-${m.key}`);
-      const pctEl = document.getElementById(`strip-pct-${m.key}`);
-      if (!priceEl || !pctEl) return;
-
-      if (!q || !Number.isFinite(Number(q.price))) {
-        priceEl.textContent = "—";
-        pctEl.textContent = "—";
-        pctEl.className = "";
-        return;
-      }
-
-      const price = Number(q.price);
-      const pct = Number(q.changesPercentage);
-      const up = Number.isFinite(pct) ? pct >= 0 : true;
-
-      priceEl.textContent = price.toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-
-      pctEl.textContent = Number.isFinite(pct) ? `${up ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}%` : "—";
-      pctEl.className = Number.isFinite(pct) ? (up ? "positive" : "negative") : "";
-    });
-  } catch (error) {
-    console.warn("Market strip failed:", error);
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  fetchMarketStrip();
-});
-setInterval(fetchMarketStrip, 60000);
-
-
-
 
 function openInfoModal(title, html) {
   const modal = document.getElementById("modal");
@@ -1527,3 +1473,58 @@ function openOptionsFlowDetails() {
 
   openInfoModal("TRQX Options Flow Scanner", panel.innerHTML);
 }
+
+
+async function fetchMarketStrip() {
+  const map = [
+    { key: "spx", symbol: "SPY" },
+    { key: "ndx", symbol: "QQQ" },
+    { key: "dji", symbol: "DIA" },
+    { key: "gold", symbol: "GLD" },
+    { key: "btc", symbol: "BINANCE:BTCUSDT" }
+  ];
+
+  try {
+    const symbols = map.map((m) => m.symbol).join(",");
+    const res = await fetch(`/api/quotes?symbols=${encodeURIComponent(symbols)}`);
+    if (!res.ok) throw new Error("Market strip quote request failed");
+
+    const data = await res.json();
+    const quotes = Array.isArray(data) ? data : [];
+
+    map.forEach((m) => {
+      const q = quotes.find((x) => String(x.symbol || "").toUpperCase() === m.symbol.toUpperCase());
+      const priceEl = document.getElementById(`strip-price-${m.key}`);
+      const pctEl = document.getElementById(`strip-pct-${m.key}`);
+      if (!priceEl || !pctEl) return;
+
+      if (!q || !Number.isFinite(Number(q.price))) {
+        priceEl.textContent = "—";
+        pctEl.textContent = "—";
+        pctEl.className = "";
+        return;
+      }
+
+      const price = Number(q.price);
+      const pct = Number(q.changesPercentage);
+      const up = Number.isFinite(pct) ? pct >= 0 : true;
+
+      priceEl.textContent = price.toLocaleString(undefined, {
+        minimumFractionDigits: price >= 1000 ? 0 : 2,
+        maximumFractionDigits: price >= 1000 ? 0 : 2
+      });
+
+      pctEl.textContent = Number.isFinite(pct) ? `${up ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}%` : "—";
+      pctEl.className = Number.isFinite(pct) ? (up ? "positive" : "negative") : "";
+    });
+  } catch (error) {
+    console.warn("Market strip failed:", error);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  fetchMarketStrip();
+});
+
+setInterval(fetchMarketStrip, 60000);
+

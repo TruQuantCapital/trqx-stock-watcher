@@ -1,17 +1,19 @@
-# TRQX AI Market Terminal v17.2 — Button Actions Fixed
+# TRQX AI Market Terminal v17.3 — Live Strip Corrected
 
 ## Fixed
 
-- `View Full Distribution →` now opens a detailed AI Probability Distribution modal.
-- `Learn More` in the TRQX Options Flow Scanner now opens a detailed Options Flow roadmap modal.
+- Top strip now displays:
+  - SPY
+  - QQQ
+  - DIA
+  - GLD
+  - BTC
+- Removed misleading S&P 500 label while using SPY data.
+- BTC now requests `BINANCE:BTCUSDT` instead of a stock proxy.
+- Increased live strip font size.
 
-## Added
+## Note
 
-- Full probability breakdown
-- Options Flow premium feature details
-- Modal helper functions:
-  - openProbabilityDetails()
-  - openOptionsFlowDetails()
-  - openInfoModal()
+If BTC still shows blank, your current `/api/quotes` route or Finnhub plan may not support crypto symbols. It will now show `—` instead of an incorrect stock/proxy price.
 
 Upload all files/folders to GitHub root, redeploy in Vercel, then hard refresh with Ctrl+F5.

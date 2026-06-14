@@ -372,3 +372,60 @@ input,select,textarea{background:#030303;border:1px solid var(--soft);border-rad
     grid-template-columns: 1fr;
   }
 }
+
+
+
+/* === v17.3 Live Strip Labels + Larger Font === */
+.live-strip {
+  height: 48px !important;
+  grid-template-columns: repeat(6, 1fr) !important;
+  background: linear-gradient(180deg, rgba(5,5,5,.98), rgba(1,1,1,.96)) !important;
+}
+
+.live-strip div {
+  gap: 12px !important;
+}
+
+.live-strip span {
+  font-size: 15px !important;
+  font-weight: 1000 !important;
+  color: #ffe071 !important;
+  letter-spacing: 1px !important;
+}
+
+.live-strip strong {
+  font-size: 16px !important;
+  min-width: 78px !important;
+  text-align: right !important;
+  color: #fff !important;
+}
+
+.live-strip em {
+  font-size: 14px !important;
+  min-width: 78px !important;
+  text-align: left !important;
+  font-weight: 1000 !important;
+}
+
+.live-strip .market-open {
+  font-size: 15px !important;
+  font-weight: 1000 !important;
+  color: #36d17c !important;
+}
+
+@media(max-width: 1100px) {
+  .live-strip {
+    grid-template-columns: repeat(3, 1fr) !important;
+    height: auto !important;
+  }
+
+  .live-strip div {
+    min-height: 38px;
+  }
+}
+
+@media(max-width: 700px) {
+  .live-strip {
+    display: none !important;
+  }
+}
