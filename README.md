@@ -1,18 +1,27 @@
-# TRQX AI Market Terminal v19.3 — Gamma Restored + Metrics Cleaned
+# TRQX AI Market Terminal v19.4 — Portfolio Readability + Links
 
-## Fixed
+## Changed
 
-- Restored Gamma Dashboard in the navigation.
-- Added Gamma Dashboard section back into the page.
-- Removed the bloated metric-card layout.
-- Replaced it with a cleaner command strip:
-  - Stock Lookup
-  - Growth Setups
-  - Gamma Dashboard
-  - Top AI Pick
-  - Terminal Status
+- Portfolio Summary now explains what the sample allocation is based on:
+  - TRQX score
+  - probability
+  - risk mode
+  - goal
+  - available capital
+  - current price
+- Enlarged the Portfolio Summary table.
+- Improved table readability and scrolling.
+- Added TRQX Member Access panel:
+  - Buy on Whop
+  - Join Discord
+  - Get ORB Indicator
 
-## Notes
+## Link note
 
-This keeps the section useful and removes the unnecessary dashboard decoration.
-No scanner, lookup, portfolio, AI chat, watchlist, or options-flow functionality was intentionally changed.
+The links currently point to:
+
+```text
+https://whop.com/tqpx-tru-quant-enterprise
+```
+
+Update the Discord and ORB Indicator links in `index.html` when your final URLs are ready.
