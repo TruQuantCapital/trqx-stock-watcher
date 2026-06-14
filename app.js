@@ -1569,3 +1569,52 @@ setInterval(() => {
   fetchMarketStrip();
 }, 60000);
 
+
+
+
+function renderTopAIPickMetric() {
+  const tickerEl = document.getElementById("topPickTicker");
+  const metaEl = document.getElementById("topPickMeta");
+  if (!tickerEl || !metaEl || !Array.isArray(stocks)) return;
+
+  const ranked = stocks
+    .filter((s) => Number(s.price) > 0 || Number(s.trqxScore) > 0)
+    .slice()
+    .sort((a, b) => {
+      const aScore = (Number(a.trqxScore) || 0) + (Number(a.price) > 0 ? 5 : 0);
+      const bScore = (Number(b.trqxScore) || 0) + (Number(b.price) > 0 ? 5 : 0);
+      return bScore - aScore;
+    });
+
+  const pick = ranked[0];
+
+  if (!pick) {
+    tickerEl.textContent = "—";
+    metaEl.textContent = "Refresh data to rank";
+    return;
+  }
+
+  const score = Number(pick.trqxScore) || 0;
+  const conf = typeof confidenceForStock === "function" ? confidenceForStock(pick) : { label: "Medium" };
+  const prob = typeof getProbability === "function" ? getProbability(pick, conf) : Math.min(95, Math.max(45, score));
+  const risk = typeof getRisk === "function" ? getRisk(pick) : { label: "Moderate" };
+
+  tickerEl.textContent = pick.ticker || "—";
+  metaEl.textContent = `${prob}% confidence • ${risk.label} risk`;
+}
+
+if (!window.__trqxTopPickMetricPatched) {
+  window.__trqxTopPickMetricPatched = true;
+
+  const originalRenderForTopPickMetric = typeof render === "function" ? render : null;
+  if (originalRenderForTopPickMetric) {
+    render = function() {
+      originalRenderForTopPickMetric();
+      renderTopAIPickMetric();
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(renderTopAIPickMetric, 500);
+  });
+}

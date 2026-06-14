@@ -220,3 +220,70 @@ footer{text-align:center;color:#89919b;font-size:12px;margin:24px}
     grid-template-columns: 1fr;
   }
 }
+
+
+
+/* === v19.2 Intelligence Metric Cards Upgrade === */
+.intelligence-metrics {
+  grid-template-columns: repeat(5, 1fr) !important;
+}
+
+.metric-card {
+  min-height: 150px;
+}
+
+.metric-card span {
+  letter-spacing: .4px;
+}
+
+.metric-card strong {
+  line-height: 1;
+}
+
+.metric-card small {
+  display: block;
+  min-height: 18px;
+}
+
+.top-pick-card {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(13,11,7,.96), rgba(4,5,5,.97)),
+    radial-gradient(circle at top right, rgba(255,224,113,.14), transparent 42%) !important;
+  border-color: rgba(255,224,113,.42) !important;
+}
+
+.top-pick-card::before {
+  content: "★";
+  position: absolute;
+  right: 18px;
+  top: 14px;
+  color: rgba(255,224,113,.30);
+  font-size: 22px;
+}
+
+.top-pick-card strong {
+  color: #ffe071 !important;
+  font-size: 34px !important;
+  letter-spacing: .5px;
+}
+
+.pickbar {
+  background: linear-gradient(90deg, rgba(255,224,113,.20), rgba(255,224,113,.92)) !important;
+}
+
+.terminal-status-card strong {
+  font-size: 32px !important;
+}
+
+@media(max-width: 1400px) {
+  .intelligence-metrics {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media(max-width: 800px) {
+  .intelligence-metrics {
+    grid-template-columns: 1fr !important;
+  }
+}

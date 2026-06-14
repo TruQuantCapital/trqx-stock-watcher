@@ -137,15 +137,44 @@
       </div>
 
     </section>
+    <section class="metric-row intelligence-metrics">
+      <article class="metric-card" title="Stocks meeting TRQX AI criteria for momentum, opportunity, probability, and risk.">
+        <span>Qualified Setups</span>
+        <strong id="bullishCount">—</strong>
+        <small>Stocks passing TRQX criteria</small>
+        <i></i>
+      </article>
 
-    <section class="metric-row">
-      <article><span>AI Opportunities</span><strong id="bullishCount">—</strong><small>High Quality Setups</small><i></i></article>
-      <article><span>Elite AI Ratings</span><strong id="eliteCount">—</strong><small>Top Rated Stocks</small><i class="goldbar"></i></article>
-      <article><span>High Probability</span><strong id="highProbCount">—</strong><small>70%+ Probability</small><i class="bluebar"></i></article>
-      <article><span>Terminal Status</span><strong class="live">LIVE</strong><small>Market Data Active</small><i></i></article>
+      <article class="metric-card" title="Stocks with elite TRQX AI ratings. Generally TRQX score 85+ with favorable setup quality.">
+        <span>A-Rated Stocks</span>
+        <strong id="eliteCount">—</strong>
+        <small>Elite TRQX AI scores</small>
+        <i class="goldbar"></i>
+      </article>
+
+      <article class="metric-card" title="Stocks estimated at 70%+ probability based on TRQX scoring logic.">
+        <span>70%+ Probability</span>
+        <strong id="highProbCount">—</strong>
+        <small>Higher-confidence ideas</small>
+        <i class="bluebar"></i>
+      </article>
+
+      <article class="metric-card top-pick-card" title="The highest-ranked stock in the current TRQX universe based on score, probability, and risk.">
+        <span>Top AI Pick</span>
+        <strong id="topPickTicker">—</strong>
+        <small id="topPickMeta">Refresh data to rank</small>
+        <i class="pickbar"></i>
+      </article>
+
+      <article class="metric-card terminal-status-card" title="Shows whether the terminal and market data engine are active.">
+        <span>Terminal Status</span>
+        <strong class="live" id="terminalStatusMetric">LIVE</strong>
+        <small id="terminalStatusMeta">Market Data Active</small>
+        <i></i>
+      </article>
     </section>
 
-    <section class="top-grid">
+<section class="top-grid">
       <section id="aiChatPanel" class="panel ai-card">
         <div class="panel-head">
           <div>
