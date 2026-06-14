@@ -1,24 +1,42 @@
-# TRQX AI Market Terminal v17.4 — SPY Strip Force Fix
+# TRQX AI Market Terminal v17.5 — Nuclear Strip Fix
 
-## Fixed
+## What was wrong
 
-- Forces top strip labels to:
-  - SPY
-  - QQQ
-  - DIA
-  - GLD
-  - BTC/USD
-- Adds JavaScript label override so old cached labels cannot remain visible.
-- Adds cache busting: `app.js?v=17.4`
-- BTC now requests `BINANCE:BTCUSDT`.
-- Increased top strip font size.
+If the live site still showed S&P 500 / NASDAQ / DOW, it means the production page was still serving old HTML or old app.js.
 
-## Important
+## What this version does
 
-After upload, redeploy in Vercel and hard refresh:
+This version fixes it in three places:
+
+1. `index.html` labels are hard-coded as:
+   - SPY
+   - QQQ
+   - DIA
+   - GLD
+   - IBIT
+
+2. An inline script inside `index.html` force-overwrites the labels immediately, even before `app.js` loads.
+
+3. `app.js` also force-overwrites the labels every 60 seconds.
+
+## BTC Fix
+
+The prior BTC price was wrong because it was pulling a proxy/security price, not Bitcoin spot.
+
+To avoid misleading users, this version labels the fifth ticker as:
+
+```text
+IBIT
+```
+
+That price will match the Bitcoin ETF/proxy price being pulled.
+
+## After Upload
+
+Redeploy in Vercel and hard refresh:
 
 ```text
 Ctrl + Shift + R
 ```
 
-If Vercel still shows S&P 500 after this, the production deployment is serving an older file.
+If it still says S&P 500 after this, the production site is not using the files you uploaded.

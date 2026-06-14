@@ -1507,6 +1507,36 @@ function forceLiveStripLabels() {
   }
 }
 
+
+
+/* === TRQX v17.5 Live Strip Nuclear Fix ===
+   This intentionally uses tradable ETF/proxy labels:
+   SPY, QQQ, DIA, GLD, IBIT.
+*/
+
+function forceLiveStripLabels() {
+  const labels = {
+    spx: "SPY",
+    ndx: "QQQ",
+    dji: "DIA",
+    gold: "GLD",
+    btc: "IBIT"
+  };
+
+  Object.entries(labels).forEach(([key, value]) => {
+    const el = document.getElementById(`label-${key}`);
+    if (el) el.textContent = value;
+  });
+
+  const strip = document.querySelector(".live-strip");
+  if (strip) {
+    const spans = strip.querySelectorAll("div span");
+    ["SPY", "QQQ", "DIA", "GLD", "IBIT"].forEach((label, index) => {
+      if (spans[index]) spans[index].textContent = label;
+    });
+  }
+}
+
 async function fetchMarketStrip() {
   forceLiveStripLabels();
 
@@ -1515,16 +1545,14 @@ async function fetchMarketStrip() {
     { key: "ndx", symbol: "QQQ" },
     { key: "dji", symbol: "DIA" },
     { key: "gold", symbol: "GLD" },
-    { key: "btc", symbol: "BINANCE:BTCUSDT" }
+    { key: "btc", symbol: "IBIT" }
   ];
 
   try {
     const symbols = map.map((m) => m.symbol).join(",");
-    const response = await fetch(`/api/quotes?symbols=${encodeURIComponent(symbols)}&v=17.4`);
+    const response = await fetch(`/api/quotes?symbols=${encodeURIComponent(symbols)}&v=17.5`);
 
-    if (!response.ok) {
-      throw new Error("Failed to load market strip quotes");
-    }
+    if (!response.ok) throw new Error("Failed to load market strip quotes");
 
     const data = await response.json();
     const quotes = Array.isArray(data) ? data : [];
@@ -1532,13 +1560,11 @@ async function fetchMarketStrip() {
     map.forEach((item) => {
       const priceEl = document.getElementById(`strip-price-${item.key}`);
       const pctEl = document.getElementById(`strip-pct-${item.key}`);
-
       if (!priceEl || !pctEl) return;
 
-      const quote = quotes.find((q) => {
-        const symbol = String(q.symbol || "").toUpperCase();
-        return symbol === item.symbol.toUpperCase();
-      });
+      const quote = quotes.find((q) =>
+        String(q.symbol || "").toUpperCase() === item.symbol.toUpperCase()
+      );
 
       if (!quote || !Number.isFinite(Number(quote.price))) {
         priceEl.textContent = "—";
@@ -1551,8 +1577,8 @@ async function fetchMarketStrip() {
       const pct = Number(quote.changesPercentage);
 
       priceEl.textContent = price.toLocaleString(undefined, {
-        minimumFractionDigits: price >= 1000 ? 0 : 2,
-        maximumFractionDigits: price >= 1000 ? 0 : 2
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
       });
 
       if (Number.isFinite(pct)) {
@@ -1566,14 +1592,6 @@ async function fetchMarketStrip() {
     });
   } catch (error) {
     console.warn("Market strip failed:", error);
-
-    // Never show wrong BTC proxy or wrong labels.
-    map.forEach((item) => {
-      const priceEl = document.getElementById(`strip-price-${item.key}`);
-      const pctEl = document.getElementById(`strip-pct-${item.key}`);
-      if (priceEl && priceEl.textContent.trim() === "") priceEl.textContent = "—";
-      if (pctEl && pctEl.textContent.trim() === "") pctEl.textContent = "—";
-    });
   }
 }
 

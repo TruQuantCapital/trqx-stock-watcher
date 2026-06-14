@@ -26,9 +26,41 @@
     <div><span id="label-ndx">QQQ</span><strong id="strip-price-ndx">—</strong><em id="strip-pct-ndx">—</em></div>
     <div><span id="label-dji">DIA</span><strong id="strip-price-dji">—</strong><em id="strip-pct-dji">—</em></div>
     <div><span id="label-gold">GLD</span><strong id="strip-price-gold">—</strong><em id="strip-pct-gold">—</em></div>
-    <div><span id="label-btc">BTC/USD</span><strong id="strip-price-btc">—</strong><em id="strip-pct-btc">—</em></div>
+    <div><span id="label-btc">IBIT</span><strong id="strip-price-btc">—</strong><em id="strip-pct-btc">—</em></div>
     <div class="market-open">● Market Open</div>
   </section>
+
+  <script>
+    window.TRQX_STRIP_VERSION = "17.5";
+
+    function trqxForceStripLabels() {
+      const labels = ["SPY", "QQQ", "DIA", "GLD", "IBIT"];
+      const strip = document.querySelector(".live-strip");
+      if (!strip) return;
+
+      strip.querySelectorAll("div span").forEach((span, index) => {
+        if (labels[index]) span.textContent = labels[index];
+      });
+
+      const ids = {
+        "label-spx": "SPY",
+        "label-ndx": "QQQ",
+        "label-dji": "DIA",
+        "label-gold": "GLD",
+        "label-btc": "IBIT"
+      };
+
+      Object.entries(ids).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+      });
+    }
+
+    trqxForceStripLabels();
+    document.addEventListener("DOMContentLoaded", trqxForceStripLabels);
+    setInterval(trqxForceStripLabels, 1000);
+  </script>
+
 
 <main class="dash">
     <nav class="topnav">
@@ -424,6 +456,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=17.4"></script>
+  <script src="app.js?v=17.5"></script>
 </body>
 </html>
