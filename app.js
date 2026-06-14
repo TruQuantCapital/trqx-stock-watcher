@@ -1382,10 +1382,10 @@ function removeTyping(id) {
 
 // ============================================================
 // LIVE MARKET STRIP — ETF proxies via Finnhub (free tier)
-// SPY ≈ S&P 500, QQQ ≈ NASDAQ 100, DIA ≈ DOW, GLD ≈ Gold, BTC/USD via Finnhub crypto
+// SPY ≈ S&P 500, QQQ ≈ NASDAQ 100, DIA ≈ DOW, GLD ≈ Gold, IWM via Finnhub crypto
 // ============================================================
 
-// Market strip — dedicated /api/market route handles ETFs + BTC
+// Market strip — dedicated /api/market route handles ETFs + IWM
 
 
 function bindAutoRefreshControl() {
@@ -1465,118 +1465,9 @@ function openOptionsFlowDetails() {
 
 
 /* === TRQX v17.4 Live Strip Force Fix ===
-   Display labels: SPY / QQQ / DIA / GLD / BTC/USD
-   Data symbols:   SPY / QQQ / DIA / GLD / BINANCE:BTCUSDT
+   Display labels: SPY / QQQ / DIA / GLD / IWM
+   Data symbols:   SPY / QQQ / DIA / GLD / BINANCE:IWMT
 */
-
-function forceLiveStripLabels() {
-  const labels = {
-    spx: "SPY",
-    ndx: "QQQ",
-    dji: "DIA",
-    gold: "GLD",
-    btc: "BTC/USD"
-  };
-
-  Object.entries(labels).forEach(([key, value]) => {
-    const el = document.getElementById(`label-${key}`);
-    if (el) el.textContent = value;
-  });
-
-  // Fallback: if old HTML is still present, overwrite by position.
-  const strip = document.querySelector(".live-strip");
-  if (strip) {
-    const spans = strip.querySelectorAll("div span");
-    const values = ["SPY", "QQQ", "DIA", "GLD", "BTC/USD"];
-    spans.forEach((span, i) => {
-      if (values[i]) span.textContent = values[i];
-    });
-  }
-}
-
-async function fetchMarketStrip() {
-  forceLiveStripLabels();
-
-  const map = [
-    { key: "spx", symbol: "SPY" },
-    { key: "ndx", symbol: "QQQ" },
-    { key: "dji", symbol: "DIA" },
-    { key: "gold", symbol: "GLD" },
-    { key: "btc", symbol: "BINANCE:BTCUSDT" }
-  ];
-
-  try {
-    const symbols = map.map((m) => m.symbol).join(",");
-    const response = await fetch(`/api/quotes?symbols=${encodeURIComponent(symbols)}&v=17.4`);
-
-    if (!response.ok) {
-      throw new Error("Failed to load market strip quotes");
-    }
-
-    const data = await response.json();
-    const quotes = Array.isArray(data) ? data : [];
-
-    map.forEach((item) => {
-      const priceEl = document.getElementById(`strip-price-${item.key}`);
-      const pctEl = document.getElementById(`strip-pct-${item.key}`);
-
-      if (!priceEl || !pctEl) return;
-
-      const quote = quotes.find((q) => {
-        const symbol = String(q.symbol || "").toUpperCase();
-        return symbol === item.symbol.toUpperCase();
-      });
-
-      if (!quote || !Number.isFinite(Number(quote.price))) {
-        priceEl.textContent = "—";
-        pctEl.textContent = "—";
-        pctEl.className = "";
-        return;
-      }
-
-      const price = Number(quote.price);
-      const pct = Number(quote.changesPercentage);
-
-      priceEl.textContent = price.toLocaleString(undefined, {
-        minimumFractionDigits: price >= 1000 ? 0 : 2,
-        maximumFractionDigits: price >= 1000 ? 0 : 2
-      });
-
-      if (Number.isFinite(pct)) {
-        const isUp = pct >= 0;
-        pctEl.textContent = `${isUp ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}%`;
-        pctEl.className = isUp ? "positive" : "negative";
-      } else {
-        pctEl.textContent = "—";
-        pctEl.className = "";
-      }
-    });
-  } catch (error) {
-    console.warn("Market strip failed:", error);
-
-    // Never show wrong BTC proxy or wrong labels.
-    map.forEach((item) => {
-      const priceEl = document.getElementById(`strip-price-${item.key}`);
-      const pctEl = document.getElementById(`strip-pct-${item.key}`);
-      if (priceEl && priceEl.textContent.trim() === "") priceEl.textContent = "—";
-      if (pctEl && pctEl.textContent.trim() === "") pctEl.textContent = "—";
-    });
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  forceLiveStripLabels();
-  fetchMarketStrip();
-});
-
-setInterval(() => {
-  forceLiveStripLabels();
-  fetchMarketStrip();
-}, 60000);
-
-
-
-
 
 
 function renderTopAIPickMetric() {
@@ -1657,3 +1548,187 @@ if (!window.__trqxCommandStripPatched) {
     }, 500);
   });
 }
+
+
+/* === TRQX v20 Live Strip ===
+   Display: SPY | QQQ | DIA | IWM | VIX | Market Open
+   Data: SPY / QQQ / DIA / IWM / ^VIX with VIXY fallback
+*/
+
+async function fetchQuoteBatch(symbols) {
+  const response = await fetch(`/api/quotes?symbols=${encodeURIComponent(symbols.join(","))}&v=20`);
+  if (!response.ok) throw new Error("Quote request failed");
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
+}
+
+
+
+/* === TRQX v20.1 Final Live Strip Fix ===
+   Display: SPY | QQQ | DIA | IWM | VIX | Market Open
+   Removed IWM permanently from the strip.
+*/
+function forceLiveStripLabels() {
+  const labels = {
+    spx: "SPY",
+    ndx: "QQQ",
+    dji: "DIA",
+    iwm: "IWM",
+    vix: "VIX"
+  };
+
+  Object.entries(labels).forEach(([key, value]) => {
+    const el = document.getElementById(`label-${key}`);
+    if (el) el.textContent = value;
+  });
+
+  // Hard fallback by position in case old HTML is cached.
+  const strip = document.querySelector(".live-strip");
+  if (strip) {
+    const spans = strip.querySelectorAll("div span");
+    ["SPY", "QQQ", "DIA", "IWM", "VIX"].forEach((label, idx) => {
+      if (spans[idx]) spans[idx].textContent = label;
+    });
+  }
+}
+
+async function fetchQuoteBatch(symbols) {
+  const response = await fetch(`/api/quotes?symbols=${encodeURIComponent(symbols.join(","))}&v=20.1`);
+  if (!response.ok) throw new Error("Quote request failed");
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
+}
+
+async function fetchMarketStrip() {
+  forceLiveStripLabels();
+
+  const map = [
+    { key: "spx", symbol: "SPY" },
+    { key: "ndx", symbol: "QQQ" },
+    { key: "dji", symbol: "DIA" },
+    { key: "iwm", symbol: "IWM" },
+    { key: "vix", symbol: "^VIX", fallback: "VIXY" }
+  ];
+
+  try {
+    let quotes = await fetchQuoteBatch(map.map((m) => m.symbol));
+
+    const hasVix = quotes.some((q) => {
+      return String(q.symbol || "").toUpperCase() === "^VIX" && Number.isFinite(Number(q.price));
+    });
+
+    if (!hasVix) {
+      try {
+        const fallbackQuotes = await fetchQuoteBatch(["VIXY"]);
+        const fb = fallbackQuotes.find((q) => String(q.symbol || "").toUpperCase() === "VIXY");
+        if (fb && Number.isFinite(Number(fb.price))) {
+          quotes.push({ ...fb, symbol: "^VIX" });
+        }
+      } catch (fallbackError) {
+        console.warn("VIX fallback failed:", fallbackError);
+      }
+    }
+
+    map.forEach((item) => {
+      const priceEl = document.getElementById(`strip-price-${item.key}`);
+      const pctEl = document.getElementById(`strip-pct-${item.key}`);
+      if (!priceEl || !pctEl) return;
+
+      const quote = quotes.find((q) => String(q.symbol || "").toUpperCase() === item.symbol.toUpperCase());
+
+      if (!quote || !Number.isFinite(Number(quote.price))) {
+        priceEl.textContent = "—";
+        pctEl.textContent = "—";
+        pctEl.className = "";
+        return;
+      }
+
+      const price = Number(quote.price);
+      const pct = Number(quote.changesPercentage);
+      const isUp = Number.isFinite(pct) ? pct >= 0 : true;
+
+      priceEl.textContent = price.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+      pctEl.textContent = Number.isFinite(pct)
+        ? `${isUp ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}%`
+        : "—";
+
+      pctEl.className = Number.isFinite(pct) ? (isUp ? "positive" : "negative") : "";
+    });
+  } catch (error) {
+    console.warn("Market strip failed:", error);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  forceLiveStripLabels();
+  fetchMarketStrip();
+});
+
+setInterval(fetchMarketStrip, 60000);
+
+
+
+/* === TRQX Market Status Fix ===
+   NYSE/Nasdaq regular session:
+   Monday-Friday, 9:30 AM - 4:00 PM Eastern Time.
+   This avoids hard-coding "Market Open" when the market is closed.
+*/
+function getEasternMarketTimeParts(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).formatToParts(date);
+
+  const result = {};
+  parts.forEach((p) => {
+    if (p.type !== "literal") result[p.type] = p.value;
+  });
+
+  return {
+    weekday: result.weekday,
+    hour: Number(result.hour),
+    minute: Number(result.minute)
+  };
+}
+
+function isRegularMarketOpenNow(date = new Date()) {
+  const { weekday, hour, minute } = getEasternMarketTimeParts(date);
+  const isWeekend = weekday === "Sat" || weekday === "Sun";
+  if (isWeekend) return false;
+
+  const minutes = hour * 60 + minute;
+  const open = 9 * 60 + 30;
+  const close = 16 * 60;
+
+  return minutes >= open && minutes < close;
+}
+
+function updateMarketStatus() {
+  const el = document.getElementById("marketStatus") || document.querySelector(".market-open") || document.querySelector(".market-status");
+  if (!el) return;
+
+  const open = isRegularMarketOpenNow();
+  const { hour, minute } = getEasternMarketTimeParts();
+
+  el.classList.remove("market-open", "market-closed", "market-status");
+  el.classList.add("market-status");
+  el.classList.add(open ? "market-open" : "market-closed");
+
+  const timeLabel = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")} ET`;
+  el.textContent = open ? `● Market Open · ${timeLabel}` : `● Market Closed · ${timeLabel}`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateMarketStatus();
+});
+
+setInterval(updateMarketStatus, 60000);
+/* === END TRQX Market Status Fix === */
+

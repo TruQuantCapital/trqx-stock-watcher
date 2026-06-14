@@ -916,3 +916,335 @@ footer{text-align:center;color:#89919b;font-size:12px;margin:24px}
     min-height: 280px !important;
   }
 }
+
+
+
+/* === v20 Final Homepage Cleanup === */
+
+/* Top product sales cards */
+.products-top-panel {
+  margin: 16px 0 18px !important;
+  padding: 24px !important;
+  border-color: rgba(255,224,113,.36) !important;
+}
+
+.product-card-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 18px !important;
+  margin-top: 18px !important;
+}
+
+.product-card-grid .cta-card {
+  position: relative !important;
+  min-height: 330px !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  padding: 0 !important;
+  background: #050505 !important;
+  border: 1px solid rgba(214,168,61,.36) !important;
+  text-decoration: none !important;
+  isolation: isolate !important;
+}
+
+.product-card-grid .cta-card > img {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: -3 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  display: block !important;
+  opacity: .92 !important;
+  filter: brightness(.78) contrast(1.08) saturate(1.05) !important;
+}
+
+.product-card-grid .cta-card::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: -2 !important;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.55) 52%, rgba(0,0,0,.92)),
+    radial-gradient(circle at top right, rgba(255,224,113,.16), transparent 42%) !important;
+}
+
+.product-card-grid .cta-content {
+  width: 100%;
+  padding: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.product-card-grid .cta-card span {
+  display: block;
+  color: #ffe071 !important;
+  font-size: 12px !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase;
+  font-weight: 1000;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 10px rgba(0,0,0,1);
+}
+
+.product-card-grid .cta-card strong {
+  display: block;
+  color: #fff !important;
+  font-size: 32px !important;
+  line-height: 1.05 !important;
+  margin-bottom: 10px !important;
+  text-shadow: 0 4px 12px rgba(0,0,0,1), 0 0 22px rgba(214,168,61,.28);
+}
+
+.product-card-grid .premium strong {
+  color: #ffe071 !important;
+}
+
+.product-card-grid .cta-card small {
+  color: #edf2fa !important;
+  font-size: 14px !important;
+  line-height: 1.42 !important;
+  text-shadow: 0 3px 10px rgba(0,0,0,1);
+}
+
+/* Top strip changed to SPY / QQQ / DIA / IWM / VIX */
+.live-strip {
+  height: 56px !important;
+  grid-template-columns: repeat(6, 1fr) !important;
+}
+
+.live-strip span {
+  font-size: 18px !important;
+  color: #ffe071 !important;
+  font-weight: 1000 !important;
+}
+
+.live-strip strong {
+  font-size: 18px !important;
+}
+
+.live-strip em {
+  font-size: 15px !important;
+}
+
+/* Remove non-sales clutter from top */
+.embedded-heat,
+#marketHeatMapPanel.embedded-heat {
+  display: none !important;
+}
+
+.metric-row,
+.intelligence-metrics {
+  display: none !important;
+}
+
+/* Clean command strip */
+.command-strip {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr 1fr .85fr;
+  gap: 14px;
+  margin: 18px 0;
+}
+
+.command-card {
+  cursor: pointer;
+  min-height: 126px;
+  padding: 18px;
+  border: 1px solid rgba(214,168,61,.30);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(12,12,10,.94), rgba(4,5,5,.97)),
+    radial-gradient(circle at top right, rgba(255,224,113,.07), transparent 44%);
+  box-shadow: 0 0 30px rgba(214,168,61,.06), inset 0 1px rgba(255,255,255,.04);
+}
+
+.command-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,224,113,.48);
+}
+
+.command-card span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin-bottom: 10px;
+}
+
+.command-card strong {
+  display: block;
+  color: #fff;
+  font-size: 22px;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.command-card small {
+  display: block;
+  color: #dce1e9;
+  font-size: 13px;
+}
+
+.command-card.primary {
+  border-color: rgba(255,224,113,.48);
+}
+
+.command-card.primary strong,
+.command-card.status strong {
+  color: var(--gold2) !important;
+}
+
+/* Gamma dashboard */
+.gamma-dashboard-panel {
+  margin-top: 16px;
+}
+
+.gamma-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.gamma-grid article {
+  min-height: 142px;
+  padding: 18px;
+  border: 1px solid rgba(214,168,61,.24);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(8,8,7,.84), rgba(3,3,3,.88)),
+    radial-gradient(circle at top right, rgba(255,224,113,.08), transparent 45%);
+}
+
+.gamma-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin-bottom: 10px;
+}
+
+.gamma-grid strong {
+  display: block;
+  font-size: 30px;
+  color: var(--gold2);
+  margin-bottom: 8px;
+}
+
+.gamma-grid small {
+  color: #dce1e9;
+  line-height: 1.35;
+}
+
+/* Move secondary sections lower visually */
+.probability-card {
+  opacity: .92;
+}
+
+@media(max-width: 1200px) {
+  .product-card-grid,
+  .command-strip,
+  .gamma-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .product-card-grid .cta-card {
+    min-height: 280px !important;
+  }
+}
+
+
+
+/* === v20.1 Final Fix: Discord Image + IWM/VIX Strip === */
+.live-strip {
+  height: 56px !important;
+  grid-template-columns: repeat(6, 1fr) !important;
+}
+
+.live-strip span {
+  font-size: 18px !important;
+  color: #ffe071 !important;
+  font-weight: 1000 !important;
+}
+
+.live-strip strong {
+  font-size: 18px !important;
+}
+
+.live-strip em {
+  font-size: 15px !important;
+}
+
+.product-card-grid .cta-card {
+  position: relative !important;
+  min-height: 330px !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  background: #050505 !important;
+}
+
+.product-card-grid .cta-card > img {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  display: block !important;
+  z-index: -3 !important;
+  opacity: .94 !important;
+  filter: brightness(.78) contrast(1.12) saturate(1.05) !important;
+}
+
+.discord-card > img {
+  opacity: .90 !important;
+  object-position: center center !important;
+}
+
+.discord-card {
+  background-image: url("assets/discord-card-bg.png?v=20.1") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+}
+
+.product-card-grid .cta-card::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: -2 !important;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.52) 52%, rgba(0,0,0,.92)),
+    radial-gradient(circle at top right, rgba(255,224,113,.16), transparent 42%) !important;
+}
+
+.product-card-grid .cta-content {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+
+
+/* === v20.2 Market Status Fix === */
+.market-status {
+  font-size: 16px !important;
+  font-weight: 1000 !important;
+  letter-spacing: .2px;
+  justify-content: center !important;
+}
+
+.market-status.market-open {
+  color: #36d17c !important;
+}
+
+.market-status.market-closed {
+  color: #ef4d5e !important;
+}
+
+.live-strip .market-status {
+  border-right: 0 !important;
+}

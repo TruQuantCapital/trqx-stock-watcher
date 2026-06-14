@@ -15,17 +15,16 @@
       <span>ALPHA • PROBABILITY • DISCIPLINE • EXECUTION • RISK MANAGEMENT • MARKET INTELLIGENCE •</span>
     </div>
   </div>
-
   <section class="live-strip" id="liveStrip">
     <div><span id="label-spx">SPY</span><strong id="strip-price-spx">—</strong><em id="strip-pct-spx">—</em></div>
     <div><span id="label-ndx">QQQ</span><strong id="strip-price-ndx">—</strong><em id="strip-pct-ndx">—</em></div>
     <div><span id="label-dji">DIA</span><strong id="strip-price-dji">—</strong><em id="strip-pct-dji">—</em></div>
-    <div><span id="label-gold">GLD</span><strong id="strip-price-gold">—</strong><em id="strip-pct-gold">—</em></div>
-    <div><span id="label-btc">BTC/USD</span><strong id="strip-price-btc">—</strong><em id="strip-pct-btc">—</em></div>
-    <div class="market-open">● Market Open</div>
+    <div><span id="label-iwm">IWM</span><strong id="strip-price-iwm">—</strong><em id="strip-pct-iwm">—</em></div>
+    <div><span id="label-vix">VIX</span><strong id="strip-price-vix">—</strong><em id="strip-pct-vix">—</em></div>
+    <div class="market-status market-closed" id="marketStatus">● Market Status</div>
   </section>
 
-  <main class="terminal-shell">
+<main class="terminal-shell">
     <nav class="terminal-nav">
       <a class="brand-lockup" href="#dashboard">
         <img src="assets/trqx-official-logo.png" alt="TRQX AI Market Terminal">
@@ -44,20 +43,18 @@
 
       <button class="account-btn" aria-label="Account"><span></span></button>
     </nav>
-
-    
     <section class="panel trqx-cta-panel products-top-panel">
       <div class="panel-head">
         <div>
           <div class="eyebrow">TRQX Member Access</div>
-          <h2>Join TRQX Premium Tools</h2>
-          <p>Start here: purchase access, join the community, or get the ORB Sniper Pro indicator.</p>
+          <h2>Start Here</h2>
+          <p>Purchase access, join the TRQX community, or get the ORB Sniper Pro indicator.</p>
         </div>
       </div>
 
       <div class="cta-grid cta-image-grid product-card-grid">
         <a class="cta-card premium whop-card" href="https://whop.com/tqpx-tru-quant-enterprise" target="_blank" rel="noopener">
-          <img src="assets/whop-card-bg.png" alt="TRQX Whop Access" />
+          <img src="assets/whop-card-bg.png?v=20.1" alt="TRQX Whop Access" />
           <div class="cta-content">
             <span>Premium Access</span>
             <strong>Buy on Whop</strong>
@@ -66,7 +63,7 @@
         </a>
 
         <a class="cta-card discord-card" href="https://discord.gg/jy3ta9qkfH" target="_blank" rel="noopener">
-          <img src="assets/discord-card-bg.png" alt="TRQX Capital Discord" />
+          <img src="assets/discord-card-bg.png?v=20.1" alt="TRQX Capital Discord" />
           <div class="cta-content">
             <span>Community</span>
             <strong>Join TRQX Discord</strong>
@@ -75,7 +72,7 @@
         </a>
 
         <a class="cta-card orb-card" href="https://whop.com/tqpx-tru-quant-enterprise" target="_blank" rel="noopener">
-          <img src="assets/orb-card-bg.png" alt="ORB Sniper Pro" />
+          <img src="assets/orb-card-bg.png?v=20.1" alt="ORB Sniper Pro" />
           <div class="cta-content">
             <span>Indicator</span>
             <strong>Get ORB Sniper Pro</strong>
@@ -84,6 +81,7 @@
         </a>
       </div>
     </section>
+
 <section id="dashboard" class="market-pulse-hero">
       <div class="pulse-copy">
         <div class="eyebrow">TRQX CAPITAL • AI MARKET TERMINAL</div>
@@ -133,26 +131,7 @@
           <button class="dark-btn" onclick="refreshQuotes()"><span class="btn-icon refresh-icon"></span>Refresh Market Data</button>
           <label class="auto"><input type="checkbox" id="autoRefresh"> Auto-refresh 5m</label>
         </div>
-
-        <section id="marketHeatMapPanel" class="panel heat-card embedded-heat">
-          <div class="panel-head">
-            <h3>Market Heat Map</h3>
-            <button class="icon-btn" onclick="refreshQuotes()">↻</button>
-          </div>
-          <div class="heat-map">
-            <div class="heat up">Technology<br><strong>+1.85%</strong></div>
-            <div class="heat up">Financials<br><strong>+0.62%</strong></div>
-            <div class="heat up">Healthcare<br><strong>+0.11%</strong></div>
-            <div class="heat up">Consumer Cyclical<br><strong>+1.23%</strong></div>
-            <div class="heat down">Energy<br><strong>-0.72%</strong></div>
-            <div class="heat down">Utilities<br><strong>-0.15%</strong></div>
-            <div class="heat up">Industrials<br><strong>+0.48%</strong></div>
-            <div class="heat down">Real Estate<br><strong>-0.28%</strong></div>
-            <div class="heat up">Materials<br><strong>+0.22%</strong></div>
-          </div>
-          <div class="heat-legend"><span>Losers</span><i></i><b></b><span>Gainers</span></div>
-        </section>
-      </div>
+</div>
 
       <div class="hero-image-panel">
         <img src="assets/trqx-background-emblem.png" alt="TRQX AI Market Terminal">
@@ -496,6 +475,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=19"></script>
+  <script src="app.js?v=20.2"></script>
 </body>
 </html>

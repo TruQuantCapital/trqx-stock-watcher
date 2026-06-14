@@ -1,26 +1,36 @@
-# TRQX AI Market Terminal v19.8 — Products Top + Images Fixed
+# TRQX AI Market Terminal v20.2 — Market Status Fix
 
 ## Fixed
 
-- Product cards moved directly under the navigation at the top of the site.
-- Market Heat Map removed from the top hero section.
-- Product images now use real `<img>` elements, not only CSS backgrounds.
-- This fixes the issue where only one card image appeared.
-
-## Product cards
-
-- Buy on Whop
-- Join TRQX Discord
-- Get ORB Sniper Pro
-
-## Correct Discord Link
+The top strip no longer hard-codes:
 
 ```text
-https://discord.gg/jy3ta9qkfH
+Market Open
 ```
 
-## Image assets copied
+It now calculates U.S. regular market hours using Eastern Time:
 
-{'whop-card-bg.png': '/mnt/data/i am algooooo.png', 'discord-card-bg.png': '/mnt/data/2aecf654-1fd3-4802-b2c0-d42f6315bc5c.png', 'orb-card-bg.png': '/mnt/data/ChatGPT Image May 6, 2026, 11_48_46 AM(1).png'}
+```text
+Monday-Friday
+9:30 AM ET - 4:00 PM ET
+```
+
+It displays:
+
+```text
+Market Open · HH:MM ET
+```
+
+or:
+
+```text
+Market Closed · HH:MM ET
+```
+
+## Note
+
+This checks regular weekday hours. It does not yet include the full U.S. market holiday calendar or early-close schedule. That can be added later if needed.
+
+## Upload
 
 Upload all files/folders to GitHub root, redeploy in Vercel, then hard refresh with Ctrl+Shift+R.
