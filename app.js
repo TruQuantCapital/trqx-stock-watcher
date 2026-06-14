@@ -28,7 +28,6 @@ async function load() {
   renderGrowthScanner();
   renderPortfolioBuilder();
   renderTopAIPicks();
-  updateMarketRegime();
   setStatus("TRQX AI Market Terminal loaded. Click Refresh Market Data for live prices.");
 }
 
@@ -171,7 +170,6 @@ function refreshAllViews() {
   renderPortfolioBuilder();
   updateInsights();
   renderTopAIPicks();
-  updateMarketRegime();
 }
 
 
@@ -186,7 +184,7 @@ function updateInsights() {
   const bullishEl = document.getElementById("bullishCount");
   const eliteEl = document.getElementById("eliteCount");
   const highProbEl = document.getElementById("highProbCount");
-  const regimeEl = null; // Market regime hero banner is controlled by updateMarketRegime()
+  const regimeEl = document.getElementById("marketRegime");
 
   if (bullishEl) bullishEl.textContent = bullish.toLocaleString();
   if (eliteEl) eliteEl.textContent = elite.toLocaleString();
@@ -987,7 +985,6 @@ async function refreshQuotes() {
     renderGrowthScanner();
     renderPortfolioBuilder();
     renderTopAIPicks();
-    updateMarketRegime();
     setStatus(`Live refresh complete at ${lastUpdated}. Updated ${updated} of ${stocks.length} stocks.`);
   } catch (e) {
     console.error(e);
@@ -1040,77 +1037,9 @@ function exportWatchlist() {
   URL.revokeObjectURL(url);
 }
 
-
-// ============================================================
-// TRQX MARKET REGIME BANNER
-// Uses SPY live percentage change after market refresh
-// ============================================================
-
-function updateMarketRegime() {
-  const el = document.getElementById("marketRegime");
-  if (!el || !Array.isArray(stocks)) return;
-
-  const spy = stocks.find(
-    (s) => String(s.ticker || "").toUpperCase() === "SPY"
-  );
-
-  if (!spy) {
-    el.className = "market-regime neutral";
-    el.innerHTML = "⚪ MARKET REGIME: WAITING FOR SPY DATA";
-    return;
-  }
-
-  const change = Number(
-    spy.changesPercentage ||
-    spy.changePercent ||
-    spy.percentChange ||
-    spy.change_pct ||
-    0
-  );
-
-  if (change > 0.5) {
-    el.className = "market-regime risk-on";
-    el.innerHTML = `🟢 MARKET REGIME: RISK ON · SPY ${change.toFixed(2)}%`;
-  } else if (change < -0.5) {
-    el.className = "market-regime risk-off";
-    el.innerHTML = `🔴 MARKET REGIME: RISK OFF · SPY ${change.toFixed(2)}%`;
-  } else {
-    el.className = "market-regime neutral";
-    el.innerHTML = `⚪ MARKET REGIME: NEUTRAL · SPY ${change.toFixed(2)}%`;
-  }
-}
-
-
 load();
 fetchMarketStrip();
 
-document.addEventListener("DOMContentLoaded", () => {
-  const chat = document.getElementById("aiChatMessages");
-
-  if (chat) {
-    // Keep existing height
-    chat.style.height = "700px";
-    chat.style.minHeight = "700px";
-    chat.style.maxHeight = "75vh";
-    chat.style.overflowY = "auto";
-    chat.style.padding = "20px";
-    chat.style.borderRadius = "12px";
-
-    // Make message area use full width
-    chat.style.width = "100%";
-    chat.style.maxWidth = "100%";
-  }
-
-  // Expand all parent containers
-  let parent = chat?.parentElement;
-
-  while (parent) {
-    parent.style.width = "100%";
-    parent.style.maxWidth = "2200px";
-    parent.style.margin = "0 auto";
-    parent = parent.parentElement;
-  }
-});
 function openStockModal(ticker) {
   const stock = stocks.find((s) => s.ticker === ticker);
   const modal = document.getElementById("modal");
@@ -1578,36 +1507,6 @@ function forceLiveStripLabels() {
   }
 }
 
-
-
-/* === TRQX v17.5 Live Strip Nuclear Fix ===
-   This intentionally uses tradable ETF/proxy labels:
-   SPY, QQQ, DIA, GLD, IBIT.
-*/
-
-function forceLiveStripLabels() {
-  const labels = {
-    spx: "SPY",
-    ndx: "QQQ",
-    dji: "DIA",
-    gold: "GLD",
-    btc: "IBIT"
-  };
-
-  Object.entries(labels).forEach(([key, value]) => {
-    const el = document.getElementById(`label-${key}`);
-    if (el) el.textContent = value;
-  });
-
-  const strip = document.querySelector(".live-strip");
-  if (strip) {
-    const spans = strip.querySelectorAll("div span");
-    ["SPY", "QQQ", "DIA", "GLD", "IBIT"].forEach((label, index) => {
-      if (spans[index]) spans[index].textContent = label;
-    });
-  }
-}
-
 async function fetchMarketStrip() {
   forceLiveStripLabels();
 
@@ -1616,14 +1515,16 @@ async function fetchMarketStrip() {
     { key: "ndx", symbol: "QQQ" },
     { key: "dji", symbol: "DIA" },
     { key: "gold", symbol: "GLD" },
-    { key: "btc", symbol: "IBIT" }
+    { key: "btc", symbol: "BINANCE:BTCUSDT" }
   ];
 
   try {
     const symbols = map.map((m) => m.symbol).join(",");
-    const response = await fetch(`/api/quotes?symbols=${encodeURIComponent(symbols)}&v=17.5`);
+    const response = await fetch(`/api/quotes?symbols=${encodeURIComponent(symbols)}&v=17.4`);
 
-    if (!response.ok) throw new Error("Failed to load market strip quotes");
+    if (!response.ok) {
+      throw new Error("Failed to load market strip quotes");
+    }
 
     const data = await response.json();
     const quotes = Array.isArray(data) ? data : [];
@@ -1631,11 +1532,13 @@ async function fetchMarketStrip() {
     map.forEach((item) => {
       const priceEl = document.getElementById(`strip-price-${item.key}`);
       const pctEl = document.getElementById(`strip-pct-${item.key}`);
+
       if (!priceEl || !pctEl) return;
 
-      const quote = quotes.find((q) =>
-        String(q.symbol || "").toUpperCase() === item.symbol.toUpperCase()
-      );
+      const quote = quotes.find((q) => {
+        const symbol = String(q.symbol || "").toUpperCase();
+        return symbol === item.symbol.toUpperCase();
+      });
 
       if (!quote || !Number.isFinite(Number(quote.price))) {
         priceEl.textContent = "—";
@@ -1648,8 +1551,8 @@ async function fetchMarketStrip() {
       const pct = Number(quote.changesPercentage);
 
       priceEl.textContent = price.toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        minimumFractionDigits: price >= 1000 ? 0 : 2,
+        maximumFractionDigits: price >= 1000 ? 0 : 2
       });
 
       if (Number.isFinite(pct)) {
@@ -1663,6 +1566,14 @@ async function fetchMarketStrip() {
     });
   } catch (error) {
     console.warn("Market strip failed:", error);
+
+    // Never show wrong BTC proxy or wrong labels.
+    map.forEach((item) => {
+      const priceEl = document.getElementById(`strip-price-${item.key}`);
+      const pctEl = document.getElementById(`strip-pct-${item.key}`);
+      if (priceEl && priceEl.textContent.trim() === "") priceEl.textContent = "—";
+      if (pctEl && pctEl.textContent.trim() === "") pctEl.textContent = "—";
+    });
   }
 }
 
@@ -1675,3 +1586,4 @@ setInterval(() => {
   forceLiveStripLabels();
   fetchMarketStrip();
 }, 60000);
+

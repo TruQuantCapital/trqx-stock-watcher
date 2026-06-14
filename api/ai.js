@@ -1,40 +1,25 @@
-// TRQX Secure AI Route
-// Required Vercel Environment Variable:
-// ANTHROPIC_API_KEY
+// TRQX Secure AI Chat Route
+// Required Vercel Environment Variable: ANTHROPIC_API_KEY
+// Endpoint: /api/ai
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed. Use POST." });
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   const key = process.env.ANTHROPIC_API_KEY;
 
   if (!key) {
     return res.status(500).json({
-      error:
-        "Missing ANTHROPIC_API_KEY. Add it in Vercel Project Settings → Environment Variables, then redeploy."
+      error: "Missing ANTHROPIC_API_KEY environment variable"
     });
   }
 
   try {
-    const body = req.body || {};
+    const { system, messages, max_tokens = 1000 } = req.body || {};
 
-    const userMessage =
-      body.message ||
-      body.prompt ||
-      body.text ||
-      "";
-
-    const messages = Array.isArray(body.messages)
-      ? body.messages
-      : userMessage
-        ? [{ role: "user", content: userMessage }]
-        : [];
-
-    if (!messages.length) {
-      return res.status(400).json({
-        error: "Missing message. Send either { message: 'text' } or { messages: [...] }."
-      });
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: "Missing messages array" });
     }
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -45,11 +30,9 @@ export default async function handler(req, res) {
         "anthropic-version": "2023-06-01"
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: Number(body.max_tokens) || 1000,
-        system:
-          body.system ||
-          "You are TRQX AI Market Analyst. Provide concise educational stock-market research only. Do not provide personalized financial advice or guaranteed outcomes.",
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens,
+        system: system || "You are TRQX AI Market Analyst. Provide concise educational market research only. Do not give personalized financial advice.",
         messages
       })
     });
@@ -58,23 +41,16 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       return res.status(response.status).json({
-        error:
-          data?.error?.message ||
-          data?.message ||
-          "Anthropic API request failed.",
+        error: data?.error?.message || "Anthropic API request failed",
         details: data
       });
     }
 
-    return res.status(200).json({
-      reply: data?.content?.[0]?.text || "",
-      raw: data
-    });
+    return res.status(200).json(data);
   } catch (error) {
-    console.error("TRQX AI route error:", error);
-
+    console.error("TRQX AI chat route error:", error);
     return res.status(500).json({
-      error: "TRQX AI request failed. Check Vercel function logs."
+      error: "TRQX AI request failed"
     });
   }
 }

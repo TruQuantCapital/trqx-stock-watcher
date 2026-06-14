@@ -6,143 +6,6 @@
   <title>TRQX AI Market Terminal</title>
   <link rel="icon" href="favicon.svg" />
   <link rel="stylesheet" href="styles.css" />
-
-  <style>
-    /* TRQX Gamma Pressure Dashboard */
-    .gamma-card-wide {
-      margin-top: 24px;
-    }
-
-    .gamma-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
-      width: 100%;
-    }
-
-    .gamma-pressure-card {
-      background: linear-gradient(145deg, rgba(9,9,9,.96), rgba(24,18,8,.96));
-      border: 1px solid rgba(247, 210, 76, .28);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 0 24px rgba(247, 210, 76, .08);
-    }
-
-    .gamma-pressure-card h3 {
-      margin: 0 0 4px;
-      color: #f7d24c;
-      font-size: 24px;
-      letter-spacing: .5px;
-    }
-
-    .gamma-price {
-      font-size: 30px;
-      font-weight: 900;
-      margin: 12px 0 14px;
-    }
-
-    .gamma-stat {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      padding: 8px 0;
-      font-size: 14px;
-    }
-
-    .gamma-stat span {
-      color: #aaa;
-    }
-
-    .gamma-stat b {
-      color: #fff;
-    }
-
-    .gamma-bias {
-      margin-top: 14px;
-      padding: 10px;
-      border-radius: 12px;
-      font-weight: 900;
-      text-align: center;
-      border: 1px solid rgba(255,255,255,.08);
-    }
-
-    .gamma-positive {
-      background: rgba(22, 185, 112, .16);
-      color: #3ddc84;
-    }
-
-    .gamma-negative {
-      background: rgba(255, 90, 90, .16);
-      color: #ff5a5a;
-    }
-
-    .gamma-neutral {
-      background: rgba(247, 210, 76, .16);
-      color: #f7d24c;
-    }
-
-    .gamma-summary {
-      margin-top: 12px;
-      font-size: 13px;
-      color: #bbb;
-      line-height: 1.45;
-    }
-
-    /* Make the AI market analyst wider without breaking the whole page */
-    #aiChatPanel {
-      grid-column: span 2;
-      width: 100%;
-      max-width: none;
-    }
-
-    #aiChatMessages,
-    .aiChatMessages {
-      width: 100%;
-      max-width: 100%;
-    }
-
-    @media (max-width: 1100px) {
-      #aiChatPanel {
-        grid-column: span 1;
-      }
-    }
-  </style>
-
-
-  <style>
-    /* TRQX v18.2 layout adjustment: move heat map into hero-left space and widen Top AI Picks */
-    .hero-left-heatmap-slot {
-      margin-top: 28px;
-      max-width: 720px;
-      width: 100%;
-    }
-
-    .hero-left-heatmap-slot .heat-card {
-      width: 100%;
-      margin: 0;
-    }
-
-    #topAIPicksPanel {
-      grid-column: span 2;
-      min-height: 520px;
-    }
-
-    #topAIPicks {
-      min-height: 360px;
-    }
-
-    @media (max-width: 1100px) {
-      #topAIPicksPanel {
-        grid-column: span 1;
-      }
-
-      .hero-left-heatmap-slot {
-        max-width: 100%;
-      }
-    }
-  </style>
-
 </head>
 <body>
   <div class="bg-stage" aria-hidden="true">
@@ -163,76 +26,30 @@
     <div><span id="label-ndx">QQQ</span><strong id="strip-price-ndx">—</strong><em id="strip-pct-ndx">—</em></div>
     <div><span id="label-dji">DIA</span><strong id="strip-price-dji">—</strong><em id="strip-pct-dji">—</em></div>
     <div><span id="label-gold">GLD</span><strong id="strip-price-gold">—</strong><em id="strip-pct-gold">—</em></div>
-    <div><span id="label-btc">IBIT</span><strong id="strip-price-btc">—</strong><em id="strip-pct-btc">—</em></div>
+    <div><span id="label-btc">BTC/USD</span><strong id="strip-price-btc">—</strong><em id="strip-pct-btc">—</em></div>
     <div class="market-open">● Market Open</div>
   </section>
 
-  <script>
-    window.TRQX_STRIP_VERSION = "17.5";
-
-    function trqxForceStripLabels() {
-      const labels = ["SPY", "QQQ", "DIA", "GLD", "IBIT"];
-      const strip = document.querySelector(".live-strip");
-      if (!strip) return;
-
-      strip.querySelectorAll("div span").forEach((span, index) => {
-        if (labels[index]) span.textContent = labels[index];
-      });
-
-      const ids = {
-        "label-spx": "SPY",
-        "label-ndx": "QQQ",
-        "label-dji": "DIA",
-        "label-gold": "GLD",
-        "label-btc": "IBIT"
-      };
-
-      Object.entries(ids).forEach(([id, value]) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = value;
-      });
-    }
-
-    trqxForceStripLabels();
-    document.addEventListener("DOMContentLoaded", trqxForceStripLabels);
-    setInterval(trqxForceStripLabels, 1000);
-  </script>
-
-
 <main class="dash">
     <nav class="topnav">
-      <img src="assets/trqx-logo.svg" alt="TRQX" class="logo" />
+      <img src="assets/trqx-logo-pro.svg" alt="TRQX" class="logo" />
       <div class="navlinks">
         <button class="active" onclick="scrollToSection('dashboard')">Dashboard</button>
         <button onclick="scrollToSection('stockLookupPanel')">Stock Lookup</button>
         <button onclick="scrollToSection('growthScannerPanel')">Growth Scanner</button>
         <button onclick="scrollToSection('portfolioBuilderPanel')">Portfolio</button>
         <button onclick="scrollToSection('aiChatPanel')">Market Intelligence</button>
-        <button onclick="scrollToSection('gammaDashboardPanel')">Gamma Dashboard <span class="newtag">NEW</span></button>
         <button onclick="scrollToSection('watchlistPanel')">Watchlist</button>
         <button onclick="scrollToSection('flowPreviewPanel')">Options Flow <span class="newtag">NEW</span></button>
       </div>
-      <button class="userdot">●</button>
+      <button class="userdot" aria-label="Account"><span></span></button>
     </nav>
-
-    <section id="dashboard" class="hero-compact">
-      <div class="hero-left">
-    <div class="eyebrow">
-        TRQX CAPITAL • AI MARKET TERMINAL
-    </div>
-
-    <h1>TRQX AI Market Terminal</h1>
-
-    <div id="marketRegime" class="market-regime neutral">
-        ⚪ MARKET REGIME: ANALYZING...
-    </div>
-
-    <p class="hero-subtitle">
-        AI-Powered. Data-Driven. Built for Results.
-    </p>
-</div>
-        
-        <p>Real-time market intelligence, probability scoring, stock lookup, portfolio builder, and TRQX AI research in one premium terminal.</p>
+    <section id="dashboard" class="hero-final">
+      <div class="hero-final-copy">
+        <div class="eyebrow">TRQX CAPITAL • AI MARKET TERMINAL</div>
+        <h1>TRQX AI Market Terminal</h1>
+        <div id="marketRegimeHero" class="regime-pill">● MARKET REGIME: WAITING FOR SPY DATA</div>
+        <p>AI-powered market intelligence, probability scoring, stock lookup, portfolio builder, and TRQX AI research in one premium terminal.</p>
         <div id="status" class="status-line">TRQX AI Market Terminal loaded. Click Refresh Market Data for live prices.</div>
         <div id="lastUpdated" class="muted">Last live refresh: not yet refreshed</div>
         <div id="terminalMeta" class="terminal-meta">TRQX AI Engine • Growth • Income • Momentum • Risk</div>
@@ -243,37 +60,42 @@
           <button class="gold-btn" onclick="refreshQuotes()">Refresh Market Data</button>
           <label class="auto"><input type="checkbox" id="autoRefresh"> Auto-refresh 5m</label>
         </div>
-        <div class="hero-left-heatmap-slot">
-<section id="marketHeatMapPanel" class="panel heat-card">
-        <div class="panel-head">
-          <h2>Market Heat Map</h2>
-          <button class="icon-btn" onclick="refreshQuotes()">↻</button>
-        </div>
-        <div class="heat-map">
-          <div class="heat up">Technology<br><strong>+1.85%</strong></div>
-          <div class="heat up">Financials<br><strong>+0.62%</strong></div>
-          <div class="heat up">Healthcare<br><strong>+0.11%</strong></div>
-          <div class="heat up">Consumer Cyclical<br><strong>+1.23%</strong></div>
-          <div class="heat down">Energy<br><strong>-0.72%</strong></div>
-          <div class="heat down">Utilities<br><strong>-0.15%</strong></div>
-          <div class="heat up">Industrials<br><strong>+0.48%</strong></div>
-          <div class="heat down">Real Estate<br><strong>-0.28%</strong></div>
-          <div class="heat up">Materials<br><strong>+0.22%</strong></div>
-        </div>
-        <div class="heat-legend"><span>◆ Gainers</span><b></b><i></i><span>Losers</span></div>
-      </section>
-        </div>
       </div>
-      <div class="hero-right">
-        <img src="assets/trqx-master-hero.png" alt="TRQX Market Hero" />
+      <div class="hero-final-art">
+        <img src="assets/trqx-master-hero.png" alt="TRQX Master the Market">
       </div>
     </section>
 
-    <section class="metric-row">
+<section class="metric-row">
       <article><span>AI Opportunities</span><strong id="bullishCount">—</strong><small>High Quality Setups</small><i></i></article>
       <article><span>Elite AI Ratings</span><strong id="eliteCount">—</strong><small>Top Rated Stocks</small><i class="goldbar"></i></article>
       <article><span>High Probability</span><strong id="highProbCount">—</strong><small>70%+ Probability</small><i class="bluebar"></i></article>
       <article><span>Terminal Status</span><strong class="live">LIVE</strong><small>Market Data Active</small><i></i></article>
+    </section>
+
+        <section id="aiInsightsPanel" class="panel market-pulse-panel">
+      <div class="panel-head">
+        <div>
+          <h2>TRQX AI Market Pulse</h2>
+          <p>Quick market intelligence snapshot powered by TRQX scoring.</p>
+        </div>
+        <div class="marketBadge" id="marketRegime">Market Regime: Neutral</div>
+      </div>
+      <div class="pulse-grid">
+        <div><span>Momentum</span><b>Strong Relative Strength</b></div>
+        <div><span>Institutional Profile</span><b>Accumulation Watch</b></div>
+        <div><span>Growth Theme</span><b>AI / Data Center Leadership</b></div>
+        <div><span>Technical Posture</span><b>Above Key Moving Averages</b></div>
+      </div>
+      <div class="terminal-controls pulse-controls">
+        <label>Universe Mode
+          <select id="universeMode" onchange="changeUniverseMode()">
+            <option value="scored">TRQX Scored Universe</option>
+            <option value="live">Expanded Live U.S. Universe</option>
+          </select>
+        </label>
+        <button class="dark-btn" onclick="loadExpandedUniverse()">Load Expanded Universe</button>
+      </div>
     </section>
 
     <section class="top-grid">
@@ -292,7 +114,7 @@
         </div>
         <div id="aiChatMessages" class="aiChatMessages">
           <div class="msg ai">
-            <div class="msg-avatar">♛</div>
+            <div class="msg-avatar"><img src="assets/ai-avatar-pro.svg" alt="TRQX AI"></div>
             <div class="msg-bubble">Ask me about stocks, risk, sectors, portfolio ideas, or high-probability setups.</div>
           </div>
         </div>
@@ -319,47 +141,25 @@
         <button class="link-btn" onclick="scrollToSection('watchlistPanel')">View All AI Picks →</button>
       </section>
 
-      <section id="aiInsightsPanel" class="panel insights-card">
+      <section id="marketHeatMapPanel" class="panel heat-card">
         <div class="panel-head">
-          <div>
-            <h2>AI Insights</h2>
-            <p>Ratings, probability, setups, and portfolio intelligence.</p>
-          </div>
-          <div class="marketBadge" id="marketRegimeBadge">Market Regime: Neutral</div>
+          <h2>Market Heat Map</h2>
+          <button class="icon-btn" onclick="refreshQuotes()">↻</button>
         </div>
-        <ul class="insight-list">
-          <li>Strong momentum and relative strength vs. market</li>
-          <li>High institutional accumulation profile</li>
-          <li>Leading AI/data-center growth theme</li>
-          <li>Above key moving averages</li>
-        </ul>
-        <div class="terminal-controls">
-          <label>Universe Mode
-            <select id="universeMode" onchange="changeUniverseMode()">
-              <option value="scored">TRQX Scored Universe</option>
-              <option value="live">Expanded Live U.S. Universe</option>
-            </select>
-          </label>
-          <button class="dark-btn full" onclick="loadExpandedUniverse()">Load Expanded Universe</button>
+        <div class="heat-map">
+          <div class="heat up">Technology<br><strong>+1.85%</strong></div>
+          <div class="heat up">Financials<br><strong>+0.62%</strong></div>
+          <div class="heat up">Healthcare<br><strong>+0.11%</strong></div>
+          <div class="heat up">Consumer Cyclical<br><strong>+1.23%</strong></div>
+          <div class="heat down">Energy<br><strong>-0.72%</strong></div>
+          <div class="heat down">Utilities<br><strong>-0.15%</strong></div>
+          <div class="heat up">Industrials<br><strong>+0.48%</strong></div>
+          <div class="heat down">Real Estate<br><strong>-0.28%</strong></div>
+          <div class="heat up">Materials<br><strong>+0.22%</strong></div>
         </div>
+        <div class="heat-legend"><span>◆ Gainers</span><b></b><i></i><span>Losers</span></div>
       </section>
-    </section>
-
-
-    <section id="gammaDashboardPanel" class="panel gamma-card-wide">
-      <div class="panel-head">
-        <div>
-          <div class="eyebrow">TRQX GAMMA PRESSURE DASHBOARD</div>
-          <h2>Dealer Positioning & Gamma Levels</h2>
-          <p>Educational estimate of call walls, put walls, gamma flip zones, and expected pin risk.</p>
-        </div>
-        <button class="dark-btn" onclick="renderGammaDashboard()">Refresh Gamma</button>
-      </div>
-
-      <div id="gammaRows" class="gamma-grid">
-        <div class="emptyState">Refresh market data to load gamma pressure levels.</div>
-      </div>
-    </section>
+</section>
 
     <section class="middle-grid">
       <section id="portfolioBuilderPanel" class="panel portfolio-card">
@@ -623,6 +423,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=18.2"></script>
+  <script src="app.js?v=17.4"></script>
 </body>
 </html>
