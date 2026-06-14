@@ -1,23 +1,15 @@
-# TRQX AI Market Terminal v16.1 — Sentinel Panel Removed
+# TRQX AI Market Terminal v17 — Generated Mockup Match
 
-## Changed
+This build matches the generated dashboard screenshot layout more closely.
 
-- Removed the TRQX Market Sentinel/Mr. TRQX panel that was visually crowding the dashboard.
-- Added a more useful **Top AI Picks Today** panel in its place.
-- The new panel ranks the top 5 opportunities from the current TRQX universe.
+## Fixed
 
-## Keeps
-
-- Brand hero image
-- Flow Scanner preview
-- Stock Lookup
-- Growth Scanner
-- AI Market Analyst
-- Market Heat Map
-- AI Insights
-- Portfolio Builder
-- Live market strip
-- Secure AI routes
+- Third/options-flow section image is framed correctly
+- Removed excessive empty space in middle section
+- Market heat map is fitted
+- Top AI Picks is now a table-style panel
+- Portfolio and AI Probability panels sit side-by-side
+- Options Flow module spans wide and uses the supplied image properly
 
 ## Upload
 
