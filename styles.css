@@ -620,3 +620,108 @@ footer{text-align:center;color:#89919b;font-size:12px;margin:24px}
     min-height: 240px;
   }
 }
+
+
+
+/* === v19.6 Image Background CTA Cards === */
+.cta-image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.cta-image-grid .cta-card {
+  position: relative;
+  min-height: 260px;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px;
+  border: 1px solid rgba(214,168,61,.36);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.cta-image-grid .cta-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: rgba(0,0,0,.42);
+}
+
+.cta-image-grid .cta-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.16), rgba(0,0,0,.76) 66%, rgba(0,0,0,.92)),
+    radial-gradient(circle at top right, rgba(255,224,113,.16), transparent 38%);
+}
+
+.cta-image-grid .cta-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255,224,113,.70);
+  box-shadow:
+    0 0 42px rgba(214,168,61,.20),
+    inset 0 1px rgba(255,255,255,.08);
+}
+
+.whop-card {
+  background-image: url("assets/whop-card-bg.png");
+}
+
+.discord-card {
+  background-image: url("assets/discord-card-bg.png");
+}
+
+.orb-card {
+  background-image: url("assets/orb-card-bg.png");
+  background-position: center center;
+}
+
+.cta-image-grid .cta-card span {
+  color: #ffe071;
+  font-size: 12px;
+  letter-spacing: 1.4px;
+  text-shadow: 0 0 10px rgba(0,0,0,.90);
+}
+
+.cta-image-grid .cta-card strong {
+  font-size: 30px;
+  line-height: 1.05;
+  color: #fff;
+  text-shadow:
+    0 2px 8px rgba(0,0,0,.95),
+    0 0 18px rgba(214,168,61,.30);
+}
+
+.cta-image-grid .cta-card small {
+  max-width: 460px;
+  color: #e8edf4;
+  font-size: 14px;
+  line-height: 1.4;
+  text-shadow: 0 2px 8px rgba(0,0,0,.95);
+}
+
+.cta-image-grid .premium strong {
+  color: #ffe071;
+}
+
+.trqx-cta-panel .panel-head p {
+  max-width: 760px;
+}
+
+@media(max-width: 1000px) {
+  .cta-image-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-image-grid .cta-card {
+    min-height: 230px;
+  }
+}
