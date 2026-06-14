@@ -544,3 +544,29 @@ input,select,textarea{background:#030303;border:1px solid var(--soft);border-rad
     min-height: 44px !important;
   }
 }
+.market-regime{
+  margin:12px 0;
+  padding:12px 18px;
+  border-radius:12px;
+  font-weight:800;
+  font-size:14px;
+  letter-spacing:1px;
+}
+
+.market-regime.risk-on{
+  background:rgba(0,200,120,.15);
+  border:1px solid rgba(0,200,120,.35);
+  color:#35ff9b;
+}
+
+.market-regime.risk-off{
+  background:rgba(255,70,70,.15);
+  border:1px solid rgba(255,70,70,.35);
+  color:#ff6b6b;
+}
+
+.market-regime.neutral{
+  background:rgba(255,215,0,.12);
+  border:1px solid rgba(255,215,0,.25);
+  color:#f7d24c;
+}
