@@ -1062,7 +1062,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   while (parent) {
     parent.style.width = "100%";
-    parent.style.maxWidth = "1800px";
+    parent.style.maxWidth = "2200px";
     parent.style.margin = "0 auto";
     parent = parent.parentElement;
   }
