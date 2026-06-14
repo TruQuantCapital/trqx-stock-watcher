@@ -1040,6 +1040,28 @@ function exportWatchlist() {
 load();
 fetchMarketStrip();
 
+document.addEventListener("DOMContentLoaded", () => {
+  const chat = document.getElementById("aiChatMessages");
+
+  if (chat) {
+    chat.style.height = "700px";
+    chat.style.minHeight = "700px";
+    chat.style.maxHeight = "75vh";
+    chat.style.overflowY = "auto";
+    chat.style.padding = "20px";
+    chat.style.borderRadius = "12px";
+  }
+
+  const parent =
+    chat?.parentElement;
+
+  if (parent) {
+    parent.style.width = "100%";
+    parent.style.maxWidth = "1200px";
+    parent.style.minHeight = "850px";
+  }
+});
+
 function openStockModal(ticker) {
   const stock = stocks.find((s) => s.ticker === ticker);
   const modal = document.getElementById("modal");
