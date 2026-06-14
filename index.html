@@ -6,6 +6,109 @@
   <title>TRQX AI Market Terminal</title>
   <link rel="icon" href="favicon.svg" />
   <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* TRQX Gamma Pressure Dashboard */
+    .gamma-card-wide {
+      margin-top: 24px;
+    }
+
+    .gamma-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      width: 100%;
+    }
+
+    .gamma-pressure-card {
+      background: linear-gradient(145deg, rgba(9,9,9,.96), rgba(24,18,8,.96));
+      border: 1px solid rgba(247, 210, 76, .28);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 0 24px rgba(247, 210, 76, .08);
+    }
+
+    .gamma-pressure-card h3 {
+      margin: 0 0 4px;
+      color: #f7d24c;
+      font-size: 24px;
+      letter-spacing: .5px;
+    }
+
+    .gamma-price {
+      font-size: 30px;
+      font-weight: 900;
+      margin: 12px 0 14px;
+    }
+
+    .gamma-stat {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      padding: 8px 0;
+      font-size: 14px;
+    }
+
+    .gamma-stat span {
+      color: #aaa;
+    }
+
+    .gamma-stat b {
+      color: #fff;
+    }
+
+    .gamma-bias {
+      margin-top: 14px;
+      padding: 10px;
+      border-radius: 12px;
+      font-weight: 900;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .gamma-positive {
+      background: rgba(22, 185, 112, .16);
+      color: #3ddc84;
+    }
+
+    .gamma-negative {
+      background: rgba(255, 90, 90, .16);
+      color: #ff5a5a;
+    }
+
+    .gamma-neutral {
+      background: rgba(247, 210, 76, .16);
+      color: #f7d24c;
+    }
+
+    .gamma-summary {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #bbb;
+      line-height: 1.45;
+    }
+
+    /* Make the AI market analyst wider */
+    #aiChatPanel {
+      grid-column: span 2;
+      width: 100%;
+      max-width: none;
+    }
+
+    #aiChatMessages,
+    .aiChatMessages {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    @media (max-width: 1100px) {
+      #aiChatPanel {
+        grid-column: span 1;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <div class="bg-stage" aria-hidden="true">
@@ -71,6 +174,7 @@
         <button onclick="scrollToSection('growthScannerPanel')">Growth Scanner</button>
         <button onclick="scrollToSection('portfolioBuilderPanel')">Portfolio</button>
         <button onclick="scrollToSection('aiChatPanel')">Market Intelligence</button>
+        <button onclick="scrollToSection('gammaDashboardPanel')">Gamma Dashboard <span class="newtag">NEW</span></button>
         <button onclick="scrollToSection('watchlistPanel')">Watchlist</button>
         <button onclick="scrollToSection('flowPreviewPanel')">Options Flow <span class="newtag">NEW</span></button>
       </div>
@@ -193,6 +297,22 @@
         </div>
       </section>
     </section>
+
+
+      <section id="gammaDashboardPanel" class="panel gamma-card-wide">
+        <div class="panel-head">
+          <div>
+            <div class="eyebrow">TRQX GAMMA PRESSURE DASHBOARD</div>
+            <h2>Dealer Positioning & Gamma Levels</h2>
+            <p>Educational estimate of call walls, put walls, gamma flip zones, and pin risk.</p>
+          </div>
+          <button class="dark-btn" onclick="renderGammaDashboard()">Refresh Gamma</button>
+        </div>
+
+        <div id="gammaRows" class="gamma-grid">
+          <div class="emptyState">Refresh market data to load gamma pressure levels.</div>
+        </div>
+      </section>
 
     <section class="middle-grid">
       <section id="portfolioBuilderPanel" class="panel portfolio-card">
@@ -456,6 +576,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=17.6"></script>
+  <script src="app.js?v=18.0"></script>
 </body>
 </html>
