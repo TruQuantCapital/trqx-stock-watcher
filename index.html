@@ -216,7 +216,7 @@
           <div><span>Avg. Probability</span><strong>76%</strong></div>
           <div><span>High Conviction</span><strong class="live">72</strong></div>
         </div>
-        <button class="link-btn">View Full Distribution →</button>
+        <button class="link-btn" onclick="openProbabilityDetails()">View Full Distribution →</button>
       </section>
 
       <section id="flowPreviewPanel" class="panel flow-card">
@@ -230,7 +230,7 @@
             <div><b>▥</b><span>Smart Insights</span><small>See what smart money is doing</small></div>
             <div><b>★</b><span>Alerts That Matter</span><small>Never miss high-conviction setups</small></div>
           </div>
-          <button class="gold-btn">Learn More</button>
+          <button class="gold-btn" onclick="openOptionsFlowDetails()">Learn More</button>
         </div>
         <div class="flow-image-wrap">
           <img src="assets/flow-scanner-pro.png" alt="TRQX Options Flow Scanner" />
@@ -327,6 +327,83 @@
     <input id="yield" class="hidden" value="4" />
     <div id="annualIncome" class="hidden"></div>
     <div id="monthlyIncome" class="hidden"></div>
+
+    
+    <section id="probabilityDetailsPanel" class="panel hidden detailsPanel">
+      <div class="panel-head">
+        <div>
+          <h2>Full AI Probability Distribution</h2>
+          <p>Breakdown of the current TRQX universe by probability tier, conviction level, and risk quality.</p>
+        </div>
+      </div>
+
+      <div class="details-grid">
+        <div class="detail-card strong">
+          <span>90%+ Strongest</span>
+          <b>23 Stocks</b>
+          <p>Highest conviction candidates. These usually have the strongest TRQX score, cleaner setup quality, and better probability alignment.</p>
+        </div>
+        <div class="detail-card high">
+          <span>70% - 90% High</span>
+          <b>49 Stocks</b>
+          <p>Solid watchlist candidates. These may be strong but still require confirmation before action.</p>
+        </div>
+        <div class="detail-card moderate">
+          <span>50% - 70% Moderate</span>
+          <b>61 Stocks</b>
+          <p>Neutral setups. These need stronger trend, volume, or catalyst confirmation.</p>
+        </div>
+        <div class="detail-card low">
+          <span>Below 50% Low</span>
+          <b>17 Stocks</b>
+          <p>Lower probability or higher uncertainty. These are typically avoided or placed on a caution list.</p>
+        </div>
+      </div>
+
+      <div class="details-note">
+        <h3>How TRQX Uses Probability</h3>
+        <p>Probability is not a guarantee. It is a ranking tool that helps separate cleaner setups from lower-quality opportunities. Always combine probability with risk, price action, volume, market regime, and position sizing.</p>
+      </div>
+    </section>
+
+    <section id="optionsFlowDetailsPanel" class="panel hidden detailsPanel">
+      <div class="panel-head">
+        <div>
+          <div class="eyebrow">Coming Premium Module</div>
+          <h2>TRQX Options Flow Scanner</h2>
+          <p>The Options Flow Scanner will track unusual contracts, sweeps, blocks, bullish/bearish pressure, and institutional-style activity.</p>
+        </div>
+      </div>
+
+      <div class="details-grid">
+        <div class="detail-card strong">
+          <span>Real-Time Flow</span>
+          <b>Live Contracts</b>
+          <p>Track unusual options activity as it appears, including calls, puts, sweeps, blocks, and premium size.</p>
+        </div>
+        <div class="detail-card high">
+          <span>Smart Filters</span>
+          <b>Cut The Noise</b>
+          <p>Filter by ticker, contract type, expiration, premium, sentiment, and unusual activity level.</p>
+        </div>
+        <div class="detail-card moderate">
+          <span>Sentiment Engine</span>
+          <b>Bullish / Bearish</b>
+          <p>Separate bullish flow from bearish flow and see where large premium is moving.</p>
+        </div>
+        <div class="detail-card low">
+          <span>TRQX Alerts</span>
+          <b>High-Conviction Setups</b>
+          <p>Future alerts can notify premium users when major unusual activity hits their watchlist.</p>
+        </div>
+      </div>
+
+      <div class="details-note">
+        <h3>Premium Roadmap</h3>
+        <p>This module can become a paid TRQX Pro feature after Whop login is connected. Free users can see a preview, while premium users get the full scanner, exports, alerts, and AI explanations.</p>
+      </div>
+    </section>
+
 
     <footer>
       <div class="footer-ticker">
