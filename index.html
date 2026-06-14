@@ -89,7 +89,7 @@
       line-height: 1.45;
     }
 
-    /* Make the AI market analyst wider */
+    /* Make the AI market analyst wider without breaking the whole page */
     #aiChatPanel {
       grid-column: span 2;
       width: 100%;
@@ -299,20 +299,20 @@
     </section>
 
 
-      <section id="gammaDashboardPanel" class="panel gamma-card-wide">
-        <div class="panel-head">
-          <div>
-            <div class="eyebrow">TRQX GAMMA PRESSURE DASHBOARD</div>
-            <h2>Dealer Positioning & Gamma Levels</h2>
-            <p>Educational estimate of call walls, put walls, gamma flip zones, and pin risk.</p>
-          </div>
-          <button class="dark-btn" onclick="renderGammaDashboard()">Refresh Gamma</button>
+    <section id="gammaDashboardPanel" class="panel gamma-card-wide">
+      <div class="panel-head">
+        <div>
+          <div class="eyebrow">TRQX GAMMA PRESSURE DASHBOARD</div>
+          <h2>Dealer Positioning & Gamma Levels</h2>
+          <p>Educational estimate of call walls, put walls, gamma flip zones, and expected pin risk.</p>
         </div>
+        <button class="dark-btn" onclick="renderGammaDashboard()">Refresh Gamma</button>
+      </div>
 
-        <div id="gammaRows" class="gamma-grid">
-          <div class="emptyState">Refresh market data to load gamma pressure levels.</div>
-        </div>
-      </section>
+      <div id="gammaRows" class="gamma-grid">
+        <div class="emptyState">Refresh market data to load gamma pressure levels.</div>
+      </div>
+    </section>
 
     <section class="middle-grid">
       <section id="portfolioBuilderPanel" class="panel portfolio-card">
@@ -576,6 +576,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=18.0"></script>
+  <script src="app.js?v=18.1"></script>
 </body>
 </html>
