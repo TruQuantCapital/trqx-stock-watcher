@@ -1248,3 +1248,273 @@ footer{text-align:center;color:#89919b;font-size:12px;margin:24px}
 .live-strip .market-status {
   border-right: 0 !important;
 }
+
+
+
+/* === v21 Production Polish === */
+
+/* luxury moving background typography */
+.lux-bg-tape span {
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: 76px !important;
+  letter-spacing: 12px !important;
+  font-weight: 700 !important;
+  color: rgba(255,224,113,.65) !important;
+  opacity: .20 !important;
+}
+
+/* top ticker/status */
+.live-strip {
+  height: 58px !important;
+  grid-template-columns: repeat(6, 1fr) !important;
+}
+
+.live-strip span {
+  font-size: 18px !important;
+  color: #ffe071 !important;
+  font-weight: 1000 !important;
+}
+
+.live-strip strong {
+  font-size: 18px !important;
+  font-weight: 1000 !important;
+}
+
+.live-strip em {
+  font-size: 15px !important;
+  font-weight: 1000 !important;
+}
+
+.market-status {
+  font-size: 16px !important;
+  font-weight: 1000 !important;
+}
+
+.market-status.market-open {
+  color: #36d17c !important;
+}
+
+.market-status.market-closed {
+  color: #ef4d5e !important;
+}
+
+/* product cards standardized */
+.products-top-panel {
+  margin: 16px 0 18px !important;
+  padding: 24px !important;
+}
+
+.terminal-version {
+  border: 1px solid rgba(214,168,61,.28);
+  border-radius: 999px;
+  padding: 10px 14px;
+  color: #ffe071;
+  background: rgba(214,168,61,.08);
+  font-size: 12px;
+  font-weight: 1000;
+  white-space: nowrap;
+}
+
+.product-card-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 18px !important;
+  margin-top: 18px !important;
+}
+
+.product-card-grid .cta-card {
+  position: relative !important;
+  min-height: 340px !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  padding: 0 !important;
+  background: #050505 !important;
+  border: 1px solid rgba(214,168,61,.36) !important;
+  text-decoration: none !important;
+  isolation: isolate !important;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.product-card-grid .cta-card > img {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: -3 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  display: block !important;
+  opacity: .92 !important;
+  filter: brightness(.78) contrast(1.10) saturate(1.06) !important;
+}
+
+.product-card-grid .cta-card::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: -2 !important;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.52) 52%, rgba(0,0,0,.92)),
+    radial-gradient(circle at top right, rgba(255,224,113,.15), transparent 42%) !important;
+}
+
+.product-card-grid .cta-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255,224,113,.72) !important;
+  box-shadow: 0 0 38px rgba(214,168,61,.24);
+}
+
+.product-card-grid .cta-content {
+  width: 100%;
+  padding: 24px;
+  z-index: 3;
+  position: relative;
+}
+
+.product-card-grid .cta-card span {
+  color: #ffe071 !important;
+  font-size: 12px !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase;
+  font-weight: 1000;
+  margin-bottom: 10px;
+}
+
+.product-card-grid .cta-card strong {
+  color: #fff !important;
+  font-size: 32px !important;
+  line-height: 1.05 !important;
+  margin-bottom: 10px !important;
+  text-shadow: 0 4px 12px rgba(0,0,0,1), 0 0 22px rgba(214,168,61,.28);
+}
+
+.product-card-grid .premium strong {
+  color: #ffe071 !important;
+}
+
+.product-card-grid .cta-card small {
+  color: #edf2fa !important;
+  font-size: 14px !important;
+  line-height: 1.42 !important;
+  text-shadow: 0 3px 10px rgba(0,0,0,1);
+}
+
+/* options flow subscribe CTA */
+.flow-action-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.flow-action-row .gold-btn,
+.flow-action-row .dark-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  text-decoration: none;
+}
+
+.subscribe-btn {
+  min-width: 170px;
+  box-shadow: 0 0 24px rgba(214,168,61,.18);
+}
+
+/* keep noncritical top clutter out */
+.embedded-heat,
+#marketHeatMapPanel.embedded-heat {
+  display: none !important;
+}
+
+.metric-row,
+.intelligence-metrics {
+  display: none !important;
+}
+
+/* cleaner command strip if present */
+.command-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 30px rgba(214,168,61,.16);
+}
+
+@media(max-width: 1200px) {
+  .product-card-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .product-card-grid .cta-card {
+    min-height: 280px !important;
+  }
+
+  .terminal-version {
+    margin-top: 10px;
+  }
+}
+
+@media(max-width: 700px) {
+  .lux-bg-tape span {
+    font-size: 42px !important;
+  }
+
+  .flow-action-row {
+    flex-direction: column;
+  }
+}
+
+
+
+
+
+/* === v21.1 ORB Subscribe CTA Fix === */
+.flow-action-row {
+  display: flex !important;
+  gap: 14px !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  margin-top: 22px !important;
+}
+
+.flow-action-row .gold-btn,
+.flow-action-row .dark-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 48px !important;
+  text-decoration: none !important;
+  border-radius: 9px !important;
+}
+
+.subscribe-btn {
+  min-width: 190px !important;
+  font-size: 15px !important;
+  box-shadow: 0 0 26px rgba(214,168,61,.24) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.subscribe-btn::after {
+  content: "›";
+  margin-left: 9px;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.subscribe-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 36px rgba(214,168,61,.42) !important;
+}
+
+@media(max-width: 700px) {
+  .flow-action-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .flow-action-row .gold-btn,
+  .flow-action-row .dark-btn {
+    width: 100% !important;
+  }
+}

@@ -1,36 +1,65 @@
-# TRQX AI Market Terminal v20.2 — Market Status Fix
+# TRQX AI Market Terminal v21 — Production Polish
 
-## Fixed
+## Included
 
-The top strip no longer hard-codes:
+- Final ticker strip:
+  - SPY
+  - QQQ
+  - DIA
+  - IWM
+  - VIX
+  - Market Open / Market Closed
 
-```text
-Market Open
-```
+- Proper market status logic:
+  - Monday-Friday
+  - 9:30 AM ET to 4:00 PM ET
+  - Shows live ET time
 
-It now calculates U.S. regular market hours using Eastern Time:
+- Product cards standardized:
+  - Same height
+  - Same hover glow
+  - Real image tags
+  - No developer notes
 
-```text
-Monday-Friday
-9:30 AM ET - 4:00 PM ET
-```
+- Luxury background typography:
+  - INTELLIGENCE
+  - PRECISION
+  - DISCIPLINE
+  - EXECUTION
+  - PROBABILITY
 
-It displays:
+- Options Flow section updated:
+  - Added Subscribe Here button
+  - Link points to Whop
 
-```text
-Market Open · HH:MM ET
-```
+## Links
 
-or:
+- Whop:
+  https://whop.com/tqpx-tru-quant-enterprise
 
-```text
-Market Closed · HH:MM ET
-```
-
-## Note
-
-This checks regular weekday hours. It does not yet include the full U.S. market holiday calendar or early-close schedule. That can be added later if needed.
+- Discord:
+  https://discord.gg/jy3ta9qkfH
 
 ## Upload
 
-Upload all files/folders to GitHub root, redeploy in Vercel, then hard refresh with Ctrl+Shift+R.
+Upload all files/folders to GitHub root, redeploy Vercel production, then hard refresh:
+
+Ctrl + Shift + R
+
+
+## v21.1 Update
+
+- Added **Subscribe to ORB** button in the Options Flow section.
+- Button points to:
+  https://whop.com/joined/tqpx-tru-quant-enterprise/products/tlqx-precision-orb/
+- Kept the existing Learn More button.
+- Updated ORB product card link to the same Whop product URL.
+
+
+## v21.1 Update
+
+- Added **Subscribe to ORB** button to the Options Flow preview card.
+- Button points to:
+  https://whop.com/joined/tqpx-tru-quant-enterprise/products/tlqx-precision-orb/
+- Kept the existing Learn More button.
+- Updated ORB product card link to the same Whop product URL.

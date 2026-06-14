@@ -1568,29 +1568,6 @@ async function fetchQuoteBatch(symbols) {
    Display: SPY | QQQ | DIA | IWM | VIX | Market Open
    Removed IWM permanently from the strip.
 */
-function forceLiveStripLabels() {
-  const labels = {
-    spx: "SPY",
-    ndx: "QQQ",
-    dji: "DIA",
-    iwm: "IWM",
-    vix: "VIX"
-  };
-
-  Object.entries(labels).forEach(([key, value]) => {
-    const el = document.getElementById(`label-${key}`);
-    if (el) el.textContent = value;
-  });
-
-  // Hard fallback by position in case old HTML is cached.
-  const strip = document.querySelector(".live-strip");
-  if (strip) {
-    const spans = strip.querySelectorAll("div span");
-    ["SPY", "QQQ", "DIA", "IWM", "VIX"].forEach((label, idx) => {
-      if (spans[idx]) spans[idx].textContent = label;
-    });
-  }
-}
 
 async function fetchQuoteBatch(symbols) {
   const response = await fetch(`/api/quotes?symbols=${encodeURIComponent(symbols.join(","))}&v=20.1`);
@@ -1599,84 +1576,7 @@ async function fetchQuoteBatch(symbols) {
   return Array.isArray(data) ? data : [];
 }
 
-async function fetchMarketStrip() {
-  forceLiveStripLabels();
 
-  const map = [
-    { key: "spx", symbol: "SPY" },
-    { key: "ndx", symbol: "QQQ" },
-    { key: "dji", symbol: "DIA" },
-    { key: "iwm", symbol: "IWM" },
-    { key: "vix", symbol: "^VIX", fallback: "VIXY" }
-  ];
-
-  try {
-    let quotes = await fetchQuoteBatch(map.map((m) => m.symbol));
-
-    const hasVix = quotes.some((q) => {
-      return String(q.symbol || "").toUpperCase() === "^VIX" && Number.isFinite(Number(q.price));
-    });
-
-    if (!hasVix) {
-      try {
-        const fallbackQuotes = await fetchQuoteBatch(["VIXY"]);
-        const fb = fallbackQuotes.find((q) => String(q.symbol || "").toUpperCase() === "VIXY");
-        if (fb && Number.isFinite(Number(fb.price))) {
-          quotes.push({ ...fb, symbol: "^VIX" });
-        }
-      } catch (fallbackError) {
-        console.warn("VIX fallback failed:", fallbackError);
-      }
-    }
-
-    map.forEach((item) => {
-      const priceEl = document.getElementById(`strip-price-${item.key}`);
-      const pctEl = document.getElementById(`strip-pct-${item.key}`);
-      if (!priceEl || !pctEl) return;
-
-      const quote = quotes.find((q) => String(q.symbol || "").toUpperCase() === item.symbol.toUpperCase());
-
-      if (!quote || !Number.isFinite(Number(quote.price))) {
-        priceEl.textContent = "—";
-        pctEl.textContent = "—";
-        pctEl.className = "";
-        return;
-      }
-
-      const price = Number(quote.price);
-      const pct = Number(quote.changesPercentage);
-      const isUp = Number.isFinite(pct) ? pct >= 0 : true;
-
-      priceEl.textContent = price.toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-
-      pctEl.textContent = Number.isFinite(pct)
-        ? `${isUp ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}%`
-        : "—";
-
-      pctEl.className = Number.isFinite(pct) ? (isUp ? "positive" : "negative") : "";
-    });
-  } catch (error) {
-    console.warn("Market strip failed:", error);
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  forceLiveStripLabels();
-  fetchMarketStrip();
-});
-
-setInterval(fetchMarketStrip, 60000);
-
-
-
-/* === TRQX Market Status Fix ===
-   NYSE/Nasdaq regular session:
-   Monday-Friday, 9:30 AM - 4:00 PM Eastern Time.
-   This avoids hard-coding "Market Open" when the market is closed.
-*/
 function getEasternMarketTimeParts(date = new Date()) {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/New_York",
@@ -1725,10 +1625,134 @@ function updateMarketStatus() {
   el.textContent = open ? `● Market Open · ${timeLabel}` : `● Market Closed · ${timeLabel}`;
 }
 
+
+/* === END TRQX Market Status Fix === */
+
+
+
+/* === TRQX v21 Production Live Strip + Status === */
+function forceLiveStripLabels() {
+  const labels = { spx: "SPY", ndx: "QQQ", dji: "DIA", iwm: "IWM", vix: "VIX" };
+  Object.entries(labels).forEach(([key, value]) => {
+    const el = document.getElementById(`label-${key}`);
+    if (el) el.textContent = value;
+  });
+
+  const strip = document.querySelector(".live-strip");
+  if (strip) {
+    const spans = strip.querySelectorAll("div span");
+    ["SPY", "QQQ", "DIA", "IWM", "VIX"].forEach((label, idx) => {
+      if (spans[idx]) spans[idx].textContent = label;
+    });
+  }
+}
+
+async function fetchQuoteBatch(symbols) {
+  const response = await fetch(`/api/quotes?symbols=${encodeURIComponent(symbols.join(","))}&v=21`);
+  if (!response.ok) throw new Error("Quote request failed");
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
+}
+
+async function fetchMarketStrip() {
+  forceLiveStripLabels();
+
+  const map = [
+    { key: "spx", symbol: "SPY" },
+    { key: "ndx", symbol: "QQQ" },
+    { key: "dji", symbol: "DIA" },
+    { key: "iwm", symbol: "IWM" },
+    { key: "vix", symbol: "^VIX", fallback: "VIXY" }
+  ];
+
+  try {
+    let quotes = await fetchQuoteBatch(map.map((m) => m.symbol));
+
+    const hasVix = quotes.some((q) => String(q.symbol || "").toUpperCase() === "^VIX" && Number.isFinite(Number(q.price)));
+    if (!hasVix) {
+      try {
+        const fallbackQuotes = await fetchQuoteBatch(["VIXY"]);
+        const fb = fallbackQuotes.find((q) => String(q.symbol || "").toUpperCase() === "VIXY");
+        if (fb && Number.isFinite(Number(fb.price))) quotes.push({ ...fb, symbol: "^VIX" });
+      } catch (e) {
+        console.warn("VIX fallback failed:", e);
+      }
+    }
+
+    map.forEach((item) => {
+      const priceEl = document.getElementById(`strip-price-${item.key}`);
+      const pctEl = document.getElementById(`strip-pct-${item.key}`);
+      if (!priceEl || !pctEl) return;
+
+      const quote = quotes.find((q) => String(q.symbol || "").toUpperCase() === item.symbol.toUpperCase());
+
+      if (!quote || !Number.isFinite(Number(quote.price))) {
+        priceEl.textContent = "—";
+        pctEl.textContent = "—";
+        pctEl.className = "";
+        return;
+      }
+
+      const price = Number(quote.price);
+      const pct = Number(quote.changesPercentage);
+      const up = Number.isFinite(pct) ? pct >= 0 : true;
+
+      priceEl.textContent = price.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+      pctEl.textContent = Number.isFinite(pct) ? `${up ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}%` : "—";
+      pctEl.className = Number.isFinite(pct) ? (up ? "positive" : "negative") : "";
+    });
+  } catch (err) {
+    console.warn("Market strip failed:", err);
+  }
+}
+
+function getEasternMarketTimeParts(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).formatToParts(date);
+
+  const out = {};
+  parts.forEach((p) => {
+    if (p.type !== "literal") out[p.type] = p.value;
+  });
+
+  return { weekday: out.weekday, hour: Number(out.hour), minute: Number(out.minute) };
+}
+
+function isRegularMarketOpenNow(date = new Date()) {
+  const { weekday, hour, minute } = getEasternMarketTimeParts(date);
+  if (weekday === "Sat" || weekday === "Sun") return false;
+  const mins = hour * 60 + minute;
+  return mins >= 570 && mins < 960; // 9:30 AM to 4:00 PM ET
+}
+
+function updateMarketStatus() {
+  const el = document.getElementById("marketStatus") || document.querySelector(".market-status");
+  if (!el) return;
+
+  const open = isRegularMarketOpenNow();
+  const { hour, minute } = getEasternMarketTimeParts();
+  const time = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")} ET`;
+
+  el.classList.remove("market-open", "market-closed");
+  el.classList.add(open ? "market-open" : "market-closed");
+  el.textContent = open ? `● Market Open · ${time}` : `● Market Closed · ${time}`;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  forceLiveStripLabels();
+  fetchMarketStrip();
   updateMarketStatus();
 });
 
+setInterval(fetchMarketStrip, 60000);
 setInterval(updateMarketStatus, 60000);
-/* === END TRQX Market Status Fix === */
 
