@@ -1,8 +1,13 @@
-# TRQX AI Market Terminal v19.6 — CTA Background Images
+# TRQX AI Market Terminal v19.8 — Products Top + Images Fixed
 
-## Updated
+## Fixed
 
-Added image backgrounds to the TRQX Member Access cards:
+- Product cards moved directly under the navigation at the top of the site.
+- Market Heat Map removed from the top hero section.
+- Product images now use real `<img>` elements, not only CSS backgrounds.
+- This fixes the issue where only one card image appeared.
+
+## Product cards
 
 - Buy on Whop
 - Join TRQX Discord
@@ -14,17 +19,8 @@ Added image backgrounds to the TRQX Member Access cards:
 https://discord.gg/jy3ta9qkfH
 ```
 
-## Current links
+## Image assets copied
 
-- Whop: https://whop.com/tqpx-tru-quant-enterprise
-- Discord: https://discord.gg/jy3ta9qkfH
-- ORB Indicator: currently points to Whop until a separate ORB/TradingView URL is provided
+{'whop-card-bg.png': '/mnt/data/i am algooooo.png', 'discord-card-bg.png': '/mnt/data/2aecf654-1fd3-4802-b2c0-d42f6315bc5c.png', 'orb-card-bg.png': '/mnt/data/ChatGPT Image May 6, 2026, 11_48_46 AM(1).png'}
 
-## Added assets
-
-```text
-assets/discord-card-bg.png
-assets/orb-card-bg.png
-assets/whop-card-bg.png
-assets/whop-logo-bg.png
-```
+Upload all files/folders to GitHub root, redeploy in Vercel, then hard refresh with Ctrl+Shift+R.
