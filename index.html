@@ -83,6 +83,48 @@
         </a>
       </div>
     </section>
+
+    <section id="membershipAccessPanel" class="panel membership-access-panel">
+      <div class="panel-head">
+        <div>
+          <div class="eyebrow">TRQX Membership Onboarding</div>
+          <h2>Access Requires Membership</h2>
+          <p>TRQX tools are educational market-intelligence resources. Members must review the disclaimer and complete onboarding before using premium tools.</p>
+        </div>
+        <span class="badge">Required Before Access</span>
+      </div>
+
+      <div class="membership-grid">
+        <article class="membership-step">
+          <span>Step 1</span>
+          <strong>Subscribe on Whop</strong>
+          <small>Start your TRQX membership and unlock paid tools.</small>
+          <a class="gold-btn" href="https://whop.com/joined/tqpx-tru-quant-enterprise/products/tlqx-precision-orb/" target="_blank" rel="noopener">Subscribe to ORB</a>
+        </article>
+
+        <article class="membership-step">
+          <span>Step 2</span>
+          <strong>Accept Disclaimer</strong>
+          <small>Confirm that TRQX is education only and not financial advice.</small>
+          <button class="dark-btn" onclick="openDisclaimerModal()">View Disclaimer</button>
+        </article>
+
+        <article class="membership-step">
+          <span>Step 3</span>
+          <strong>Member Intake</strong>
+          <small>Collect basic member details so access and support can be organized.</small>
+          <button class="dark-btn" onclick="openMemberIntake()">Start Intake</button>
+        </article>
+
+        <article class="membership-step">
+          <span>Step 4</span>
+          <strong>Join Discord</strong>
+          <small>Enter the TRQX Capital community after completing access steps.</small>
+          <a class="dark-btn" href="https://discord.gg/jy3ta9qkfH" target="_blank" rel="noopener">Join Discord</a>
+        </article>
+      </div>
+    </section>
+
 <section id="dashboard" class="market-pulse-hero">
       <div class="pulse-copy">
         <div class="eyebrow">TRQX CAPITAL • AI MARKET TERMINAL</div>
@@ -463,7 +505,86 @@
       </div>
     </section>
 
-    <div id="topList" class="hidden"></div>
+    
+    <section id="disclaimerModal" class="modal hidden">
+      <div class="modalCard legal-modal-card">
+        <button class="closeBtn" onclick="closeDisclaimerModal()">×</button>
+        <div class="eyebrow">TRQX Legal Disclaimer</div>
+        <h2>Educational Use Only</h2>
+        <div class="legal-copy">
+          <p><b>TRQX Capital, TRQX AI Market Terminal, ORB Sniper Pro, scanners, dashboards, alerts, ratings, and AI-generated content are provided for educational and informational purposes only.</b></p>
+          <p>Nothing on this site is financial, investment, tax, legal, or trading advice. TRQX does not guarantee profits, outcomes, accuracy, or future market performance.</p>
+          <p>Trading stocks, options, and other securities involves risk. Options trading can result in substantial losses. Past performance does not guarantee future results.</p>
+          <p>Members are responsible for their own trading decisions, risk management, broker selection, position sizing, and compliance with applicable rules and laws.</p>
+          <label class="legal-check">
+            <input type="checkbox" id="disclaimerAccepted">
+            I understand and agree that TRQX is educational only and that all trading decisions are my responsibility.
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button class="gold-btn" onclick="acceptDisclaimer()">Accept Disclaimer</button>
+          <button class="dark-btn" onclick="closeDisclaimerModal()">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="memberIntakeModal" class="modal hidden">
+      <div class="modalCard intake-modal-card">
+        <button class="closeBtn" onclick="closeMemberIntake()">×</button>
+        <div class="eyebrow">TRQX Member Intake</div>
+        <h2>Member Information</h2>
+        <p class="muted">This creates a local intake record you can connect to Whop, Google Forms, Airtable, or your CRM later.</p>
+
+        <form id="memberIntakeForm" class="intake-form" onsubmit="submitMemberIntake(event)">
+          <label>Full Name
+            <input id="memberName" required placeholder="Full name" />
+          </label>
+
+          <label>Email
+            <input id="memberEmail" type="email" required placeholder="email@example.com" />
+          </label>
+
+          <label>Discord Username
+            <input id="memberDiscord" placeholder="@username" />
+          </label>
+
+          <label>Trading Experience
+            <select id="memberExperience">
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </label>
+
+          <label>Primary Interest
+            <select id="memberInterest">
+              <option value="ORB Indicator">ORB Indicator</option>
+              <option value="Options Flow">Options Flow</option>
+              <option value="AI Market Terminal">AI Market Terminal</option>
+              <option value="Mentorship">Mentorship</option>
+            </select>
+          </label>
+
+          <label>Risk Acknowledgment
+            <select id="memberRiskAck" required>
+              <option value="">Select one</option>
+              <option value="Accepted">I understand trading involves risk</option>
+            </select>
+          </label>
+
+          <div class="modal-actions">
+            <button class="gold-btn" type="submit">Submit Intake</button>
+            <button class="dark-btn" type="button" onclick="closeMemberIntake()">Cancel</button>
+          </div>
+        </form>
+
+        <div id="memberIntakeSaved" class="success-note hidden">
+          Intake saved locally. Next step: connect this form to Whop webhook, Google Forms, Airtable, or your CRM.
+        </div>
+      </div>
+    </section>
+
+<div id="topList" class="hidden"></div>
     <input id="portfolio" class="hidden" value="100000" />
     <input id="yield" class="hidden" value="4" />
     <div id="annualIncome" class="hidden"></div>

@@ -1518,3 +1518,131 @@ footer{text-align:center;color:#89919b;font-size:12px;margin:24px}
     width: 100% !important;
   }
 }
+
+
+
+/* === v21.2 Membership / Disclaimer / Intake === */
+.membership-access-panel {
+  margin: 18px 0 !important;
+  background:
+    linear-gradient(180deg, rgba(12,12,10,.96), rgba(4,5,5,.98)),
+    radial-gradient(circle at top right, rgba(255,224,113,.08), transparent 42%) !important;
+}
+
+.membership-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.membership-step {
+  min-height: 210px;
+  border: 1px solid rgba(214,168,61,.26);
+  border-radius: 14px;
+  padding: 18px;
+  background:
+    linear-gradient(180deg, rgba(8,8,7,.84), rgba(3,3,3,.9)),
+    radial-gradient(circle at top right, rgba(255,224,113,.08), transparent 45%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.membership-step span {
+  color: var(--gold2);
+  font-size: 12px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  font-weight: 1000;
+}
+
+.membership-step strong {
+  color: #fff;
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.membership-step small {
+  color: #dce1e9;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.membership-step a,
+.membership-step button {
+  width: 100%;
+  text-decoration: none;
+  text-align: center;
+}
+
+.legal-modal-card,
+.intake-modal-card {
+  max-height: 88vh;
+  overflow: auto;
+}
+
+.legal-copy {
+  display: grid;
+  gap: 12px;
+  color: #e6e8ed;
+  line-height: 1.5;
+}
+
+.legal-check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid rgba(214,168,61,.22);
+  border-radius: 10px;
+  background: rgba(214,168,61,.06);
+}
+
+.legal-check input {
+  min-height: auto;
+  margin-top: 4px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.intake-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.intake-form label {
+  display: grid;
+  gap: 7px;
+  color: #e6e8ed;
+  font-weight: 800;
+}
+
+.intake-form .modal-actions {
+  grid-column: 1 / -1;
+}
+
+.success-note {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid rgba(54,209,124,.35);
+  background: rgba(54,209,124,.08);
+  border-radius: 10px;
+  color: #8fffb8;
+  font-weight: 800;
+}
+
+@media(max-width: 1100px) {
+  .membership-grid,
+  .intake-form {
+    grid-template-columns: 1fr;
+  }
+}

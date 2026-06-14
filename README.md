@@ -63,3 +63,16 @@ Ctrl + Shift + R
   https://whop.com/joined/tqpx-tru-quant-enterprise/products/tlqx-precision-orb/
 - Kept the existing Learn More button.
 - Updated ORB product card link to the same Whop product URL.
+
+
+## v21.2 Update
+
+- VIX now uses VIXY as the data source while displaying the label as VIX. This avoids blank VIX values when the quote API does not support `^VIX`.
+- Added TRQX Membership Onboarding section:
+  - Subscribe on Whop
+  - Accept Disclaimer
+  - Member Intake
+  - Join Discord
+- Added disclaimer modal.
+- Added customer intake modal.
+- Intake currently saves to browser localStorage. Next recommended step is connecting this to Whop webhooks, Airtable, Google Forms, or a CRM.

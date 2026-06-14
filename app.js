@@ -1662,22 +1662,11 @@ async function fetchMarketStrip() {
     { key: "ndx", symbol: "QQQ" },
     { key: "dji", symbol: "DIA" },
     { key: "iwm", symbol: "IWM" },
-    { key: "vix", symbol: "^VIX", fallback: "VIXY" }
+    { key: "vix", symbol: "VIXY" }
   ];
 
   try {
     let quotes = await fetchQuoteBatch(map.map((m) => m.symbol));
-
-    const hasVix = quotes.some((q) => String(q.symbol || "").toUpperCase() === "^VIX" && Number.isFinite(Number(q.price)));
-    if (!hasVix) {
-      try {
-        const fallbackQuotes = await fetchQuoteBatch(["VIXY"]);
-        const fb = fallbackQuotes.find((q) => String(q.symbol || "").toUpperCase() === "VIXY");
-        if (fb && Number.isFinite(Number(fb.price))) quotes.push({ ...fb, symbol: "^VIX" });
-      } catch (e) {
-        console.warn("VIX fallback failed:", e);
-      }
-    }
 
     map.forEach((item) => {
       const priceEl = document.getElementById(`strip-price-${item.key}`);
@@ -1755,4 +1744,83 @@ document.addEventListener("DOMContentLoaded", () => {
 
 setInterval(fetchMarketStrip, 60000);
 setInterval(updateMarketStatus, 60000);
+
+
+
+/* === TRQX v21.2 VIX Display Safety === */
+function normalizeVixDisplayLabel() {
+  const label = document.getElementById("label-vix");
+  if (label) label.textContent = "VIX";
+}
+document.addEventListener("DOMContentLoaded", normalizeVixDisplayLabel);
+setInterval(normalizeVixDisplayLabel, 30000);
+
+
+
+/* === TRQX v21.2 Membership / Disclaimer / Intake === */
+function openDisclaimerModal() {
+  const el = document.getElementById("disclaimerModal");
+  if (el) el.classList.remove("hidden");
+}
+
+function closeDisclaimerModal() {
+  const el = document.getElementById("disclaimerModal");
+  if (el) el.classList.add("hidden");
+}
+
+function acceptDisclaimer() {
+  const accepted = document.getElementById("disclaimerAccepted");
+  if (!accepted || !accepted.checked) {
+    alert("Please check the acknowledgment box before continuing.");
+    return;
+  }
+
+  localStorage.setItem("trqxDisclaimerAccepted", "true");
+  localStorage.setItem("trqxDisclaimerAcceptedAt", new Date().toISOString());
+  closeDisclaimerModal();
+  alert("Disclaimer accepted. You may continue with TRQX membership onboarding.");
+}
+
+function openMemberIntake() {
+  const hasAccepted = localStorage.getItem("trqxDisclaimerAccepted") === "true";
+  if (!hasAccepted) {
+    openDisclaimerModal();
+    return;
+  }
+
+  const el = document.getElementById("memberIntakeModal");
+  if (el) el.classList.remove("hidden");
+}
+
+function closeMemberIntake() {
+  const el = document.getElementById("memberIntakeModal");
+  if (el) el.classList.add("hidden");
+}
+
+function submitMemberIntake(event) {
+  event.preventDefault();
+
+  const data = {
+    name: document.getElementById("memberName")?.value || "",
+    email: document.getElementById("memberEmail")?.value || "",
+    discord: document.getElementById("memberDiscord")?.value || "",
+    experience: document.getElementById("memberExperience")?.value || "",
+    interest: document.getElementById("memberInterest")?.value || "",
+    riskAcknowledgment: document.getElementById("memberRiskAck")?.value || "",
+    disclaimerAccepted: localStorage.getItem("trqxDisclaimerAccepted") === "true",
+    submittedAt: new Date().toISOString()
+  };
+
+  if (!data.name || !data.email || !data.riskAcknowledgment) {
+    alert("Please complete the required fields.");
+    return;
+  }
+
+  localStorage.setItem("trqxMemberIntake", JSON.stringify(data));
+
+  const saved = document.getElementById("memberIntakeSaved");
+  if (saved) saved.classList.remove("hidden");
+
+  alert("TRQX member intake saved. Next step: connect this to Whop, Airtable, Google Forms, or your CRM.");
+}
 
