@@ -1475,7 +1475,41 @@ function openOptionsFlowDetails() {
 }
 
 
+
+
+/* === TRQX v17.4 Live Strip Force Fix ===
+   Display labels: SPY / QQQ / DIA / GLD / BTC/USD
+   Data symbols:   SPY / QQQ / DIA / GLD / BINANCE:BTCUSDT
+*/
+
+function forceLiveStripLabels() {
+  const labels = {
+    spx: "SPY",
+    ndx: "QQQ",
+    dji: "DIA",
+    gold: "GLD",
+    btc: "BTC/USD"
+  };
+
+  Object.entries(labels).forEach(([key, value]) => {
+    const el = document.getElementById(`label-${key}`);
+    if (el) el.textContent = value;
+  });
+
+  // Fallback: if old HTML is still present, overwrite by position.
+  const strip = document.querySelector(".live-strip");
+  if (strip) {
+    const spans = strip.querySelectorAll("div span");
+    const values = ["SPY", "QQQ", "DIA", "GLD", "BTC/USD"];
+    spans.forEach((span, i) => {
+      if (values[i]) span.textContent = values[i];
+    });
+  }
+}
+
 async function fetchMarketStrip() {
+  forceLiveStripLabels();
+
   const map = [
     { key: "spx", symbol: "SPY" },
     { key: "ndx", symbol: "QQQ" },
@@ -1486,45 +1520,70 @@ async function fetchMarketStrip() {
 
   try {
     const symbols = map.map((m) => m.symbol).join(",");
-    const res = await fetch(`/api/quotes?symbols=${encodeURIComponent(symbols)}`);
-    if (!res.ok) throw new Error("Market strip quote request failed");
+    const response = await fetch(`/api/quotes?symbols=${encodeURIComponent(symbols)}&v=17.4`);
 
-    const data = await res.json();
+    if (!response.ok) {
+      throw new Error("Failed to load market strip quotes");
+    }
+
+    const data = await response.json();
     const quotes = Array.isArray(data) ? data : [];
 
-    map.forEach((m) => {
-      const q = quotes.find((x) => String(x.symbol || "").toUpperCase() === m.symbol.toUpperCase());
-      const priceEl = document.getElementById(`strip-price-${m.key}`);
-      const pctEl = document.getElementById(`strip-pct-${m.key}`);
+    map.forEach((item) => {
+      const priceEl = document.getElementById(`strip-price-${item.key}`);
+      const pctEl = document.getElementById(`strip-pct-${item.key}`);
+
       if (!priceEl || !pctEl) return;
 
-      if (!q || !Number.isFinite(Number(q.price))) {
+      const quote = quotes.find((q) => {
+        const symbol = String(q.symbol || "").toUpperCase();
+        return symbol === item.symbol.toUpperCase();
+      });
+
+      if (!quote || !Number.isFinite(Number(quote.price))) {
         priceEl.textContent = "—";
         pctEl.textContent = "—";
         pctEl.className = "";
         return;
       }
 
-      const price = Number(q.price);
-      const pct = Number(q.changesPercentage);
-      const up = Number.isFinite(pct) ? pct >= 0 : true;
+      const price = Number(quote.price);
+      const pct = Number(quote.changesPercentage);
 
       priceEl.textContent = price.toLocaleString(undefined, {
         minimumFractionDigits: price >= 1000 ? 0 : 2,
         maximumFractionDigits: price >= 1000 ? 0 : 2
       });
 
-      pctEl.textContent = Number.isFinite(pct) ? `${up ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}%` : "—";
-      pctEl.className = Number.isFinite(pct) ? (up ? "positive" : "negative") : "";
+      if (Number.isFinite(pct)) {
+        const isUp = pct >= 0;
+        pctEl.textContent = `${isUp ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}%`;
+        pctEl.className = isUp ? "positive" : "negative";
+      } else {
+        pctEl.textContent = "—";
+        pctEl.className = "";
+      }
     });
   } catch (error) {
     console.warn("Market strip failed:", error);
+
+    // Never show wrong BTC proxy or wrong labels.
+    map.forEach((item) => {
+      const priceEl = document.getElementById(`strip-price-${item.key}`);
+      const pctEl = document.getElementById(`strip-pct-${item.key}`);
+      if (priceEl && priceEl.textContent.trim() === "") priceEl.textContent = "—";
+      if (pctEl && pctEl.textContent.trim() === "") pctEl.textContent = "—";
+    });
   }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  forceLiveStripLabels();
   fetchMarketStrip();
 });
 
-setInterval(fetchMarketStrip, 60000);
+setInterval(() => {
+  forceLiveStripLabels();
+  fetchMarketStrip();
+}, 60000);
 

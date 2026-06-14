@@ -429,3 +429,64 @@ input,select,textarea{background:#030303;border:1px solid var(--soft);border-rad
     display: none !important;
   }
 }
+
+
+
+/* === v17.4 Live Strip Font + Label Override === */
+.live-strip {
+  height: 52px !important;
+  grid-template-columns: repeat(6, 1fr) !important;
+  background: linear-gradient(180deg, rgba(5,5,5,.99), rgba(1,1,1,.97)) !important;
+  border-bottom: 1px solid rgba(214,168,61,.26) !important;
+}
+
+.live-strip div {
+  gap: 14px !important;
+  padding: 0 16px !important;
+}
+
+.live-strip span {
+  font-size: 16px !important;
+  font-weight: 1000 !important;
+  color: #ffe071 !important;
+  letter-spacing: 1.2px !important;
+}
+
+.live-strip strong {
+  font-size: 17px !important;
+  min-width: 82px !important;
+  color: #ffffff !important;
+  text-align: right !important;
+  font-weight: 1000 !important;
+}
+
+.live-strip em {
+  font-size: 15px !important;
+  min-width: 82px !important;
+  text-align: left !important;
+  font-weight: 1000 !important;
+  font-style: normal !important;
+}
+
+.live-strip .market-open {
+  color: #36d17c !important;
+  font-size: 16px !important;
+  font-weight: 1000 !important;
+}
+
+@media(max-width: 1100px) {
+  .live-strip {
+    grid-template-columns: repeat(3, 1fr) !important;
+    height: auto !important;
+  }
+
+  .live-strip div {
+    min-height: 42px !important;
+  }
+}
+
+@media(max-width: 700px) {
+  .live-strip {
+    display: none !important;
+  }
+}
