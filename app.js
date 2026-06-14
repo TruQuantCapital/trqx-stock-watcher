@@ -1044,24 +1044,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const chat = document.getElementById("aiChatMessages");
 
   if (chat) {
+    // Keep existing height
     chat.style.height = "700px";
     chat.style.minHeight = "700px";
     chat.style.maxHeight = "75vh";
     chat.style.overflowY = "auto";
     chat.style.padding = "20px";
     chat.style.borderRadius = "12px";
+
+    // Make message area use full width
+    chat.style.width = "100%";
+    chat.style.maxWidth = "100%";
   }
 
-  const parent =
-    chat?.parentElement;
+  // Expand all parent containers
+  let parent = chat?.parentElement;
 
-  if (parent) {
+  while (parent) {
     parent.style.width = "100%";
-    parent.style.maxWidth = "1200px";
-    parent.style.minHeight = "850px";
+    parent.style.maxWidth = "1800px";
+    parent.style.margin = "0 auto";
+    parent = parent.parentElement;
   }
 });
-
 function openStockModal(ticker) {
   const stock = stocks.find((s) => s.ticker === ticker);
   const modal = document.getElementById("modal");
