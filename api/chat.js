@@ -30,7 +30,7 @@ export default async function handler(req, res) {
         "anthropic-version": "2023-06-01"
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
+        model: "claude-3-5-sonnet-20241022",
         max_tokens,
         system: system || "You are TRQX AI Market Analyst. Provide concise educational market research only. Do not give personalized financial advice.",
         messages
