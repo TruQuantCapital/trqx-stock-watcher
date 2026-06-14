@@ -15,7 +15,7 @@ body:before{content:"";position:fixed;inset:0;background-image:linear-gradient(r
 .metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.metric-row article{padding:22px 24px;min-height:118px}.metric-row span{display:block;color:var(--muted);font-size:12px;text-transform:uppercase}.metric-row strong{display:block;font-size:34px;margin:10px 0 5px;color:var(--gold2)}.metric-row small{color:#cfd4dc}.metric-row .live{color:var(--green)}
 .main-grid{display:grid;grid-template-columns:1fr .86fr;gap:14px;align-items:start}.bottom-grid{display:grid;grid-template-columns:1.15fr 1.3fr 1fr 1fr;gap:14px;margin-top:14px;align-items:start}.panel{padding:20px}.panel h2{font-size:23px;margin:0 0 8px}.panel p{color:var(--muted);font-size:13px}.panel-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.target-card{border:1px solid var(--soft);background:#050505;border-radius:10px;padding:16px 20px;text-align:right;min-width:140px}.target-card span{color:var(--muted);font-size:11px}.target-card strong{display:block;color:var(--gold2);font-size:28px}
 .control-row,.filter-row,.lookup-bar,.terminal-controls,.quick-prompts,.aiChatInputRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.control-row{margin:16px 0}.control-row label,.terminal-controls label{display:grid;gap:6px;color:#ccd2dc;font-size:11px}input,select,textarea{background:#030303;border:1px solid var(--soft);border-radius:7px;color:white;padding:11px;min-height:40px}.lookup-bar input,.filter-row input,.aiChatInputRow input{flex:1;min-width:260px}
-.table-wrap{overflow:auto;border-top:1px solid var(--soft);margin-top:8px}table{width:100%;border-collapse:collapse;min-width:920px}th{color:var(--gold2);font-size:11px;text-align:left;text-transform:uppercase;padding:12px 9px;white-space:nowrap}td{border-top:1px solid rgba(255,255,255,.06);padding:11px 9px;font-size:13px;white-space:nowrap}.small{color:var(--muted);font-size:11px}.score{color:var(--gold2);font-weight:1000}
+.table-wrap{overflow-x:auto;overflow-y:visible;border-top:1px solid var(--soft);margin-top:8px;border-radius:0 0 10px 10px}table{width:100%;border-collapse:collapse;min-width:780px}th{color:var(--gold2);font-size:11px;text-align:left;text-transform:uppercase;padding:10px 8px;white-space:nowrap}td{border-top:1px solid rgba(255,255,255,.06);padding:9px 8px;font-size:12.5px;white-space:nowrap}.small{color:var(--muted);font-size:11px}.score{color:var(--gold2);font-weight:1000}
 .meter,.confidence,.pill{padding:5px 9px;border-radius:999px;font-weight:900;font-size:11px;display:inline-block}.meter.strong,.confidence.high,.pill.buy{background:rgba(54,209,124,.14);color:var(--green)}.meter.watch,.confidence.medium,.pill.watch{background:rgba(214,168,61,.14);color:var(--gold2)}.confidence.low,.pill.avoid{background:rgba(239,77,94,.14);color:var(--red)}
 .lookup-example,.lookupCard{margin-top:14px;border:1px solid var(--soft);border-radius:10px;background:#050505;padding:18px}.lookup-example{display:grid;grid-template-columns:58px 1fr auto;gap:18px;align-items:center}.ticker-orb{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:rgba(54,209,124,.12);color:var(--green);font-size:30px}.example-price,.reportPrice{font-size:28px;font-weight:1000}.example-price span,.positive{color:var(--green);font-size:13px}.negative{color:var(--red)}.rating-pill{background:rgba(54,209,124,.13);color:var(--green);padding:14px 18px;border-radius:9px;text-align:center}.rating-pill span{display:block;font-size:11px}
 .lookupTitleRow{display:flex;justify-content:space-between;gap:18px}.lookupStats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:16px 0}.lookupStats div{background:#090909;border:1px solid var(--soft);border-radius:9px;padding:12px}.lookupStats span{display:block;color:var(--muted);font-size:11px}.lookupStats b{font-size:16px}.verdictBox{min-width:230px;border-radius:12px;padding:15px;border:1px solid var(--soft);background:rgba(255,255,255,.035)}.verdictBox.buy{border-color:rgba(54,209,124,.36);color:var(--green)}.verdictBox.watch{border-color:rgba(214,168,61,.36);color:var(--gold2)}.verdictBox.avoid{border-color:rgba(239,77,94,.36);color:var(--red)}
@@ -266,12 +266,11 @@ footer{text-align:center;color:#89919b;font-size:12px;margin:28px}
 
 
 /* === v15.2 Full Background + Live Strip Fix === */
-html, body {
+html {
   min-height: 100%;
-  overflow-x: hidden;
 }
-
 body {
+  overflow-x: clip; /* clip (not hidden) allows child overflow-x:auto to still work */
   background:
     radial-gradient(circle at 12% 18%, rgba(214,168,61,.18), transparent 26%),
     radial-gradient(circle at 88% 12%, rgba(214,168,61,.20), transparent 26%),
@@ -452,7 +451,7 @@ body {
 
 .panel {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .panel::before {
@@ -462,6 +461,8 @@ body {
   background:
     linear-gradient(120deg, transparent 0 52%, rgba(255,215,94,.025) 53%, transparent 68%);
   pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
 }
 
 .main-grid,
