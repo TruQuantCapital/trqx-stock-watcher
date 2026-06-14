@@ -1399,47 +1399,29 @@ document.addEventListener("DOMContentLoaded", bindAutoRefreshControl);
 
 
 
+
 function renderTopAIPicks() {
   const el = document.getElementById("topAIPicks");
   if (!el || !Array.isArray(stocks)) return;
-
   const picks = stocks
     .filter((s) => Number(s.price) > 0 || Number(s.trqxScore) > 0)
     .slice()
-    .sort((a, b) => {
-      const aScore = (Number(a.trqxScore) || 0) + (Number(a.price) > 0 ? 5 : 0);
-      const bScore = (Number(b.trqxScore) || 0) + (Number(b.price) > 0 ? 5 : 0);
-      return bScore - aScore;
-    })
+    .sort((a, b) => ((Number(b.trqxScore) || 0) + (Number(b.price) > 0 ? 5 : 0)) - ((Number(a.trqxScore) || 0) + (Number(a.price) > 0 ? 5 : 0)))
     .slice(0, 5);
-
   if (!picks.length) {
     el.innerHTML = `<div class="emptyState">Refresh market data to load top AI picks.</div>`;
     return;
   }
-
   el.innerHTML = picks.map((s, i) => {
     const score = Number(s.trqxScore) || 0;
     const signal = s.signal || (score >= 85 ? "BUY" : score >= 70 ? "WATCH" : "REVIEW");
-    const risk = typeof getRisk === "function" ? getRisk(s) : { label: "Moderate", icon: "●", cls: "medium" };
     const conf = typeof confidenceForStock === "function" ? confidenceForStock(s) : { label: "Medium" };
     const prob = typeof getProbability === "function" ? getProbability(s, conf) : Math.min(95, Math.max(45, score));
     const rating = typeof getAIRating === "function" ? getAIRating(score) : { label: score >= 85 ? "A Strong" : "B Watch" };
-
-    return `
-      <div class="topPick">
-        <div class="rank">${i + 1}</div>
-        <b>${s.ticker}</b>
-        <span>${s.name || "Unknown Company"}</span>
-        <span class="aiRatingText">${rating.label}</span>
-        <span class="biasPill">${signal}</span>
-        <span class="probPill">${prob}%</span>
-      </div>
-    `;
+    return `<div class="topPick"><div class="rank">${i + 1}</div><b>${s.ticker}</b><span>${s.name || "Unknown Company"}</span><span class="aiRatingText">${rating.label}</span><span class="biasPill">${signal}</span><span class="probPill">${prob}%</span></div>`;
   }).join("");
 }
-
-
+document.addEventListener("DOMContentLoaded", () => setTimeout(renderTopAIPicks, 500));
 
 
 function openInfoModal(title, html) {
@@ -1510,25 +1492,45 @@ function forceLiveStripLabels() {
 async function fetchMarketStrip() {
   forceLiveStripLabels();
 
-  try {
-    // /api/market handles SPY→S&P, QQQ→NASDAQ, DIA→DOW, GLD→Gold
-    // and BTC via Binance public API (Finnhub free tier can't do crypto)
-    const response = await fetch("/api/market");
+  const map = [
+    { key: "spx", symbol: "SPY" },
+    { key: "ndx", symbol: "QQQ" },
+    { key: "dji", symbol: "DIA" },
+    { key: "gold", symbol: "GLD" },
+    { key: "btc", symbol: "BINANCE:BTCUSDT" }
+  ];
 
-    if (!response.ok) throw new Error("Market strip API failed");
+  try {
+    const symbols = map.map((m) => m.symbol).join(",");
+    const response = await fetch(`/api/quotes?symbols=${encodeURIComponent(symbols)}&v=17.4`);
+
+    if (!response.ok) {
+      throw new Error("Failed to load market strip quotes");
+    }
 
     const data = await response.json();
+    const quotes = Array.isArray(data) ? data : [];
 
-    Object.entries(data).forEach(([id, item]) => {
-      if (!item || item.price == null) return;
+    map.forEach((item) => {
+      const priceEl = document.getElementById(`strip-price-${item.key}`);
+      const pctEl = document.getElementById(`strip-pct-${item.key}`);
 
-      const priceEl = document.getElementById(`strip-price-${id}`);
-      const pctEl   = document.getElementById(`strip-pct-${id}`);
       if (!priceEl || !pctEl) return;
 
-      const price = Number(item.price);
-      const pct   = Number(item.pct);
-      const up    = pct >= 0;
+      const quote = quotes.find((q) => {
+        const symbol = String(q.symbol || "").toUpperCase();
+        return symbol === item.symbol.toUpperCase();
+      });
+
+      if (!quote || !Number.isFinite(Number(quote.price))) {
+        priceEl.textContent = "—";
+        pctEl.textContent = "—";
+        pctEl.className = "";
+        return;
+      }
+
+      const price = Number(quote.price);
+      const pct = Number(quote.changesPercentage);
 
       priceEl.textContent = price.toLocaleString(undefined, {
         minimumFractionDigits: price >= 1000 ? 0 : 2,
@@ -1536,16 +1538,24 @@ async function fetchMarketStrip() {
       });
 
       if (Number.isFinite(pct)) {
-        pctEl.textContent = `${up ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}%`;
-        pctEl.className   = up ? "positive" : "negative";
+        const isUp = pct >= 0;
+        pctEl.textContent = `${isUp ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}%`;
+        pctEl.className = isUp ? "positive" : "negative";
       } else {
         pctEl.textContent = "—";
-        pctEl.className   = "";
+        pctEl.className = "";
       }
     });
-
   } catch (error) {
     console.warn("Market strip failed:", error);
+
+    // Never show wrong BTC proxy or wrong labels.
+    map.forEach((item) => {
+      const priceEl = document.getElementById(`strip-price-${item.key}`);
+      const pctEl = document.getElementById(`strip-pct-${item.key}`);
+      if (priceEl && priceEl.textContent.trim() === "") priceEl.textContent = "—";
+      if (pctEl && pctEl.textContent.trim() === "") pctEl.textContent = "—";
+    });
   }
 }
 
