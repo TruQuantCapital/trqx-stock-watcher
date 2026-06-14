@@ -1,16 +1,28 @@
-# TRQX AI Market Terminal v17 — Generated Mockup Match
+# TRQX AI Market Terminal v17.1 — RSS + Layout Merge Fix
 
-This build matches the generated dashboard screenshot layout more closely.
+## What changed
+
+This version keeps the newer v17 layout fixes but restores the better RSS/live market strip structure from your current uploaded files.
 
 ## Fixed
 
-- Third/options-flow section image is framed correctly
-- Removed excessive empty space in middle section
-- Market heat map is fitted
-- Top AI Picks is now a table-style panel
-- Portfolio and AI Probability panels sit side-by-side
-- Options Flow module spans wide and uses the supplied image properly
+- Top RSS/live strip labels restored:
+  - S&P 500
+  - NASDAQ
+  - DOW
+  - GOLD
+  - BTC
+- RSS strip IDs match the JavaScript updater:
+  - strip-price-spx / strip-pct-spx
+  - strip-price-ndx / strip-pct-ndx
+  - strip-price-dji / strip-pct-dji
+  - strip-price-gold / strip-pct-gold
+  - strip-price-btc / strip-pct-btc
+- Live strip now refreshes every 60 seconds
+- Top AI Picks table now matches the v17 layout
+- Flow Scanner image uses `object-fit: contain` so it no longer gets cut off
+- Restored the richer background stage from your uploaded version
 
 ## Upload
 
-Upload all files/folders to GitHub root, redeploy in Vercel, then hard refresh with Ctrl+F5.
+Upload everything to GitHub root, redeploy in Vercel, then hard refresh with Ctrl+F5.

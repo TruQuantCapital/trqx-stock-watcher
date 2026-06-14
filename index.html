@@ -8,16 +8,30 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div class="bg-stage" aria-hidden="true">
+    <div class="bg-orb bg-orb-one"></div>
+    <div class="bg-orb bg-orb-two"></div>
+    <div class="bg-ticker">
+      <span>TRQX • AI MARKET TERMINAL • SPY ▲ QQQ ▲ NVDA ▲ TSLA ▼ BTC ▲ MARKET INTELLIGENCE •</span>
+      <span>TRQX • AI MARKET TERMINAL • SPY ▲ QQQ ▲ NVDA ▲ TSLA ▼ BTC ▲ MARKET INTELLIGENCE •</span>
+    </div>
+    <div class="bg-candles bg-candles-left"></div>
+    <div class="bg-candles bg-candles-right"></div>
+    <div class="bg-watermark">TRQX</div>
+    <div class="bg-side-chart left"></div>
+    <div class="bg-side-chart right"></div>
+  </div>
+
   <section class="live-strip">
     <div><span>S&P 500</span><strong id="strip-price-spx">—</strong><em id="strip-pct-spx">—</em></div>
     <div><span>NASDAQ</span><strong id="strip-price-ndx">—</strong><em id="strip-pct-ndx">—</em></div>
     <div><span>DOW</span><strong id="strip-price-dji">—</strong><em id="strip-pct-dji">—</em></div>
     <div><span>GOLD</span><strong id="strip-price-gold">—</strong><em id="strip-pct-gold">—</em></div>
     <div><span>BTC</span><strong id="strip-price-btc">—</strong><em id="strip-pct-btc">—</em></div>
-    <div class="market-open">Market Open ●</div>
+    <div class="market-open">● Market Open</div>
   </section>
 
-  <main class="dash">
+<main class="dash">
     <nav class="topnav">
       <img src="assets/trqx-logo.svg" alt="TRQX" class="logo" />
       <div class="navlinks">
