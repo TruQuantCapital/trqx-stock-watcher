@@ -1,13 +1,15 @@
-# TRQX AI Market Terminal v18 — Final Cleanup
+# TRQX AI Market Terminal v19.1 — Top Hero Converted
 
-## Changed
+## Changed only the top highlighted section
 
-- Moved the main TRQX hero image cleanly to the top/right hero section.
-- Rebuilt AI Insights as a cleaner full-width TRQX AI Market Pulse panel.
-- Replaced childish star/crown-style icons with sharper SVG assets:
-  - assets/trqx-logo-pro.svg
-  - assets/ai-avatar-pro.svg
-- Updated AI chat avatar styling.
-- Improved top-grid balance after moving AI Insights.
+- Removed the giant standalone image box.
+- Converted the TRQX image into a faded background layer.
+- Expanded the functional left content area.
+- Added a compact right-side intelligence panel:
+  - Market Regime
+  - AI Engine
+  - Terminal Focus
+- Kept the heat map inside the top section.
+- Did not change scanner, lookup, AI chat, portfolio, watchlist, or flow modules.
 
 Upload all files/folders to GitHub root, redeploy in Vercel, then hard refresh with Ctrl+Shift+R.
