@@ -109,6 +109,40 @@
     }
   </style>
 
+
+  <style>
+    /* TRQX v18.2 layout adjustment: move heat map into hero-left space and widen Top AI Picks */
+    .hero-left-heatmap-slot {
+      margin-top: 28px;
+      max-width: 720px;
+      width: 100%;
+    }
+
+    .hero-left-heatmap-slot .heat-card {
+      width: 100%;
+      margin: 0;
+    }
+
+    #topAIPicksPanel {
+      grid-column: span 2;
+      min-height: 520px;
+    }
+
+    #topAIPicks {
+      min-height: 360px;
+    }
+
+    @media (max-width: 1100px) {
+      #topAIPicksPanel {
+        grid-column: span 1;
+      }
+
+      .hero-left-heatmap-slot {
+        max-width: 100%;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <div class="bg-stage" aria-hidden="true">
@@ -197,6 +231,26 @@
           <button class="gold-btn" onclick="refreshQuotes()">Refresh Market Data</button>
           <label class="auto"><input type="checkbox" id="autoRefresh"> Auto-refresh 5m</label>
         </div>
+        <div class="hero-left-heatmap-slot">
+<section id="marketHeatMapPanel" class="panel heat-card">
+        <div class="panel-head">
+          <h2>Market Heat Map</h2>
+          <button class="icon-btn" onclick="refreshQuotes()">↻</button>
+        </div>
+        <div class="heat-map">
+          <div class="heat up">Technology<br><strong>+1.85%</strong></div>
+          <div class="heat up">Financials<br><strong>+0.62%</strong></div>
+          <div class="heat up">Healthcare<br><strong>+0.11%</strong></div>
+          <div class="heat up">Consumer Cyclical<br><strong>+1.23%</strong></div>
+          <div class="heat down">Energy<br><strong>-0.72%</strong></div>
+          <div class="heat down">Utilities<br><strong>-0.15%</strong></div>
+          <div class="heat up">Industrials<br><strong>+0.48%</strong></div>
+          <div class="heat down">Real Estate<br><strong>-0.28%</strong></div>
+          <div class="heat up">Materials<br><strong>+0.22%</strong></div>
+        </div>
+        <div class="heat-legend"><span>◆ Gainers</span><b></b><i></i><span>Losers</span></div>
+      </section>
+        </div>
       </div>
       <div class="hero-right">
         <img src="assets/trqx-master-hero.png" alt="TRQX Market Hero" />
@@ -251,25 +305,6 @@
           <div class="emptyState">Refresh market data to load top AI picks.</div>
         </div>
         <button class="link-btn" onclick="scrollToSection('watchlistPanel')">View All AI Picks →</button>
-      </section>
-
-      <section id="marketHeatMapPanel" class="panel heat-card">
-        <div class="panel-head">
-          <h2>Market Heat Map</h2>
-          <button class="icon-btn" onclick="refreshQuotes()">↻</button>
-        </div>
-        <div class="heat-map">
-          <div class="heat up">Technology<br><strong>+1.85%</strong></div>
-          <div class="heat up">Financials<br><strong>+0.62%</strong></div>
-          <div class="heat up">Healthcare<br><strong>+0.11%</strong></div>
-          <div class="heat up">Consumer Cyclical<br><strong>+1.23%</strong></div>
-          <div class="heat down">Energy<br><strong>-0.72%</strong></div>
-          <div class="heat down">Utilities<br><strong>-0.15%</strong></div>
-          <div class="heat up">Industrials<br><strong>+0.48%</strong></div>
-          <div class="heat down">Real Estate<br><strong>-0.28%</strong></div>
-          <div class="heat up">Materials<br><strong>+0.22%</strong></div>
-        </div>
-        <div class="heat-legend"><span>◆ Gainers</span><b></b><i></i><span>Losers</span></div>
       </section>
 
       <section id="aiInsightsPanel" class="panel insights-card">
@@ -576,6 +611,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=18.1"></script>
+  <script src="app.js?v=18.2"></script>
 </body>
 </html>
