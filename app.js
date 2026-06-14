@@ -1380,42 +1380,30 @@ function removeTyping(id) {
 // SPY ≈ S&P 500, QQQ ≈ NASDAQ 100, DIA ≈ DOW, GLD ≈ Gold, BTC/USD via Finnhub crypto
 // ============================================================
 
-const STRIP_SYMBOLS = [
-  { id: "spx",  label: "S&P 500", sym: "SPY",               mult: 10,  fmt: "0" },
-  { id: "ndx",  label: "NASDAQ",  sym: "QQQ",               mult: 40,  fmt: "0" },
-  { id: "dji",  label: "DOW",     sym: "DIA",               mult: 100, fmt: "0" },
-  { id: "gold", label: "GOLD",    sym: "GLD",               mult: 9.5, fmt: "2" },
-  { id: "btc",  label: "BTC",     sym: "COINBASE:BTC-USD",  mult: 1,   fmt: "0" },
-];
+// Market strip — dedicated /api/market route handles ETFs + BTC
 
 async function fetchMarketStrip() {
   try {
-    const etfSyms = STRIP_SYMBOLS.map(s => s.sym).join(",");
-    const res = await fetch(`/api/quotes?symbols=${encodeURIComponent(etfSyms)}`);
+    const res = await fetch("/api/market");
     if (!res.ok) return;
 
     const data = await res.json();
-    const map = {};
-    (data || []).forEach(q => { if (q && q.symbol) map[q.symbol] = q; });
+    // data = { spx: {price, pct, change}, ndx: {...}, dji, gold, btc }
 
-    STRIP_SYMBOLS.forEach(({ id, sym, mult, fmt }) => {
-      const q = map[sym];
-      if (!q || !q.price) return;
+    Object.entries(data).forEach(([id, item]) => {
+      if (!item || item.price == null) return;
 
-      const price    = Number(q.price) * mult;
-      const pct      = Number(q.changesPercentage);
-      const up       = Number.isFinite(pct) ? pct >= 0 : true;
-      const priceStr = price.toLocaleString(undefined, {
-        minimumFractionDigits: Number(fmt),
-        maximumFractionDigits: Number(fmt)
-      });
+      const up  = item.pct >= 0;
+      const fmt = id === "gold"
+        ? item.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : Math.round(item.price).toLocaleString();
 
       const priceEl = document.getElementById("strip-price-" + id);
       const pctEl   = document.getElementById("strip-pct-" + id);
 
-      if (priceEl) priceEl.textContent = priceStr;
+      if (priceEl) priceEl.textContent = fmt;
       if (pctEl) {
-        pctEl.textContent = Number.isFinite(pct) ? `${up ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}%` : "—";
+        pctEl.textContent = `${up ? "▲" : "▼"} ${Math.abs(item.pct).toFixed(2)}%`;
         pctEl.className   = up ? "positive" : "negative";
       }
     });
