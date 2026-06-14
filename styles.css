@@ -545,12 +545,12 @@ input,select,textarea{background:#030303;border:1px solid var(--soft);border-rad
   }
 }
 .market-regime{
-  margin:12px 0;
-  padding:12px 18px;
-  border-radius:12px;
-  font-weight:800;
-  font-size:14px;
-  letter-spacing:1px;
+    margin:12px 0 20px 0;
+    padding:14px 20px;
+    border-radius:12px;
+    width:100%;
+    max-width:700px;
+    font-size:16px;
 }
 
 .market-regime.risk-on{
