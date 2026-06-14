@@ -1272,7 +1272,7 @@ async function sendAIMessage() {
   try {
     // Route through /api/chat Vercel serverless proxy to avoid CORS.
     // Set ANTHROPIC_API_KEY in Vercel → Settings → Environment Variables.
-    const response = await fetch("/api/chat", {
+    const response = await fetch("/api/chat?v=19.5", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -1300,7 +1300,12 @@ async function sendAIMessage() {
   } catch (err) {
     removeTyping(typingId);
     console.error("AI chat error:", err);
-    addChatMessage("ai", "Connection error: " + err.message + ". Make sure ANTHROPIC_API_KEY is set in Vercel environment variables and the site is redeployed.");
+    addChatMessage(
+      "ai",
+      "TRQX AI could not reach the live AI route. Backend message: " +
+        err.message +
+        ". Check Vercel → Project → Settings → Environment Variables. Required: ANTHROPIC_API_KEY. Optional: ANTHROPIC_MODEL=claude-sonnet-4-6. Then redeploy Production."
+    );
   } finally {
     btn.disabled = false;
     btn.textContent = "Ask AI \u2746";
