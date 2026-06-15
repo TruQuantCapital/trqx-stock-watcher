@@ -1653,10 +1653,11 @@ footer{text-align:center;color:#89919b;font-size:12px;margin:24px}
   z-index: 49;
   height: 58px;
   display: grid;
-  grid-template-columns: auto repeat(5, 1fr) auto;
+  grid-template-columns: auto repeat(4, 1fr) auto;
   background: rgba(2,2,2,.98);
   border-bottom: 1px solid rgba(214,168,61,.28);
   overflow: hidden;
+  font-family: Inter, Segoe UI, Arial, sans-serif;
 }
 
 .futures-label {
@@ -1670,6 +1671,7 @@ footer{text-align:center;color:#89919b;font-size:12px;margin:24px}
   color: #ffe071;
   border-right: 1px solid rgba(255,255,255,.06);
   white-space: nowrap;
+  font-family: Inter, Segoe UI, Arial, sans-serif;
 }
 
 .futures-item {
@@ -1687,12 +1689,14 @@ footer{text-align:center;color:#89919b;font-size:12px;margin:24px}
   font-weight: 1000;
   letter-spacing: 1px;
   color: #ffe071;
+  font-family: Inter, Segoe UI, Arial, sans-serif;
 }
 
 .fut-price {
   font-size: 18px;
   font-weight: 1000;
   color: #ffffff;
+  font-family: Inter, Segoe UI, Arial, sans-serif;
 }
 
 .fut-chg {
@@ -1700,6 +1704,7 @@ footer{text-align:center;color:#89919b;font-size:12px;margin:24px}
   font-weight: 1000;
   font-style: normal;
   color: rgba(255,255,255,0.45);
+  font-family: Inter, Segoe UI, Arial, sans-serif;
 }
 .fut-chg.positive { color: #36d17c !important; }
 .fut-chg.negative { color: #ef4d5e !important; }
