@@ -362,7 +362,7 @@ footer{text-align:center;color:#89919b;font-size:12px;margin:24px}
   margin-top: 16px;
 }
 
-.gamma-grid {
+.gamma-grid {   display: grid;   grid-template-columns: repeat(3, 1fr);   gap: 14px;   margin-top: 14px; }
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 14px;
@@ -437,8 +437,7 @@ footer{text-align:center;color:#89919b;font-size:12px;margin:24px}
   }
 }
 
-@media(max-width: 700px) {
-  .command-strip,
+@media (max-width: 900px) {
   .gamma-grid {
     grid-template-columns: 1fr;
   }
