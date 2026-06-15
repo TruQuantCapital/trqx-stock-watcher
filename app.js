@@ -1855,3 +1855,57 @@ function submitMemberIntake(event) {
 
   alert("TRQX member intake saved. Next step: connect this to Whop, Airtable, Google Forms, or your CRM.");
 }
+/* === TRQX v22 Futures Bar (Yahoo Finance) === */
+const FUTURES_MAP = [
+  { id: "fut-es",  yahoo: "ES=F"  },
+  { id: "fut-nq",  yahoo: "NQ=F"  },
+  { id: "fut-rty", yahoo: "RTY=F" },
+  { id: "fut-ym",  yahoo: "YM=F"  },
+  { id: "fut-vx",  yahoo: "VX=F"  },
+];
+
+async function fetchFuturesBar() {
+  for (const f of FUTURES_MAP) {
+    try {
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(f.yahoo)}?interval=1m&range=1d`;
+      const res = await fetch(url, {
+        headers: { "User-Agent": "Mozilla/5.0", "Accept": "application/json" }
+      });
+      if (!res.ok) continue;
+      const data = await res.json();
+      const meta = data?.chart?.result?.[0]?.meta;
+      if (!meta) continue;
+      const last = meta.regularMarketPrice ?? null;
+      const prev = meta.chartPreviousClose ?? meta.previousClose ?? null;
+      const change = last && prev ? +(last - prev).toFixed(2) : null;
+      const pct    = last && prev ? +((change / prev) * 100).toFixed(2) : null;
+      const up     = change !== null ? change >= 0 : null;
+
+      const el = document.getElementById(f.id);
+      if (!el) continue;
+      const priceEl = el.querySelector(".fut-price");
+      const chgEl   = el.querySelector(".fut-chg");
+
+      if (priceEl) priceEl.textContent = last !== null
+        ? last.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : "—";
+
+      if (chgEl) {
+        chgEl.textContent = change !== null
+          ? `${up ? "▲" : "▼"} ${change >= 0 ? "+" : ""}${change.toFixed(2)} (${pct >= 0 ? "+" : ""}${pct.toFixed(2)}%)`
+          : "—";
+        chgEl.className = `fut-chg ${up === null ? "" : up ? "positive" : "negative"}`;
+      }
+    } catch(e) {
+      console.warn(`[futures] ${f.yahoo}:`, e.message);
+    }
+  }
+  const upEl = document.getElementById("futuresUpdate");
+  if (upEl) upEl.textContent = `↻ ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  fetchFuturesBar();
+  setInterval(fetchFuturesBar, 15000);
+});
+/* === END TRQX v22 Futures Bar === */
