@@ -1109,6 +1109,9 @@ document.getElementById("gammaFlip").textContent =
 document.getElementById("maxPain").textContent =
   data.maxPain || "—";
 
+document.getElementById("dealerPositioning").textContent =
+  data.dealerPositioning || "—";
+
 } catch (err) {
     console.error("Gamma Error:", err);
   }
