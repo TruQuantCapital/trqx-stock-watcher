@@ -28,6 +28,6 @@ export default async function handler(req, res) {
     putWall,
     gammaFlip,
     maxPain: Math.round((callWall + putWall) / 2),
-    dealerPositioning: "Estimated"
+    dealerPositioning: price >= gammaFlip ? "Long Gamma" : "Short Gamma"
   });
 }
