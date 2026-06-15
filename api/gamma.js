@@ -21,13 +21,13 @@ export default async function handler(req, res) {
   const squeezeRisk = ticker === "IWM" || ticker === "TSLA" ? "High" : "Moderate";
 
   res.status(200).json({
-    ticker,
-    bias: price >= gammaFlip ? "Neutral / Positive" : "Neutral",
-    squeezeRisk,
-    callWall,
-    putWall,
-    gammaFlip,
-    maxPain: Math.round((callWall + putWall) / 2),
-    dealerPositioning: price >= gammaFlip ? "Long Gamma" : "Short Gamma"
-  });
-}
+  ticker,
+  bias: price >= gammaFlip ? "Neutral / Positive" : "Neutral",
+  squeezeRisk,
+  callWall,
+  putWall,
+  gammaFlip,
+  maxPain: Math.round((callWall + putWall) / 2),
+  dealerPositioning:
+    price >= gammaFlip ? "Long Gamma" : "Short Gamma"
+});
