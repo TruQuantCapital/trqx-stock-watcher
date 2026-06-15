@@ -1069,6 +1069,43 @@ function exportWatchlist() {
   URL.revokeObjectURL(url);
 }
 
+async function analyzeGamma() {
+  const ticker = document
+    .getElementById("gammaTicker")
+    .value
+    .trim()
+    .toUpperCase();
+
+  if (!ticker) return;
+
+  if (!ticker.match(/^[A-Z]{1,5}$/)) {
+    alert("Please enter a valid ticker.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/gamma?ticker=${ticker}`);
+
+    if (!res.ok) {
+      throw new Error("Gamma API failed");
+    }
+
+    const data = await res.json();
+
+    document.getElementById("gammaBias").textContent = data.bias || "Neutral";
+    document.getElementById("squeezeRisk").textContent = data.squeezeRisk || "Moderate";
+    document.getElementById("callWall").textContent = data.callWall || "—";
+    document.getElementById("putWall").textContent = data.putWall || "—";
+    document.getElementById("gammaFlip").textContent = data.gammaFlip || "—";
+    document.getElementById("maxPain").textContent = data.maxPain || "—";
+    document.getElementById("dealerPositioning").textContent = data.dealerPositioning || "—";
+    document.getElementById("putCallRatio").textContent = data.putCallRatio || "—";
+  } catch (err) {
+    console.error("Gamma Error:", err);
+    alert("Gamma API failed.");
+  }
+}
+
 load();
 fetchMarketStrip();
 
