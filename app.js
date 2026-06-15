@@ -1861,8 +1861,7 @@ const FUTURES_MAP = [
   { id: "fut-nq",  key: "NQ=F"  },
   { id: "fut-rty", key: "RTY=F" },
   { id: "fut-ym",  key: "YM=F"  },
-  { id: "fut-vx",  key: "VX=F"  },
-];
+  ];
 
 async function fetchFuturesBar() {
   try {
