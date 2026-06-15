@@ -1068,7 +1068,40 @@ function exportWatchlist() {
   a.click();
   URL.revokeObjectURL(url);
 }
+async function analyzeGamma() {
+  const ticker = document
+    .getElementById("gammaTicker")
+    .value
+    .trim()
+    .toUpperCase();
 
+  if (!ticker) return;
+
+  try {
+    const res = await fetch(`/api/gamma?ticker=${ticker}`);
+
+    if (!res.ok) {
+      throw new Error("Gamma API failed");
+    }
+
+    const data = await res.json();
+
+    document.getElementById("gammaBias").textContent =
+      data.bias || "Neutral";
+
+    document.getElementById("squeezeRisk").textContent =
+      data.squeezeRisk || "Moderate";
+
+    document.getElementById("callWall").textContent =
+      data.callWall || "—";
+
+    document.getElementById("putWall").textContent =
+      data.putWall || "—";
+
+  } catch (err) {
+    console.error("Gamma Error:", err);
+  }
+}
 load();
 fetchMarketStrip();
 
