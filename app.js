@@ -1096,9 +1096,15 @@ async function analyzeGamma() {
       data.callWall || "—";
 
     document.getElementById("putWall").textContent =
-      data.putWall || "—";
+  data.putWall || "—";
 
-  } catch (err) {
+document.getElementById("gammaFlip").textContent =
+  data.gammaFlip || "—";
+
+document.getElementById("maxPain").textContent =
+  data.maxPain || "—";
+
+} catch (err) {
     console.error("Gamma Error:", err);
   }
 }
