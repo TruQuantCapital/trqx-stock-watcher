@@ -504,12 +504,44 @@ function findStockByQuery(query) {
 }
 
 function aiVerdict(score, risk, probability, quality) {
-  if (quality.cls === "low") return { label: "WATCH ONLY", cls: "watch", note: "Limited live data coverage." };
-  if (score >= 90 && probability >= 85 && risk.label !== "Aggressive") return { label: "STRONG BUY WATCH", cls: "buy", note: "High-quality setup with strong model alignment." };
-  if (score >= 75 && probability >= 70) return { label: "BUY WATCH", cls: "buy", note: "Positive setup, but confirmation is still required." };
-  if (score >= 55) return { label: "WATCH", cls: "watch", note: "Neutral setup. Needs stronger confirmation." };
-  return { label: "AVOID / HIGH CAUTION", cls: "avoid", note: "Weak score or insufficient data." };
-}
+  if (quality.cls === "low") {
+    return {
+      label: "RESEARCH ONLY",
+      cls: "watch",
+      note: "Limited live data coverage."
+    };
+  }
+
+  if (score >= 90 && probability >= 85 && risk.label !== "Aggressive") {
+    return {
+      label: "HIGH INTEREST",
+      cls: "buy",
+      note: "Strong research metrics based on TRQX scoring."
+    };
+  }
+
+  if (score >= 75 && probability >= 70) {
+    return {
+      label: "WATCHLIST CANDIDATE",
+      cls: "buy",
+      note: "Positive characteristics, pending further analysis."
+    };
+  }
+
+  if (score >= 55) {
+    return {
+      label: "MONITOR",
+      cls: "watch",
+      note: "Neutral setup requiring additional confirmation."
+    };
+  }
+
+  return {
+    label: "ELEVATED RISK",
+    cls: "avoid",
+    note: "Lower score or insufficient data."
+  };
+}}
 
 function explainStock(stock) {
   const price = Number(stock.price) || 0;
@@ -612,7 +644,7 @@ async function runStockLookup() {
 
       <div class="reportGrid">
         <div class="whyBox">
-          <h4>Why TRQX is watching it</h4>
+          <h4>Research Highlights</h4>
           <ul>${analysis.reasons.map((r) => `<li>${r}</li>`).join("")}</ul>
         </div>
 
@@ -1073,7 +1105,7 @@ function openStockModal(ticker) {
       <div><span>52W Upside</span><b>${stock.high52 && stock.price ? fmtPct(((stock.high52 - stock.price) / stock.price) * 100) : "—"}</b></div>
     </div>
     <div class="whyBox" style="margin-top:14px">
-      <h4>Why TRQX is watching it</h4>
+      <h4>Research Highlights</h4>
       <ul>${reasons.map((r) => `<li>${r}</li>`).join("")}</ul>
     </div>
     <p class="disclaimerBox" style="margin-top:12px">Educational research only. Not financial advice or a guaranteed outcome.</p>
@@ -1196,7 +1228,7 @@ function renderPortfolioBuilder() {
   const riskLabel = riskEl.selectedOptions[0].textContent;
 
   summaryEl.textContent = candidates.length
-    ? `${fallbackUsed ? "Fallback portfolio shown because the selected filters were too restrictive. " : ""}Suggested ${goalLabel} / ${riskLabel} portfolio using ${fmtUSD(capital)}. Average probability score: ${avgProb}%.`
+    ? `${fallbackUsed ? "Fallback portfolio shown because the selected filters were too restrictive. " : ""}Sample ${goalLabel} / ${riskLabel} educational portfolio model using ${fmtUSD(capital)}. Average probability score: ${avgProb}%.`
     : "No priced portfolio candidates available. Expanded universe symbols need live price data before portfolio construction.";
 }
 
@@ -1232,7 +1264,7 @@ function buildStockContext() {
 
 function buildSystemPrompt() {
   const ctx = buildStockContext();
-  return `You are the TRQX AI Market Analyst — an expert financial research assistant embedded in the TRQX AI Market Terminal. You help traders and investors understand the stocks in the TRQX universe, find opportunities, and interpret market data.
+  return `You are the TRQX AI Market Analyst — an expert financial research assistant embedded in the TRQX AI Market Terminal. You help users analyze market data, understand securities, and interpret research metrics for educational purposes.
 
 You have full access to the current TRQX stock universe data below. Use this data to give specific, data-driven answers. Always refer to real tickers from the universe when relevant.
 
@@ -1241,13 +1273,13 @@ ${ctx}
 
 Key scoring context:
 - TRQX Score: 0-100. 95+ = Elite, 85-94 = Strong, 70-84 = Watch, 50-69 = Speculative, <50 = Avoid
-- Signal: BUY = strong setup, WATCH = monitor, AVOID/NO = do not enter
+- Signal values are educational research labels only and are not trading recommendations.
 - Probability: model-based likelihood of upside to 52-week high (not guaranteed)
 - Risk: Conservative = low volatility large cap, Moderate = mid range, Aggressive = high volatility/small cap
 
 When referencing stocks, use ticker symbols in backticks like \`AAPL\`. Be specific — cite actual tickers, scores, prices, and setups from the data. Keep answers focused and practical for a trader audience.
 
-IMPORTANT: This is educational analysis only. Always note this is not financial advice and past performance does not guarantee future results. Keep responses concise but thorough — use bullet points for lists of stocks.`;
+IMPORTANT: All responses are educational research only and must never provide personalized investment advice, recommendations, or guarantees of performance. Always note this is not financial advice and past performance does not guarantee future results. Keep responses concise but thorough — use bullet points for lists of stocks.`;
 }
 
 let chatHistory = [];
