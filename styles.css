@@ -1646,3 +1646,74 @@ footer{text-align:center;color:#89919b;font-size:12px;margin:24px}
     grid-template-columns: 1fr;
   }
 }
+/* === TRQX v22 Futures Bar === */
+.futures-strip {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #0a0a0f;
+  border-bottom: 1px solid rgba(201,168,76,0.2);
+  padding: 0 20px;
+  min-height: 40px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+}
+.futures-strip::-webkit-scrollbar { display: none; }
+
+.futures-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #C9A84C;
+  white-space: nowrap;
+  padding-right: 16px;
+  border-right: 1px solid rgba(201,168,76,0.2);
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+.futures-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  flex-shrink: 0;
+}
+
+.fut-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #C9A84C;
+}
+
+.fut-price {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.fut-chg {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  font-style: normal;
+}
+.fut-chg.positive { color: #22c55e; }
+.fut-chg.negative { color: #ef4444; }
+
+.futures-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(201,168,76,0.12);
+  flex-shrink: 0;
+}
+
+.futures-update {
+  font-size: 10px;
+  color: rgba(255,255,255,0.25);
+  white-space: nowrap;
+  margin-left: auto;
+  padding-left: 16px;
+  flex-shrink: 0;
+}
+/* === END TRQX v22 Futures Bar === */
