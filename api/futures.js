@@ -7,8 +7,7 @@ const FUTURES = [
   { key: "NQ=F",  label: "/NQ"  },
   { key: "RTY=F", label: "/RTY" },
   { key: "YM=F",  label: "/YM"  },
-  { key: "VX=F",  label: "VIX"  },
-];
+  ];
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
