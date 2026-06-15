@@ -1068,52 +1068,63 @@ function exportWatchlist() {
   a.click();
   URL.revokeObjectURL(url);
 }
-async function analyzeGamma() {
-  const ticker = document
-    .getElementById("gammaTicker")
-    .value
-    .trim()
-    .toUpperCase();
-
-  if (!ticker) return;
-
-  if (!ticker.match(/^[A-Z]{1,5}$/)) {
-    alert("Please enter a valid ticker.");
-    return;
-  }
-
+export default async function handler(req, res) {
   try {
-    const res = await fetch(`/api/gamma?ticker=${ticker}`);
+    const ticker = String(req.query.ticker || "SPY").toUpperCase();
 
-    if (!res.ok) {
-      throw new Error("Gamma API failed");
-    }
+    const mockPriceMap = {
+      SPY: 625,
+      QQQ: 545,
+      IWM: 215,
+      TSLA: 180,
+      NVDA: 145,
+      AAPL: 200,
+      AMD: 160,
+      PLTR: 125
+    };
 
-    const data = await res.json();
+    const mockPutCallRatioMap = {
+      SPY: 0.92,
+      QQQ: 0.88,
+      IWM: 1.12,
+      TSLA: 1.35,
+      NVDA: 0.76,
+      AAPL: 0.84,
+      AMD: 1.05,
+      PLTR: 1.22
+    };
 
-    document.getElementById("gammaBias").textContent =
-      data.bias || "Neutral";
+    const price = mockPriceMap[ticker] || 100;
+    const putCallRatio = mockPutCallRatioMap[ticker] || 1.00;
 
-    document.getElementById("squeezeRisk").textContent =
-      data.squeezeRisk || "Moderate";
+    const callWall = Math.ceil(price / 5) * 5 + 5;
+    const putWall = Math.floor(price / 5) * 5 - 5;
+    const gammaFlip = Math.round(price);
 
-    document.getElementById("callWall").textContent =
-      data.callWall || "—";
+    const squeezeRisk =
+      ticker === "IWM" || ticker === "TSLA" || putCallRatio > 1.2
+        ? "High"
+        : "Moderate";
 
-    document.getElementById("putWall").textContent =
-  data.putWall || "—";
+    const dealerPositioning =
+      price >= gammaFlip ? "Long Gamma" : "Short Gamma";
 
-document.getElementById("gammaFlip").textContent =
-  data.gammaFlip || "—";
-
-document.getElementById("maxPain").textContent =
-  data.maxPain || "—";
-
-document.getElementById("dealerPositioning").textContent =
-  data.dealerPositioning || "—";
-
-} catch (err) {
-    console.error("Gamma Error:", err);
+    return res.status(200).json({
+      ticker,
+      bias: price >= gammaFlip ? "Neutral / Positive" : "Neutral",
+      squeezeRisk,
+      callWall,
+      putWall,
+      gammaFlip,
+      maxPain: Math.round((callWall + putWall) / 2),
+      dealerPositioning,
+      putCallRatio: putCallRatio.toFixed(2)
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: "Gamma API failed",
+      message: error.message
+    });
   }
 }
 load();
