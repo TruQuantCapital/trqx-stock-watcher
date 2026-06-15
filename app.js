@@ -1077,6 +1077,11 @@ async function analyzeGamma() {
 
   if (!ticker) return;
 
+  if (!ticker.match(/^[A-Z]{1,5}$/)) {
+    alert("Please enter a valid ticker.");
+    return;
+  }
+
   try {
     const res = await fetch(`/api/gamma?ticker=${ticker}`);
 
