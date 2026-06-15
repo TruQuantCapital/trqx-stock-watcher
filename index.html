@@ -325,75 +325,80 @@
     </section>
 
     <section id="gammaDashboardPanel" class="panel gamma-dashboard-panel">
-      <div class="panel-head">
-        <div>
-          <div class="eyebrow">TRQX Options Intelligence</div>
-          <h2>Gamma Dashboard</h2>
-          <p>Options pressure zones, squeeze risk, and market-maker positioning cues.</p>
-        </div>
-        <span class="badge">Gamma Engine</span>
-      </div>
-<div class="gamma-search">
-  <input
-    id="gammaTicker"
-    type="text"
-    placeholder="Enter ticker (SPY, NVDA, TSLA)"
-  />
-  <button class="gold-btn" onclick="analyzeGamma()">
-    Analyze
-  </button>
-</div>
-
-<div class="gamma-grid">
-  <article>
-    <span>Gamma Bias</span>
-    <strong id="gammaBias">Neutral</strong>
-    <small>Updates with market regime and options pressure</small>
-  </article>
-
-  <article>
-    <span>Squeeze Risk</span>
-    <strong id="squeezeRisk">Moderate</strong>
-    <small>Watch for volatility expansion</small>
-  </article>
-
-  <article>
-    <span>Call Wall</span>
-    <strong id="callWall">—</strong>
-    <small>Upper resistance pressure</small>
-  </article>
-
-  <article>
-    <span>Put Wall</span>
-    <strong id="putWall">—</strong>
-    <small>Lower support pressure</small>
-  </article>
-
-  <article>
-    <span>Gamma Flip</span>
-    <strong id="gammaFlip">—</strong>
-    <small>Dealer positioning transition</small>
-  </article>
-
-  <article>
-    <span>Max Pain</span>
-    <strong id="maxPain">—</strong>
-    <small>Option expiration pressure</small>
-  </article>
-
-<article>
-  <span>Dealer Position</span>
-  <strong id="dealerPositioning">—</strong>
-  <small>Long Gamma or Short Gamma</small>
-</article>
+  <div class="panel-head">
+    <div>
+      <div class="eyebrow">TRQX Options Intelligence</div>
+      <h2>Gamma Dashboard</h2>
+      <p>Options pressure zones, squeeze risk, and market-maker positioning cues.</p>
+    </div>
+    <span class="badge">Gamma Engine</span>
   </div>
-<div class="gamma-note">
-  <h3>How to use this</h3>
-  <p>
-    Gamma does not predict direction by itself. Use it to understand where options pressure may create support, resistance, volatility compression, or squeeze conditions. Combine this with price action, volume, and TRQX AI score.
-  </p>
-</div>
 
+  <div class="gamma-search">
+    <input
+      id="gammaTicker"
+      type="text"
+      placeholder="Enter ticker (SPY, NVDA, TSLA)"
+    />
+    <button class="gold-btn" onclick="analyzeGamma()">Analyze</button>
+  </div>
+
+  <div class="gamma-grid">
+    <article>
+      <span>Gamma Bias</span>
+      <strong id="gammaBias">Neutral</strong>
+      <small>Updates with market regime and options pressure</small>
+    </article>
+
+    <article>
+      <span>Squeeze Risk</span>
+      <strong id="squeezeRisk">Moderate</strong>
+      <small>Watch for volatility expansion</small>
+    </article>
+
+    <article>
+      <span>Call Wall</span>
+      <strong id="callWall">—</strong>
+      <small>Upper resistance pressure</small>
+    </article>
+
+    <article>
+      <span>Put Wall</span>
+      <strong id="putWall">—</strong>
+      <small>Lower support pressure</small>
+    </article>
+
+    <article>
+      <span>Gamma Flip</span>
+      <strong id="gammaFlip">—</strong>
+      <small>Dealer positioning transition</small>
+    </article>
+
+    <article>
+      <span>Max Pain</span>
+      <strong id="maxPain">—</strong>
+      <small>Option expiration pressure</small>
+    </article>
+
+    <article>
+      <span>Dealer Position</span>
+      <strong id="dealerPositioning">—</strong>
+      <small>Long Gamma or Short Gamma</small>
+    </article>
+
+    <article>
+      <span>Put / Call Ratio</span>
+      <strong id="putCallRatio">—</strong>
+      <small>Options sentiment pressure</small>
+    </article>
+  </div>
+
+  <div class="gamma-note">
+    <h3>How to use this</h3>
+    <p>
+      Gamma does not predict direction by itself. Use it to understand where options pressure may create support, resistance, volatility compression, or squeeze conditions. Combine this with price action, volume, and TRQX AI score.
+    </p>
+  </div>
 </section>
 
 <section id="stockLookupPanel" class="panel lookup-card">
