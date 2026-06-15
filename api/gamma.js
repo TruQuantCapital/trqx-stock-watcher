@@ -15,8 +15,8 @@ export default async function handler(req, res) {
 
   const price = mockPriceMap[ticker] || 100;
 
-  const callWall = Math.ceil(price / 5) * 5;
-  const putWall = Math.floor(price / 5) * 5;
+  const callWall = Math.ceil(price / 5) * 5 + 5;
+  const putWall = Math.floor(price / 5) * 5 - 5;
   const gammaFlip = Math.round(price);
   const squeezeRisk = ticker === "IWM" || ticker === "TSLA" ? "High" : "Moderate";
 
