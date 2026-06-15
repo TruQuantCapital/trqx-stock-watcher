@@ -541,7 +541,7 @@ function aiVerdict(score, risk, probability, quality) {
     cls: "avoid",
     note: "Lower score or insufficient data."
   };
-}}
+}
 
 function explainStock(stock) {
   const price = Number(stock.price) || 0;
