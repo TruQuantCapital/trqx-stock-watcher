@@ -1207,7 +1207,12 @@ Write a 4-6 sentence plain English breakdown that:
 4. Mentions the squeeze risk context if relevant
 5. Ends with one clear takeaway sentence
 
-Write in a confident, direct, educational tone — like a sharp trader explaining the tape to a student. No fluff, no disclaimers in the body. Keep it tight and actionable for educational purposes.`;
+Write in a confident, direct, educational tone — like a sharp trader explaining the tape to a student. No fluff, no disclaimers in the body. Keep it tight and actionable for educational purposes.
+
+CRITICAL FORMAT RULES:
+- Plain sentences only. No markdown, no headers, no bullet points, no asterisks, no pound signs.
+- Do not label sections. Just write flowing plain English sentences.
+- Start directly with the insight, no preamble like "Here is the analysis".`;
 
   try {
     const res = await fetch("/api/ai", {
@@ -1227,22 +1232,32 @@ Write in a confident, direct, educational tone — like a sharp trader explainin
       return;
     }
 
-    // Render with typewriter effect
+    // Strip markdown symbols and render clean HTML
+    const clean = text
+      .replace(/^#{1,3}\s+.+$/gm, "")           // remove ## headers
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>") // **bold**
+      .replace(/\*(.+?)\*/g, "<em>$1</em>")      // *italic*
+      .replace(/`(.+?)`/g, "<code>$1</code>")    // `code`
+      .replace(/\n{2,}/g, "\n")                  // collapse extra blank lines
+      .trim();
+
+    // Split into sentences for fast word-chunk typewriter
+    const sentences = clean.split(/(?<=[.!?])\s+/).filter(Boolean);
+
     summaryText.innerHTML = "";
     const p = document.createElement("p");
     p.className = "gamma-ai-paragraph";
     summaryText.appendChild(p);
 
-    let i = 0;
-    const speed = 12; // ms per character
-    function typeChar() {
-      if (i < text.length) {
-        p.textContent += text[i];
-        i++;
-        setTimeout(typeChar, speed);
+    let sIdx = 0;
+    function nextSentence() {
+      if (sIdx < sentences.length) {
+        p.innerHTML += (sIdx > 0 ? " " : "") + sentences[sIdx];
+        sIdx++;
+        setTimeout(nextSentence, 120); // 120ms per sentence — snappy but still animated
       }
     }
-    typeChar();
+    nextSentence();
 
   } catch (err) {
     console.error("[gammaAI] error:", err);
