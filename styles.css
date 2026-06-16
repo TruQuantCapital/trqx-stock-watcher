@@ -1453,3 +1453,29 @@ button,
 }
 
 /* === END TRQX v22.2 Spotlight === */
+
+
+/* ============================================================
+   TRQX v22.2 — Gamma Live Price Label
+   ============================================================ */
+
+.gamma-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.gamma-live-price {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--gold2);
+  background: rgba(214,168,61,.09);
+  border: 1px solid rgba(214,168,61,.28);
+  border-radius: 8px;
+  padding: 9px 14px;
+  white-space: nowrap;
+}
+
+/* === END TRQX v22.2 Gamma === */
