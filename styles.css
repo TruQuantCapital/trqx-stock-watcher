@@ -1479,3 +1479,128 @@ button,
 }
 
 /* === END TRQX v22.2 Gamma === */
+
+
+/* ============================================================
+   TRQX v22.3 — Gamma AI Summary Box
+   ============================================================ */
+
+.gamma-ai-summary {
+  margin-top: 18px;
+  border: 1px solid rgba(214,168,61,.38);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(14,12,7,.97), rgba(4,5,5,.99)),
+    radial-gradient(circle at top right, rgba(255,224,113,.10), transparent 45%);
+  box-shadow: 0 0 36px rgba(214,168,61,.10);
+  overflow: hidden;
+}
+
+.gamma-ai-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid rgba(214,168,61,.16);
+}
+
+.gamma-ai-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid rgba(214,168,61,.40);
+  background: rgba(214,168,61,.10);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.gamma-ai-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
+}
+
+.gamma-ai-avatar span {
+  font-size: 13px;
+  font-weight: 1000;
+  color: var(--gold2);
+}
+
+.gamma-ai-label {
+  font-size: 11px;
+  font-weight: 1000;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gold2);
+  margin-bottom: 3px;
+}
+
+.gamma-ai-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #e8edf4;
+}
+
+.gamma-ai-badge {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--gold2);
+  background: rgba(214,168,61,.12);
+  border: 1px solid rgba(214,168,61,.28);
+  border-radius: 999px;
+  padding: 5px 12px;
+  white-space: nowrap;
+}
+
+.gamma-ai-text {
+  padding: 20px 22px;
+  min-height: 80px;
+}
+
+.gamma-ai-paragraph {
+  color: #e2e5ec;
+  font-size: 15px;
+  line-height: 1.70;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* Loading dots animation */
+.gamma-ai-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.gamma-ai-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold2);
+  opacity: .3;
+  animation: gammaDotPulse 1.2s ease-in-out infinite;
+}
+
+.gamma-ai-dot:nth-child(2) { animation-delay: .2s; }
+.gamma-ai-dot:nth-child(3) { animation-delay: .4s; }
+
+@keyframes gammaDotPulse {
+  0%, 100% { opacity: .2; transform: scale(.8); }
+  50%       { opacity: 1;  transform: scale(1.2); }
+}
+
+.gamma-ai-footer {
+  padding: 10px 22px 14px;
+  border-top: 1px solid rgba(255,255,255,.05);
+  font-size: 11px;
+  color: var(--muted);
+  opacity: .7;
+}
+
+/* === END TRQX v22.3 Gamma AI Summary === */
