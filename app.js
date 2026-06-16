@@ -1960,3 +1960,159 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(fetchFuturesBar, 15000);
 });
 /* === END TRQX v22 Futures Bar === */
+
+
+/* ============================================================
+   TRQX v22.2 — Live Rotating Stock Spotlight
+   Cycles through top TRQX-scored stocks every 60s,
+   fetches live price from /api/quotes, animates transition.
+   ============================================================ */
+
+const SPOTLIGHT_INTERVAL_MS = 60000;
+const SPOTLIGHT_WATCHLIST = [
+  "NVDA","AAPL","MSFT","AMZN","META","GOOGL","TSLA","AMD","PLTR","AVGO",
+  "SMCI","ARM","TSM","ORCL","CRM","NFLX","NOW","UBER","SHOP","SQ"
+];
+
+let spotlightIndex = 0;
+let spotlightTimer = null;
+let spotlightTimerAnim = null;
+let spotlightCandidates = [];
+
+function buildSpotlightCandidates() {
+  const fromUniverse = stocks
+    .filter(s => Number(s.price) > 0 && Number(s.trqxScore) >= 70)
+    .sort((a, b) => (Number(b.trqxScore) || 0) - (Number(a.trqxScore) || 0))
+    .slice(0, 20)
+    .map(s => s.ticker);
+  spotlightCandidates = [...new Set([...fromUniverse, ...SPOTLIGHT_WATCHLIST])].slice(0, 20);
+}
+
+function spotlightFadeOut(cb) {
+  const card = document.getElementById("spotlightCard");
+  if (!card) { cb(); return; }
+  card.style.transition = "opacity .35s ease, transform .35s ease";
+  card.style.opacity = "0";
+  card.style.transform = "translateY(6px)";
+  setTimeout(cb, 370);
+}
+
+function spotlightFadeIn() {
+  const card = document.getElementById("spotlightCard");
+  if (!card) return;
+  card.style.transition = "opacity .40s ease, transform .40s ease";
+  card.style.opacity = "1";
+  card.style.transform = "translateY(0)";
+}
+
+function startSpotlightTimerBar() {
+  const bar = document.getElementById("spotlightTimerBar");
+  if (!bar) return;
+  clearInterval(spotlightTimerAnim);
+  bar.style.transition = "none";
+  bar.style.width = "100%";
+  bar.getBoundingClientRect();
+  bar.style.transition = `width ${SPOTLIGHT_INTERVAL_MS}ms linear`;
+  bar.style.width = "0%";
+}
+
+async function renderSpotlight(ticker) {
+  let price = null, changePct = null;
+  try {
+    const res = await fetch(`/api/quotes?symbols=${encodeURIComponent(ticker)}`);
+    if (res.ok) {
+      const data = await res.json();
+      const q = Array.isArray(data) ? data.find(d => d.symbol === ticker) : null;
+      if (q && q.price) {
+        price = Number(q.price);
+        changePct = Number(q.changesPercentage);
+      }
+    }
+  } catch(e) { console.warn("[spotlight] quote failed:", e.message); }
+
+  const stock = stocks.find(s => s.ticker === ticker) || { ticker, name: ticker, sector: "—", trqxScore: 75 };
+  const score = Number(stock.trqxScore) || 75;
+  const conf = typeof confidenceForStock === "function" ? confidenceForStock(stock) : { label: "Medium" };
+  const prob = typeof getProbability === "function" ? getProbability(stock, conf) : Math.min(95, Math.max(45, score));
+  const rating = typeof getAIRating === "function" ? getAIRating(score) : { label: "B Watch", cls: "watch" };
+
+  const up = Number.isFinite(changePct) ? changePct >= 0 : true;
+  const changeTxt = Number.isFinite(changePct) ? `${up ? "▲" : "▼"} ${Math.abs(changePct).toFixed(2)}%` : "—";
+  const priceFmt = price
+    ? price.toLocaleString(undefined, { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : "Live price loading...";
+
+  const verdictLabel = score >= 90 ? "HIGH INTEREST" : score >= 75 ? "WATCHLIST CANDIDATE" : "MONITOR";
+  const verdictCls = score >= 75 ? "buy" : "watch";
+  const orbCls = (rating.cls === "elite" || rating.cls === "strong") ? "green" : rating.cls === "watch" ? "gold" : "red";
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set("spotlightTicker", ticker);
+  set("spotlightName", stock.name || ticker);
+  set("spotlightPrice", priceFmt);
+  set("spotlightChange", changeTxt);
+  set("spotlightSector", stock.sector || "—");
+  set("spotlightScore", `TRQX Score: ${score}`);
+  set("spotlightRating", rating.label);
+  set("spotlightVerdictLabel", verdictLabel);
+  set("spotlightVerdictSub", `Research Confidence: ${prob}%`);
+
+  const chgEl = document.getElementById("spotlightChange");
+  if (chgEl) chgEl.className = `spotlight-chg ${Number.isFinite(changePct) ? (up ? "positive" : "negative") : ""}`;
+
+  const orbEl = document.getElementById("spotlightOrb");
+  if (orbEl) orbEl.className = `ticker-orb orb-${orbCls}`;
+
+  const verdictEl = document.getElementById("spotlightVerdict");
+  if (verdictEl) verdictEl.className = `rating-pill ${verdictCls}`;
+}
+
+async function advanceSpotlight() {
+  if (!spotlightCandidates.length) buildSpotlightCandidates();
+  if (!spotlightCandidates.length) return;
+  spotlightIndex = (spotlightIndex + 1) % spotlightCandidates.length;
+  const ticker = spotlightCandidates[spotlightIndex];
+  spotlightFadeOut(async () => {
+    await renderSpotlight(ticker);
+    spotlightFadeIn();
+    startSpotlightTimerBar();
+  });
+}
+
+async function initSpotlight() {
+  buildSpotlightCandidates();
+  if (!spotlightCandidates.length) return;
+  spotlightIndex = 0;
+  const card = document.getElementById("spotlightCard");
+  if (card) { card.style.opacity = "0"; card.style.transform = "translateY(6px)"; }
+  await renderSpotlight(spotlightCandidates[0]);
+  spotlightFadeIn();
+  startSpotlightTimerBar();
+  clearInterval(spotlightTimer);
+  spotlightTimer = setInterval(advanceSpotlight, SPOTLIGHT_INTERVAL_MS);
+
+  if (card) {
+    card.style.cursor = "pointer";
+    card.title = "Click to analyze this stock";
+    card.addEventListener("click", () => {
+      const ticker = document.getElementById("spotlightTicker")?.textContent;
+      if (ticker && ticker !== "—") {
+        const input = document.getElementById("stockLookupInput");
+        if (input) { input.value = ticker; runStockLookup(); scrollToSection("stockLookupPanel"); }
+      }
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(initSpotlight, 1500);
+});
+
+/* Re-build candidates after live refresh */
+const _origRefreshQuotesSpotlight = refreshQuotes;
+refreshQuotes = async function() {
+  await _origRefreshQuotesSpotlight.apply(this, arguments);
+  buildSpotlightCandidates();
+};
+
+/* === END TRQX v22.2 Spotlight === */
