@@ -1104,26 +1104,57 @@ async function analyzeGamma() {
     return;
   }
 
+  // Show loading state
+  const fields = ["gammaBias","squeezeRisk","callWall","putWall","gammaFlip","maxPain","dealerPositioning","putCallRatio"];
+  fields.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = "Loading..."; });
+
+  // Show live price label if element exists
+  const priceEl = document.getElementById("gammaLivePrice");
+  if (priceEl) priceEl.textContent = "Fetching live price...";
+
   try {
     const res = await fetch(`/api/gamma?ticker=${ticker}`);
 
-    if (!res.ok) {
-      throw new Error("Gamma API failed");
-    }
+    if (!res.ok) throw new Error("Gamma API failed");
 
     const data = await res.json();
 
-    document.getElementById("gammaBias").textContent = data.bias || "Neutral";
-    document.getElementById("squeezeRisk").textContent = data.squeezeRisk || "Moderate";
-    document.getElementById("callWall").textContent = data.callWall || "—";
-    document.getElementById("putWall").textContent = data.putWall || "—";
-    document.getElementById("gammaFlip").textContent = data.gammaFlip || "—";
-    document.getElementById("maxPain").textContent = data.maxPain || "—";
+    // Handle live price unavailable error
+    if (data.error === "live_price_unavailable") {
+      fields.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = "—"; });
+      if (priceEl) priceEl.textContent = "Live price unavailable";
+      setStatus(`Gamma: Could not fetch live price for ${ticker}. Check FINNHUB_API_KEY or try a different ticker.`);
+      return;
+    }
+
+    // Populate gamma fields
+    document.getElementById("gammaBias").textContent        = data.bias             || "Neutral";
+    document.getElementById("squeezeRisk").textContent      = data.squeezeRisk      || "Moderate";
+    document.getElementById("callWall").textContent         = data.callWall != null  ? `$${data.callWall}` : "—";
+    document.getElementById("putWall").textContent          = data.putWall  != null  ? `$${data.putWall}`  : "—";
+    document.getElementById("gammaFlip").textContent        = data.gammaFlip != null ? `$${data.gammaFlip}` : "—";
+    document.getElementById("maxPain").textContent          = data.maxPain  != null  ? `$${data.maxPain}`  : "—";
     document.getElementById("dealerPositioning").textContent = data.dealerPositioning || "—";
-    document.getElementById("putCallRatio").textContent = data.putCallRatio || "—";
+    document.getElementById("putCallRatio").textContent     = data.putCallRatio       || "—";
+
+    // Show live price + strike spacing context
+    if (priceEl && data.price) {
+      priceEl.textContent = `Live: $${data.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} · Strike spacing: $${data.strikeSpacing}`;
+    }
+
+    // Update gamma bias color
+    const biasEl = document.getElementById("gammaBias");
+    if (biasEl) {
+      biasEl.className = (data.bias || "").includes("Positive") ? "gamma-positive" : (data.bias || "").includes("Negative") ? "gamma-negative" : "";
+    }
+
+    setStatus(`Gamma analysis updated for ${ticker} using live price $${data.price}.`);
+
   } catch (err) {
     console.error("Gamma Error:", err);
-    alert("Gamma API failed.");
+    fields.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = "—"; });
+    if (priceEl) priceEl.textContent = "Error fetching data";
+    setStatus("Gamma API failed. Check Vercel logs.");
   }
 }
 
