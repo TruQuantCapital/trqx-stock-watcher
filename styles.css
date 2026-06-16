@@ -1604,3 +1604,142 @@ button,
 }
 
 /* === END TRQX v22.3 Gamma AI Summary === */
+
+
+/* ============================================================
+   TRQX v22.4 — Overall Gamma Signal Card
+   ============================================================ */
+
+.gamma-overall-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 18px;
+  padding: 28px 30px;
+  border: 2px solid rgba(214,168,61,.45);
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, rgba(14,12,7,.98), rgba(4,5,5,.99)),
+    radial-gradient(circle at 30% 50%, rgba(255,224,113,.10), transparent 55%);
+  box-shadow: 0 0 50px rgba(214,168,61,.12), inset 0 1px rgba(255,255,255,.04);
+}
+
+.gamma-overall-eyebrow {
+  font-size: 11px;
+  font-weight: 1000;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold2);
+  margin-bottom: 10px;
+  opacity: .8;
+}
+
+.gamma-overall-verdict {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+/* Verdict color states */
+.signal-bull      { color: var(--green) !important; text-shadow: 0 0 30px rgba(54,209,124,.35); }
+.signal-lean-bull { color: #7bdf9a !important; }
+.signal-neutral   { color: var(--gold2) !important; }
+.signal-lean-bear { color: #f09840 !important; }
+.signal-bear      { color: var(--red) !important; text-shadow: 0 0 30px rgba(239,77,94,.30); }
+
+.gamma-overall-sub {
+  font-size: 14px;
+  color: #dce1e9;
+  line-height: 1.5;
+  max-width: 420px;
+}
+
+/* Right panel — signal breakdown rows */
+.gamma-overall-right {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gamma-signal-row {
+  display: grid;
+  grid-template-columns: 130px 18px 1fr;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.gamma-signal-label {
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+
+.gamma-signal-dot {
+  font-size: 16px;
+  line-height: 1;
+  text-align: center;
+}
+
+.dot-bull    { color: var(--green) !important; }
+.dot-neutral { color: var(--gold2) !important; }
+.dot-bear    { color: var(--red) !important; }
+
+.gamma-signal-value {
+  color: #e2e5ec;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* Score bar */
+.gamma-score-bar-wrap {
+  height: 8px;
+  background: rgba(255,255,255,.07);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.gamma-score-bar {
+  height: 100%;
+  border-radius: 999px;
+  width: 0%;
+  transition: width .8s cubic-bezier(.4,0,.2,1);
+}
+
+.bar-bull      { background: linear-gradient(90deg, rgba(54,209,124,.5), var(--green)); }
+.bar-lean-bull { background: linear-gradient(90deg, rgba(54,209,124,.3), #7bdf9a); }
+.bar-neutral   { background: linear-gradient(90deg, rgba(214,168,61,.4), var(--gold2)); }
+.bar-lean-bear { background: linear-gradient(90deg, rgba(240,152,64,.4), #f09840); }
+.bar-bear      { background: linear-gradient(90deg, rgba(239,77,94,.4), var(--red)); }
+
+.gamma-score-label {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+/* Border color reflects verdict */
+.gamma-overall-card:has(.signal-bull)      { border-color: rgba(54,209,124,.50) !important; box-shadow: 0 0 50px rgba(54,209,124,.10); }
+.gamma-overall-card:has(.signal-lean-bull) { border-color: rgba(123,223,154,.35) !important; }
+.gamma-overall-card:has(.signal-bear)      { border-color: rgba(239,77,94,.45) !important; box-shadow: 0 0 50px rgba(239,77,94,.10); }
+.gamma-overall-card:has(.signal-lean-bear) { border-color: rgba(240,152,64,.40) !important; }
+
+@media(max-width: 900px) {
+  .gamma-overall-card {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .gamma-overall-verdict { font-size: 38px; }
+}
+
+/* === END TRQX v22.4 Overall Signal === */
