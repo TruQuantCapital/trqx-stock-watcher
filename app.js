@@ -1150,6 +1150,9 @@ async function analyzeGamma() {
 
     setStatus(`Gamma analysis updated for ${ticker} using live price $${data.price}.`);
 
+    // Update overall signal card
+    updateGammaOverallSignal(data);
+
     // Fire AI summary with the live data
     generateGammaSummary(ticker, data);
 
@@ -2236,3 +2239,136 @@ refreshQuotes = async function() {
 };
 
 /* === END TRQX v22.2 Spotlight === */
+
+
+/* ============================================================
+   TRQX v22.4 — Overall Gamma Signal Scoring Engine
+   Scores 4 factors 0-2 each (max 8), maps to verdict
+   ============================================================ */
+function updateGammaOverallSignal(data) {
+  const card = document.getElementById("gammaOverallCard");
+  if (!card) return;
+  card.classList.remove("hidden");
+
+  const price  = data.price;
+  const flip   = data.gammaFlip;
+  const pcr    = parseFloat(data.putCallRatio);
+  const dealer = data.dealerPositioning || "";
+  const squeeze = data.squeezeRisk || "";
+
+  // --- Score each factor (2 = bullish, 1 = neutral, 0 = bearish) ---
+  let score = 0;
+  const signals = {};
+
+  // 1. Price vs Gamma Flip (most important)
+  const flipDiff = ((price - flip) / flip) * 100;
+  if (flipDiff > 0.5) {
+    score += 2; signals.flip = { dot: "bull", val: `$${price.toFixed(2)} above flip $${flip}`, label: "Above Flip ✓" };
+  } else if (flipDiff >= -0.5) {
+    score += 1; signals.flip = { dot: "neutral", val: `$${price.toFixed(2)} at flip $${flip}`, label: "At Flip ⚠" };
+  } else {
+    score += 0; signals.flip = { dot: "bear", val: `$${price.toFixed(2)} below flip $${flip}`, label: "Below Flip ✗" };
+  }
+
+  // 2. Dealer position
+  if (dealer.includes("Long")) {
+    score += 2; signals.dealer = { dot: "bull", val: "Long Gamma", label: "Stabilizing ✓" };
+  } else {
+    score += 0; signals.dealer = { dot: "bear", val: "Short Gamma", label: "Amplifying ✗" };
+  }
+
+  // 3. Put/Call Ratio
+  if (pcr < 0.90) {
+    score += 2; signals.pcr = { dot: "bull", val: pcr.toFixed(2), label: "Bullish Flow ✓" };
+  } else if (pcr <= 1.05) {
+    score += 1; signals.pcr = { dot: "neutral", val: pcr.toFixed(2), label: "Neutral Flow ⚠" };
+  } else {
+    score += 0; signals.pcr = { dot: "bear", val: pcr.toFixed(2), label: "Bearish Flow ✗" };
+  }
+
+  // 4. Squeeze Risk (high squeeze = volatile, ambiguous — treat as caution)
+  if (squeeze === "Low") {
+    score += 2; signals.squeeze = { dot: "bull", val: "Low", label: "Stable ✓" };
+  } else if (squeeze === "Moderate") {
+    score += 1; signals.squeeze = { dot: "neutral", val: "Moderate", label: "Watch ⚠" };
+  } else {
+    score += 1; signals.squeeze = { dot: "neutral", val: "High", label: "Volatile ⚠" };
+  }
+
+  // --- Map score to verdict ---
+  // Max score = 8
+  let verdict, verdictClass, sub, barPct, barClass;
+
+  if (score >= 7) {
+    verdict = "BULLISH";
+    verdictClass = "signal-bull";
+    sub = "Options structure strongly supports upside. Dealers are stabilizing price above the flip.";
+    barPct = 90; barClass = "bar-bull";
+  } else if (score === 6) {
+    verdict = "BULLISH";
+    verdictClass = "signal-bull";
+    sub = "Gamma structure is bullish. Watch for continuation above the flip level.";
+    barPct = 75; barClass = "bar-bull";
+  } else if (score === 5) {
+    verdict = "LEANING BULLISH";
+    verdictClass = "signal-lean-bull";
+    sub = "More bullish signals than bearish. Price is above the flip but watch the put/call ratio.";
+    barPct = 62; barClass = "bar-lean-bull";
+  } else if (score === 4) {
+    verdict = "NEUTRAL / CAUTION";
+    verdictClass = "signal-neutral";
+    sub = "Mixed signals. No clear gamma edge — wait for price to break above or below the flip.";
+    barPct = 50; barClass = "bar-neutral";
+  } else if (score === 3) {
+    verdict = "LEANING BEARISH";
+    verdictClass = "signal-lean-bear";
+    sub = "Gamma structure is under pressure. Price near or below the flip with elevated put flow.";
+    barPct = 38; barClass = "bar-lean-bear";
+  } else if (score === 2) {
+    verdict = "BEARISH";
+    verdictClass = "signal-bear";
+    sub = "Dealers are in short gamma — moves get amplified. Price is below the flip. Elevated risk.";
+    barPct = 22; barClass = "bar-bear";
+  } else {
+    verdict = "BEARISH";
+    verdictClass = "signal-bear";
+    sub = "Strong bearish gamma structure. All four factors point to downside pressure.";
+    barPct = 10; barClass = "bar-bear";
+  }
+
+  // --- Populate DOM ---
+  const verdictEl = document.getElementById("gammaOverallVerdict");
+  const subEl     = document.getElementById("gammaOverallSub");
+  const barEl     = document.getElementById("gammaScoreBar");
+  const barLabel  = document.getElementById("gammaScoreLabel");
+
+  if (verdictEl) { verdictEl.textContent = verdict; verdictEl.className = `gamma-overall-verdict ${verdictClass}`; }
+  if (subEl)     subEl.textContent = sub;
+  if (barEl)     { barEl.style.width = "0%"; setTimeout(() => { barEl.style.width = barPct + "%"; barEl.className = `gamma-score-bar ${barClass}`; }, 80); }
+  if (barLabel)  barLabel.textContent = `Signal Strength: ${score}/8`;
+
+  // Signal rows
+  const dotMap = { bull: "bull", neutral: "neutral", bear: "bear" };
+  const rows = [
+    { dot: "sigDotFlip",    val: "sigValFlip",    data: signals.flip },
+    { dot: "sigDotDealer",  val: "sigValDealer",  data: signals.dealer },
+    { dot: "sigDotPCR",     val: "sigValPCR",     data: signals.pcr },
+    { dot: "sigDotSqueeze", val: "sigValSqueeze", data: signals.squeeze },
+  ];
+  rows.forEach(r => {
+    const dotEl = document.getElementById(r.dot);
+    const valEl = document.getElementById(r.val);
+    if (dotEl) dotEl.className = `gamma-signal-dot dot-${r.data.dot}`;
+    if (valEl) valEl.textContent = r.data.val;
+  });
+
+  // Animate card in
+  card.style.opacity = "0";
+  card.style.transform = "translateY(8px)";
+  setTimeout(() => {
+    card.style.transition = "opacity .4s ease, transform .4s ease";
+    card.style.opacity = "1";
+    card.style.transform = "translateY(0)";
+  }, 30);
+}
+/* === END TRQX v22.4 Overall Signal === */
