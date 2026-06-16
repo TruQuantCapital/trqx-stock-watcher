@@ -339,9 +339,11 @@
     <input
       id="gammaTicker"
       type="text"
-      placeholder="Enter ticker (SPY, NVDA, TSLA)"
+      placeholder="Enter ticker (SPY, IWM, NVDA, TSLA...)"
+      onkeydown="if(event.key==='Enter') analyzeGamma()"
     />
     <button class="gold-btn" onclick="analyzeGamma()">Analyze</button>
+    <span id="gammaLivePrice" class="gamma-live-price">Enter a ticker and click Analyze</span>
   </div>
 
   <div class="gamma-grid">
