@@ -408,14 +408,33 @@
       </div>
 
       <div id="stockLookupResult" class="lookup-result">
-        <div class="lookup-example">
-          <div class="ticker-orb">◎</div>
-          <div>
-            <h3>NVDA</h3>
-            <p>NVIDIA Corporation</p>
-            <div class="example-price">$1,037.89 <span>▲ 18.74 (+1.84%)</span></div>
+        <div id="spotlightCard" class="lookup-example spotlight-card">
+          <div class="ticker-orb" id="spotlightOrb">◎</div>
+          <div class="spotlight-main">
+            <div class="spotlight-top-row">
+              <h3 id="spotlightTicker">—</h3>
+              <span class="spotlight-badge" id="spotlightRating">Loading...</span>
+            </div>
+            <p id="spotlightName" style="color:var(--muted);margin:2px 0 6px;font-size:14px">Fetching top research candidates...</p>
+            <div class="example-price">
+              <span id="spotlightPrice">—</span>
+              <span id="spotlightChange" class="spotlight-chg">—</span>
+            </div>
           </div>
-          <div class="rating-pill"><strong>High Interest</strong><span>Research Confidence: 89%</span></div>
+          <div class="spotlight-right">
+            <div class="rating-pill" id="spotlightVerdict">
+              <strong id="spotlightVerdictLabel">—</strong>
+              <span id="spotlightVerdictSub">Research Confidence: —</span>
+            </div>
+            <div class="spotlight-meta">
+              <span id="spotlightSector">—</span>
+              <span class="spotlight-dot">•</span>
+              <span id="spotlightScore">Score: —</span>
+            </div>
+            <div class="spotlight-timer">
+              <div class="spotlight-timer-bar" id="spotlightTimerBar"></div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
