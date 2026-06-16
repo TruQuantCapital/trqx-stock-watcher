@@ -1150,11 +1150,100 @@ async function analyzeGamma() {
 
     setStatus(`Gamma analysis updated for ${ticker} using live price $${data.price}.`);
 
+    // Fire AI summary with the live data
+    generateGammaSummary(ticker, data);
+
   } catch (err) {
     console.error("Gamma Error:", err);
     fields.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = "—"; });
     if (priceEl) priceEl.textContent = "Error fetching data";
     setStatus("Gamma API failed. Check Vercel logs.");
+  }
+}
+
+/* ============================================================
+   TRQX v22.3 — AI Gamma Plain English Summary
+   ============================================================ */
+async function generateGammaSummary(ticker, data) {
+  const summaryBox  = document.getElementById("gammaAISummary");
+  const summaryText = document.getElementById("gammaAIText");
+  const summaryTicker = document.getElementById("gammaAITicker");
+
+  if (!summaryBox || !summaryText) return;
+
+  // Show box with loading state
+  summaryBox.classList.remove("hidden");
+  if (summaryTicker) summaryTicker.textContent = ticker;
+  summaryText.innerHTML = `
+    <div class="gamma-ai-loading">
+      <span class="gamma-ai-dot"></span>
+      <span class="gamma-ai-dot"></span>
+      <span class="gamma-ai-dot"></span>
+      <span>Analyzing options structure for ${ticker}...</span>
+    </div>`;
+
+  const prompt = `You are TRQX AI, a trading education analyst for the TRQX Capital platform built for first-generation wealth builders and everyday traders.
+
+A user just ran a Gamma Dashboard analysis for ${ticker}. Here are the live results:
+
+- Live Price: $${data.price}
+- Gamma Bias: ${data.bias}
+- Dealer Position: ${data.dealerPositioning}
+- Squeeze Risk: ${data.squeezeRisk}
+- Call Wall: $${data.callWall}
+- Put Wall: $${data.putWall}
+- Gamma Flip Level: $${data.gammaFlip}
+- Max Pain: $${data.maxPain}
+- Put/Call Ratio: ${data.putCallRatio}
+- Strike Spacing: $${data.strikeSpacing}
+
+Write a 4-6 sentence plain English breakdown that:
+1. Explains what these numbers mean for ${ticker} RIGHT NOW in simple terms a beginner can understand
+2. Identifies the key level to watch (gamma flip or a wall)
+3. Explains what could happen if price moves above or below that level
+4. Mentions the squeeze risk context if relevant
+5. Ends with one clear takeaway sentence
+
+Write in a confident, direct, educational tone — like a sharp trader explaining the tape to a student. No fluff, no disclaimers in the body. Keep it tight and actionable for educational purposes.`;
+
+  try {
+    const res = await fetch("/api/ai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        max_tokens: 400,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+
+    const aiData = await res.json();
+    const text = aiData?.content?.[0]?.text || "";
+
+    if (!text || text.includes("fallback mode")) {
+      summaryText.innerHTML = `<p class="gamma-ai-paragraph">AI summary unavailable. Check that ANTHROPIC_API_KEY is set in your Vercel environment variables.</p>`;
+      return;
+    }
+
+    // Render with typewriter effect
+    summaryText.innerHTML = "";
+    const p = document.createElement("p");
+    p.className = "gamma-ai-paragraph";
+    summaryText.appendChild(p);
+
+    let i = 0;
+    const speed = 12; // ms per character
+    function typeChar() {
+      if (i < text.length) {
+        p.textContent += text[i];
+        i++;
+        setTimeout(typeChar, speed);
+      }
+    }
+    typeChar();
+
+  } catch (err) {
+    console.error("[gammaAI] error:", err);
+    summaryText.innerHTML = `<p class="gamma-ai-paragraph">Could not generate AI summary. Please try again.</p>`;
   }
 }
 
