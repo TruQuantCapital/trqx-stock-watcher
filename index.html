@@ -346,6 +346,41 @@
     <span id="gammaLivePrice" class="gamma-live-price">Enter a ticker and click Analyze</span>
   </div>
 
+  <!-- Overall Gamma Signal Card -->
+  <div id="gammaOverallCard" class="gamma-overall-card hidden">
+    <div class="gamma-overall-left">
+      <div class="gamma-overall-eyebrow">OVERALL GAMMA SIGNAL</div>
+      <div class="gamma-overall-verdict" id="gammaOverallVerdict">—</div>
+      <div class="gamma-overall-sub" id="gammaOverallSub">Run an analysis to see the signal</div>
+    </div>
+    <div class="gamma-overall-right">
+      <div class="gamma-signal-row">
+        <span class="gamma-signal-label">Price vs Flip</span>
+        <span class="gamma-signal-dot" id="sigDotFlip">●</span>
+        <span class="gamma-signal-value" id="sigValFlip">—</span>
+      </div>
+      <div class="gamma-signal-row">
+        <span class="gamma-signal-label">Dealer Position</span>
+        <span class="gamma-signal-dot" id="sigDotDealer">●</span>
+        <span class="gamma-signal-value" id="sigValDealer">—</span>
+      </div>
+      <div class="gamma-signal-row">
+        <span class="gamma-signal-label">Put/Call Ratio</span>
+        <span class="gamma-signal-dot" id="sigDotPCR">●</span>
+        <span class="gamma-signal-value" id="sigValPCR">—</span>
+      </div>
+      <div class="gamma-signal-row">
+        <span class="gamma-signal-label">Squeeze Risk</span>
+        <span class="gamma-signal-dot" id="sigDotSqueeze">●</span>
+        <span class="gamma-signal-value" id="sigValSqueeze">—</span>
+      </div>
+      <div class="gamma-score-bar-wrap">
+        <div class="gamma-score-bar" id="gammaScoreBar"></div>
+      </div>
+      <div class="gamma-score-label" id="gammaScoreLabel">—</div>
+    </div>
+  </div>
+
   <div class="gamma-grid">
     <article>
       <span>Gamma Bias</span>
