@@ -29,6 +29,13 @@ async function load() {
   renderPortfolioBuilder();
   renderTopAIPicks();
   setStatus("TRQX AI Market Terminal loaded. Click Refresh Market Data for live prices.");
+
+  // Auto-refresh on by default
+  const autoCheckbox = document.getElementById("autoRefresh");
+  if (autoCheckbox && !autoCheckbox.checked) {
+    autoCheckbox.checked = true;
+    toggleAutoRefresh();
+  }
 }
 
 function setStatus(message) {
@@ -204,6 +211,20 @@ function updateInsights() {
 
     regimeEl.textContent = `Market Regime: ${label}`;
     regimeEl.className = `marketBadge ${cls}`;
+
+    // Sync hero pill
+    const heroEl = document.getElementById("marketRegimeHero");
+    if (heroEl) {
+      heroEl.textContent = `● MARKET REGIME: ${label.toUpperCase()}`;
+      heroEl.className = `regime-pill ${cls}`;
+    }
+
+    // Sync compact intel card
+    const compactEl = document.getElementById("marketRegimeCompact");
+    if (compactEl) {
+      compactEl.textContent = label;
+      compactEl.className = cls;
+    }
   }
 }
 
